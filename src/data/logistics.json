@@ -1,0 +1,56 @@
+[
+  {
+    "id": "l01", "name": "Gomal Cold Store", "nameUr": "گومل کولڈ اسٹور",
+    "type": "storage", "location": "dik_city", "lat": 31.815, "lng": 70.915,
+    "coldStorage": true, "capacityKg": 60000,
+    "priceNote": { "en": "PKR 6/kg per week", "ur": "6 روپے فی کلو فی ہفتہ" }
+  },
+  {
+    "id": "l02", "name": "N-55 Reefer Carriers", "nameUr": "این 55 ریفر کیریئرز",
+    "type": "transport", "location": "dik_city", "lat": 31.845, "lng": 70.890,
+    "coldStorage": true,
+    "priceNote": { "en": "PKR 145,000 per cold truck to Karachi", "ur": "کراچی تک ٹھنڈا ٹرک 145,000 روپے" }
+  },
+  {
+    "id": "l03", "name": "Indus Right Bank Transport", "nameUr": "انڈس رائٹ بینک ٹرانسپورٹ",
+    "type": "transport", "location": "dik_city", "lat": 31.828, "lng": 70.905,
+    "coldStorage": false,
+    "priceNote": { "en": "PKR 18,000 per trip to Multan", "ur": "ملتان تک 18,000 روپے فی چکر" }
+  },
+  {
+    "id": "l04", "name": "Kulachi Dry Store", "nameUr": "کلاچی ڈرائی اسٹور",
+    "type": "storage", "location": "kulachi", "lat": 31.932, "lng": 70.462,
+    "coldStorage": false, "capacityKg": 25000,
+    "priceNote": { "en": "PKR 3/kg per week", "ur": "3 روپے فی کلو فی ہفتہ" }
+  },
+  {
+    "id": "l05", "name": "Paharpur Goods Transport", "nameUr": "پہاڑپور گڈز ٹرانسپورٹ",
+    "type": "transport", "location": "paharpur", "lat": 32.100, "lng": 70.965,
+    "coldStorage": false,
+    "priceNote": { "en": "PKR 9,000 per trip to D.I. Khan mandi", "ur": "ڈیرہ منڈی تک 9,000 روپے فی چکر" }
+  },
+  {
+    "id": "l06", "name": "Daraban Loader Service", "nameUr": "درابن لوڈر سروس",
+    "type": "transport", "location": "daraban", "lat": 31.730, "lng": 70.338,
+    "coldStorage": false,
+    "priceNote": { "en": "PKR 6,500 per trip within the district", "ur": "ضلع کے اندر 6,500 روپے فی چکر" }
+  },
+  {
+    "id": "l07", "name": "Paroa Grain Godown", "nameUr": "پروا غلہ گودام",
+    "type": "storage", "location": "paroa", "lat": 31.670, "lng": 70.760,
+    "coldStorage": false, "capacityKg": 200000,
+    "priceNote": { "en": "PKR 2/kg per month", "ur": "2 روپے فی کلو ماہانہ" }
+  },
+  {
+    "id": "l08", "name": "Multan Cold Chain Hub", "nameUr": "ملتان کولڈ چین حب",
+    "type": "both", "location": "multan", "lat": 30.198, "lng": 71.475,
+    "coldStorage": true, "capacityKg": 400000,
+    "priceNote": { "en": "PKR 42,000 cold pickup from D.I. Khan, then PKR 5/kg per week", "ur": "ڈیرہ سے ٹھنڈی پک اپ 42,000 روپے، پھر 5 روپے فی کلو فی ہفتہ" }
+  },
+  {
+    "id": "l09", "name": "Yarik Highway Carriers", "nameUr": "یارک ہائی وے کیریئرز",
+    "type": "transport", "location": "yarik", "lat": 32.000, "lng": 70.948,
+    "coldStorage": false,
+    "priceNote": { "en": "PKR 60,000 per truck to Lahore", "ur": "لاہور تک 60,000 روپے فی ٹرک" }
+  }
+]

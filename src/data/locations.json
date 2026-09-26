@@ -1,0 +1,10 @@
+[
+  { "id": "dik_city", "lat": 31.832, "lng": 70.902 },
+  { "id": "kulachi", "lat": 31.930, "lng": 70.459 },
+  { "id": "paharpur", "lat": 32.105, "lng": 70.972 },
+  { "id": "paroa", "lat": 31.667, "lng": 70.766 },
+  { "id": "daraban", "lat": 31.728, "lng": 70.333 },
+  { "id": "chaudhwan", "lat": 31.640, "lng": 70.360 },
+  { "id": "yarik", "lat": 32.000, "lng": 70.950 },
+  { "id": "band_kurai", "lat": 31.610, "lng": 70.900 }
+]

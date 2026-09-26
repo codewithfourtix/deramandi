@@ -1,0 +1,17 @@
+[
+  { "crop": "dhakki_dates", "grade": "A", "min": 420, "max": 520 },
+  { "crop": "dhakki_dates", "grade": "B", "min": 290, "max": 370 },
+  { "crop": "dhakki_dates", "grade": "C", "min": 170, "max": 240 },
+  { "crop": "kulachi_melon", "grade": "A", "min": 110, "max": 150 },
+  { "crop": "kulachi_melon", "grade": "B", "min": 75, "max": 100 },
+  { "crop": "kulachi_melon", "grade": "C", "min": 40, "max": 65 },
+  { "crop": "wheat", "grade": "A", "min": 96, "max": 104 },
+  { "crop": "wheat", "grade": "B", "min": 86, "max": 94 },
+  { "crop": "wheat", "grade": "C", "min": 74, "max": 84 },
+  { "crop": "sugarcane", "grade": "A", "min": 11, "max": 12 },
+  { "crop": "sugarcane", "grade": "B", "min": 9.5, "max": 10.5 },
+  { "crop": "sugarcane", "grade": "C", "min": 8, "max": 9 },
+  { "crop": "other", "grade": "A", "min": 120, "max": 160 },
+  { "crop": "other", "grade": "B", "min": 80, "max": 110 },
+  { "crop": "other", "grade": "C", "min": 50, "max": 75 }
+]

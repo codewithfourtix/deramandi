@@ -1,0 +1,110 @@
+[
+  {
+    "id": "b01", "name": "Gomal Fruit Commission Shop", "nameUr": "گومل فروٹ کمیشن شاپ",
+    "type": "local_wholesaler", "location": "dik_mandi", "minQuantityKg": 100, "verified": true,
+    "offers": [
+      { "crop": "dhakki_dates", "grade": "A", "min": 400, "max": 460 },
+      { "crop": "dhakki_dates", "grade": "B", "min": 280, "max": 330 },
+      { "crop": "dhakki_dates", "grade": "C", "min": 160, "max": 210 },
+      { "crop": "kulachi_melon", "grade": "A", "min": 100, "max": 125 },
+      { "crop": "kulachi_melon", "grade": "B", "min": 70, "max": 88 },
+      { "crop": "kulachi_melon", "grade": "C", "min": 38, "max": 55 }
+    ]
+  },
+  {
+    "id": "b02", "name": "Daraban Road Traders", "nameUr": "درابن روڈ ٹریڈرز",
+    "type": "local_wholesaler", "location": "dik_city", "minQuantityKg": 50, "verified": false,
+    "offers": [
+      { "crop": "dhakki_dates", "grade": "B", "min": 270, "max": 320 },
+      { "crop": "dhakki_dates", "grade": "C", "min": 165, "max": 220 },
+      { "crop": "other", "grade": "B", "min": 78, "max": 100 },
+      { "crop": "other", "grade": "C", "min": 48, "max": 68 }
+    ]
+  },
+  {
+    "id": "b03", "name": "Paroa Kisan Collection Point", "nameUr": "پروا کسان کلیکشن پوائنٹ",
+    "type": "local_wholesaler", "location": "paroa", "minQuantityKg": 20, "verified": true,
+    "offers": [
+      { "crop": "dhakki_dates", "grade": "C", "min": 160, "max": 205 },
+      { "crop": "kulachi_melon", "grade": "B", "min": 68, "max": 85 },
+      { "crop": "kulachi_melon", "grade": "C", "min": 38, "max": 58 },
+      { "crop": "wheat", "grade": "B", "min": 84, "max": 90 },
+      { "crop": "wheat", "grade": "C", "min": 72, "max": 80 },
+      { "crop": "other", "grade": "A", "min": 110, "max": 140 },
+      { "crop": "other", "grade": "B", "min": 75, "max": 95 },
+      { "crop": "other", "grade": "C", "min": 45, "max": 65 }
+    ]
+  },
+  {
+    "id": "b04", "name": "Paharpur Grain Depot", "nameUr": "پہاڑپور غلہ ڈپو",
+    "type": "local_wholesaler", "location": "paharpur", "minQuantityKg": 500, "verified": true,
+    "offers": [
+      { "crop": "wheat", "grade": "A", "min": 95, "max": 100 },
+      { "crop": "wheat", "grade": "B", "min": 86, "max": 92 },
+      { "crop": "wheat", "grade": "C", "min": 74, "max": 82 }
+    ]
+  },
+  {
+    "id": "b05", "name": "Right Bank Sugar Mill (gate purchase)", "nameUr": "رائٹ بینک شوگر مل (گیٹ خریداری)",
+    "type": "local_wholesaler", "location": "dik_city", "minQuantityKg": 2000, "verified": true,
+    "offers": [
+      { "crop": "sugarcane", "grade": "A", "min": 11, "max": 12 },
+      { "crop": "sugarcane", "grade": "B", "min": 9.5, "max": 10.5 },
+      { "crop": "sugarcane", "grade": "C", "min": 8, "max": 9 }
+    ]
+  },
+  {
+    "id": "b06", "name": "Kulachi Gur Makers", "nameUr": "کلاچی گڑ ساز",
+    "type": "local_wholesaler", "location": "kulachi", "minQuantityKg": 300, "verified": false,
+    "offers": [
+      { "crop": "sugarcane", "grade": "B", "min": 9, "max": 10 },
+      { "crop": "sugarcane", "grade": "C", "min": 7.5, "max": 8.5 }
+    ]
+  },
+  {
+    "id": "b07", "name": "Badami Bagh Date Wholesalers", "nameUr": "بادامی باغ کھجور ہول سیلرز",
+    "type": "national_buyer", "location": "lahore", "minQuantityKg": 500, "verified": true,
+    "offers": [
+      { "crop": "dhakki_dates", "grade": "A", "min": 440, "max": 500 },
+      { "crop": "dhakki_dates", "grade": "B", "min": 300, "max": 360 }
+    ]
+  },
+  {
+    "id": "b08", "name": "Jodia Bazaar Dry Fruit House", "nameUr": "جوڑیا بازار ڈرائی فروٹ ہاؤس",
+    "type": "national_buyer", "location": "karachi", "minQuantityKg": 1000, "verified": true,
+    "offers": [
+      { "crop": "dhakki_dates", "grade": "A", "min": 450, "max": 520 },
+      { "crop": "dhakki_dates", "grade": "B", "min": 310, "max": 370 }
+    ]
+  },
+  {
+    "id": "b09", "name": "Multan Melon Agency", "nameUr": "ملتان خربوزہ ایجنسی",
+    "type": "national_buyer", "location": "multan", "minQuantityKg": 800, "verified": true,
+    "offers": [
+      { "crop": "kulachi_melon", "grade": "A", "min": 115, "max": 145 },
+      { "crop": "kulachi_melon", "grade": "B", "min": 78, "max": 98 }
+    ]
+  },
+  {
+    "id": "b10", "name": "Lahore Flour Mills Buying Desk", "nameUr": "لاہور فلور ملز خریداری ڈیسک",
+    "type": "national_buyer", "location": "lahore", "minQuantityKg": 5000, "verified": true,
+    "offers": [
+      { "crop": "wheat", "grade": "A", "min": 98, "max": 104 },
+      { "crop": "wheat", "grade": "B", "min": 88, "max": 94 }
+    ]
+  },
+  {
+    "id": "b11", "name": "Gulf Fresh Produce Exports", "nameUr": "گلف فریش پروڈیوس ایکسپورٹس",
+    "type": "exporter", "location": "karachi_dubai", "minQuantityKg": 3000, "verified": true,
+    "offers": [
+      { "crop": "dhakki_dates", "grade": "A", "min": 500, "max": 580 }
+    ]
+  },
+  {
+    "id": "b12", "name": "Indus Melon Exports", "nameUr": "انڈس میلن ایکسپورٹس",
+    "type": "exporter", "location": "karachi_doha", "minQuantityKg": 2000, "verified": true,
+    "offers": [
+      { "crop": "kulachi_melon", "grade": "A", "min": 140, "max": 170 }
+    ]
+  }
+]
