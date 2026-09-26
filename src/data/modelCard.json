@@ -1,4 +1,9 @@
 {
+  "includesDhakki": false,
+  "headlineVarieties": [
+    "Gajar",
+    "Kupro"
+  ],
   "trainImages": 1789,
   "valImages": 379,
   "testImages": 311,
@@ -8,9 +13,35 @@
     0.7672
   ],
   "majorityBaseline": 0.4277,
-  "overallTestAccuracyInclAseel": 0.7708,
-  "overallTestImagesInclAseel": 384,
+  "coreVarieties": {
+    "varieties": [
+      "Gajar",
+      "Kupro"
+    ],
+    "n": 311,
+    "accuracy": 0.7203,
+    "wilson95": [
+      0.6679,
+      0.7672
+    ],
+    "majorityBaseline": 0.4277
+  },
+  "localVarieties": null,
+  "overallTestAccuracy": 0.7708,
+  "overallTestImages": 384,
   "temperature": 0.7,
+  "colourGuard": {
+    "hueMax": 38.1,
+    "valMax": 0.72,
+    "photos": 2614,
+    "hueP995": 26.06,
+    "valP995": 0.51,
+    "varieties": [
+      "Gajar",
+      "Kupro",
+      "Aseel"
+    ]
+  },
   "perGradeAllTest": {
     "A": {
       "precision": 0.792,

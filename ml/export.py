@@ -1,10 +1,14 @@
 """Export the trained model to TensorFlow.js, write the model card the app
 shows, and copy a few held-out test photos to use as in-app samples.
 
-Writes into ../deramandi:
+Writes into the app (the folder above ml/):
   public/model/model.json + weight shards (float16-quantised layers model)
-  src/data/modelCard.json
+  src/data/modelCard.json   (every number and flag the app shows about the model)
   public/samples/khajoor-g{1,2,3}-{1,2}.jpg
+
+Nothing about the training set is hard-coded here: the headline accuracy, the
+"trained on Dhakki?" flag and the colour guard all come from metrics.json and
+splits.json, so a retrain with Dhakki photos updates the app's claims too.
 """
 import json
 import math
@@ -19,11 +23,11 @@ import numpy as np  # noqa: E402
 import tf_keras as keras  # noqa: E402
 from PIL import Image  # noqa: E402
 
-from data import RAW  # noqa: E402
+from colour_stats import colour_guard  # noqa: E402
+from data import CORE_VARIETIES, LOCAL_VARIETIES, OUT, RAW, collect, parse_rel  # noqa: E402
 
 HERE = os.path.dirname(os.path.abspath(__file__))
-OUT = os.path.join(HERE, "out")
-APP = os.path.join(HERE, "..")
+APP = os.environ.get("DERAMANDI_APP", os.path.join(HERE, ".."))  # override for dry runs
 MODEL_DIR = os.path.join(APP, "public", "model")
 SAMPLES = os.path.join(APP, "public", "samples")
 
@@ -81,49 +85,84 @@ def main():
 
     m = json.load(open(os.path.join(OUT, "metrics.json")))
     splits = json.load(open(os.path.join(OUT, "splits.json")))
-    tta = m["test"]["tta"]
-    # Headline = the three-grade varieties only (Gajar + Kupro). Aseel is in
-    # training but only has Grade 1, which would flatter an overall number.
-    core_test = [p for p in splits["test"] if p.split("/")[0] in ("Gajar", "Kupro")]
-    n = len(core_test)
-    acc = m["test_per_variety_tta"]["Gajar+Kupro"]
-    z = 1.96
-    centre = (acc + z * z / (2 * n)) / (1 + z * z / n)
-    half = z * math.sqrt(acc * (1 - acc) / n + z * z / (4 * n * n)) / (1 + z * z / n)
-    grade_counts = [sum(1 for p in core_test if p.split("/")[2] == g) for g in ("Grade-1", "Grade-2", "Grade-3")]
-    card = {
-        "trainImages": m["counts"]["train"],
-        "valImages": m["counts"]["val"],
-        "testImages": n,
-        "testAccuracy": round(acc, 4),
-        "testAccuracyWilson95": [round(centre - half, 4), round(centre + half, 4)],
-        "majorityBaseline": round(max(grade_counts) / n, 4),
-        "overallTestAccuracyInclAseel": round(tta["accuracy"], 4),
-        "overallTestImagesInclAseel": m["counts"]["test"],
-        "temperature": m["temperature"],
-        "perGradeAllTest": {k: {"precision": round(tta["report"][k]["precision"], 3), "recall": round(tta["report"][k]["recall"], 3)} for k in ("A", "B", "C")},
-        "confusionAllTest": tta["confusion"],
-        "unseenVariety": ", ".join(m.get("unseen_varieties", [])),
-        "unseenVarietiesPredictedShare": {k: round(v, 4) for k, v in m["unseen_varieties_grade1_predicted_share"].items()},
-        "testPerVariety": {k: round(v, 4) for k, v in m["test_per_variety_tta"].items()},
-        "trainVarieties": m["train_varieties"],
-        "backbone": m["backbone"],
-        "dataset": m["dataset"],
-    }
+    card = build_card(m, splits)
     with open(os.path.join(APP, "src", "data", "modelCard.json"), "w", newline="\n") as fh:
         json.dump(card, fh, indent=2)
         fh.write("\n")
     print("model card:", json.dumps(card, indent=1))
+    write_samples(splits, card["headlineVarieties"])
 
-    # samples: random held-out TEST photos (never trained on), 2 per grade,
-    # three-grade varieties only
+
+def wilson(acc, n, z=1.96):
+    centre = (acc + z * z / (2 * n)) / (1 + z * z / n)
+    half = z * math.sqrt(acc * (1 - acc) / n + z * z / (4 * n * n)) / (1 + z * z / n)
+    return [round(centre - half, 4), round(centre + half, 4)]
+
+
+def group_stats(test_rels, varieties, per_variety):
+    """Accuracy, n, interval and majority baseline for one group of varieties."""
+    rows = [parse_rel(r) for r in test_rels]
+    chosen = [g for v, g in rows if v in varieties]
+    n = len(chosen)
+    if n == 0:
+        return None
+    key = varieties[0] if len(varieties) == 1 else "+".join(varieties)
+    acc = per_variety[key]
+    counts = [chosen.count(i) for i in range(3)]
+    return {"varieties": varieties, "n": n, "accuracy": round(acc, 4), "wilson95": wilson(acc, n), "majorityBaseline": round(max(counts) / n, 4)}
+
+
+def build_card(m, splits):
+    tta = m["test"]["tta"]
+    per_variety = m["test_per_variety_tta"]
+    train_varieties = m["train_varieties"]
+    local = [v for v in LOCAL_VARIETIES if v in train_varieties]
+    core = group_stats(splits["test"], CORE_VARIETIES, per_variety)
+    local_stats = group_stats(splits["test"], local, per_variety) if local else None
+    # Headline: the local variety when it is in the test split, else the
+    # three-grade Mendeley varieties (Aseel is Grade 1 only and would flatter).
+    head = local_stats or core
+    guard_varieties = train_varieties
+    guard = colour_guard(collect(guard_varieties))
+    return {
+        "includesDhakki": bool(local_stats),
+        "headlineVarieties": head["varieties"],
+        "trainImages": m["counts"]["train"],
+        "valImages": m["counts"]["val"],
+        "testImages": head["n"],
+        "testAccuracy": head["accuracy"],
+        "testAccuracyWilson95": head["wilson95"],
+        "majorityBaseline": head["majorityBaseline"],
+        "coreVarieties": core,
+        "localVarieties": local_stats,
+        "overallTestAccuracy": round(tta["accuracy"], 4),
+        "overallTestImages": m["counts"]["test"],
+        "temperature": m["temperature"],
+        "colourGuard": {**guard, "varieties": guard_varieties},
+        "perGradeAllTest": {k: {"precision": round(tta["report"][k]["precision"], 3), "recall": round(tta["report"][k]["recall"], 3)} for k in ("A", "B", "C")},
+        "confusionAllTest": tta["confusion"],
+        "unseenVariety": ", ".join(m.get("unseen_varieties", [])),
+        "unseenVarietiesPredictedShare": {k: round(v, 4) for k, v in m["unseen_varieties_grade1_predicted_share"].items()},
+        "testPerVariety": {k: round(v, 4) for k, v in per_variety.items()},
+        "trainVarieties": train_varieties,
+        "backbone": m["backbone"],
+        "dataset": m["dataset"] + (" plus graded Dhakki photos collected in D.I. Khan by the team" if local_stats else ""),
+    }
+
+
+def write_samples(splits, varieties):
+    """Random held-out TEST photos (never trained on), 2 per grade, from the
+    headline varieties, so the in-app samples show what the headline measures."""
     rng = random.Random(7)
     os.makedirs(SAMPLES, exist_ok=True)
-    raw = os.path.join(HERE, os.path.relpath(RAW, HERE))
-    for gi, g in enumerate(("Grade-1", "Grade-2", "Grade-3")):
-        pool = sorted(p for p in core_test if p.split("/")[2] == g)
+    test = [r for r in splits["test"] if parse_rel(r)[0] in varieties]
+    for gi in range(3):
+        pool = sorted(r for r in test if parse_rel(r)[1] == gi)
+        if len(pool) < 2:
+            print(f"only {len(pool)} held-out Grade-{gi + 1} photos; keeping the existing samples for that grade")
+            continue
         for k, rel in enumerate(rng.sample(pool, 2), start=1):
-            im = Image.open(os.path.join(raw, rel)).convert("RGB")
+            im = Image.open(os.path.join(RAW, rel)).convert("RGB")
             im.thumbnail((480, 480))
             dest = os.path.join(SAMPLES, f"khajoor-g{gi + 1}-{k}.jpg")
             im.save(dest, quality=85)
