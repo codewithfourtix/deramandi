@@ -142,15 +142,33 @@ def melon():
             continue  # only 2 third-grade photos; would teach "banana = good"
         for gi, g in enumerate(grades):
             files = sorted(f for f in glob.glob(os.path.join(root, fruit, g, "*")) if f.lower().endswith(IMAGE_EXT))
-            rng.shuffle(files)
-            k = round(len(files) * 0.15)
-            test += [(f, gi) for f in files[:k]]
-            val += [(f, gi) for f in files[k : 2 * k]]
-            train += [(f, gi) for f in files[2 * k :]]
+            # Shots a few seconds apart are often the same fruit turned over (IMG_<date>_<time>[_n]).
+            # Chain shots taken within 15 s into one group and keep each group in one split.
+            groups, last = [], None
+            for f in files:
+                m = re.match(r"IMG_(\d{8})_(\d{2})(\d{2})(\d{2})", os.path.basename(f))
+                t = (int(m.group(1)), int(m.group(2)) * 3600 + int(m.group(3)) * 60 + int(m.group(4))) if m else None
+                if t and last and t[0] == last[0] and t[1] - last[1] <= 15:
+                    groups[-1].append(f)
+                else:
+                    groups.append([f])
+                last = t
+            rng.shuffle(groups)
+            n = len(files)
+            t_n = v_n = 0
+            for grp in groups:
+                if t_n < n * 0.15:
+                    test += [(f, gi) for f in grp]
+                    t_n += len(grp)
+                elif v_n < n * 0.15:
+                    val += [(f, gi) for f in grp]
+                    v_n += len(grp)
+                else:
+                    train += [(f, gi) for f in grp]
     info = {
         "task": "grade3_proxy",
         "labels": ["A", "B", "C"],
-        "dataset": "AFruitDB: A Dataset of Common Asian Fruits for Quality Grading (Mendeley Data bz65dz2pbj, CC BY 4.0): apple, Burmese grape, mango, papaya, tomato graded 1st/2nd/3rd. No melon photos exist in any public graded dataset, so this is a stand-in.",
+        "dataset": "AFruitDB: A Dataset of Common Asian Fruits for Quality Grading (Mendeley Data bz65dz2pbj, CC BY 4.0): apple, Burmese grape, mango, papaya, tomato graded 1st/2nd/3rd, split so shots within 15 s of each other (often the same fruit) stay together. No melon photos exist in any public graded dataset, so this is a stand-in.",
     }
     return train, val, test, info
 

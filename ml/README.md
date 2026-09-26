@@ -6,7 +6,7 @@ Three trained models ship in the app: khajoor (the main crop), sugarcane and a m
 |---|---|---|
 | Khajoor | yes, `public/model/` | 72.0% on 311 photos (CI 66.8–76.7%), baseline 42.8% |
 | Sugarcane | yes, `public/models/sugarcane/` | 82.3% per photo on 452 (CI 78.5–85.5%), 92.7% per billet on 96 (CI 85.7–96.4%), baseline 61.1% |
-| Melon (stand-in) | yes, `public/models/melon/` | 92.5% on 227 photos of other fruit (CI 88.3–95.3%), baseline 33.9%; never tested on melon |
+| Melon (stand-in) | yes, `public/models/melon/` | 85.9% on 326 photos of other fruit (CI 81.7–89.3%), baseline 37.4%; never tested on melon |
 | Wheat kernels | no | 82.9% on 2,003 app-style held-out kernels (CI 81.2–84.5%); failed the handful test |
 
 # Khajoor
@@ -131,6 +131,8 @@ The app averages three views of each photo (as is, mirrored, upside down), the s
 | Recall: good / damaged | 72% / 89% |
 | Browser vs Python, 60 test photos through the upload path | same grade on 58/60; browser 51/60 correct = Python |
 
+**Leak check** (`leak_check_sugarcane.py`): the usual 16×16 dHash can't separate thin billets, so the check hashes the strip along the cane. Test photos are no closer to training photos (median 74 bits, minimum 34) than training photos are to other billets in training (median 75, minimum 32). No billet crossed splits.
+
 The first run (160 px, α 0.5) scored 76.3%. The shipped 224 px run is the second of two runs, both reported.
 
 **In the app:** two levels only, so good is A and damaged is C, never B. The photo tip asks for 2 or 3 lengthways photos of one piece on a dark cloth, turning it between shots, to match the data.
@@ -139,7 +141,9 @@ The first run (160 px, α 0.5) scored 76.3%. The shipped 224 px run is the secon
 
 No public dataset of graded melons exists. The melon grade comes from a model trained on **AFruitDB** (*A Dataset of Common Asian Fruits for Quality Grading*, Mendeley Data bz65dz2pbj, CC BY 4.0), which covers apple, Burmese grape, mango, papaya and tomato, each graded 1st/2nd/3rd (A/B/C). Banana was left out because it has only 2 third-grade photos.
 
-**Results:** **92.5%** on 227 held-out photos of those fruits (CI 88.3–95.3%; baseline 33.9%). Recall is A 92%, B 85%, C 100%. Browser vs Python on 60: same grade on 59; browser 56 correct, Python 57.
+**Split:** photos are named `IMG_<date>_<time>[_n]`, and shots taken seconds apart are often the same fruit turned over. Shots within 15 s of each other in a folder are chained into one group, and each group stays in one split. A first run with a plain random split scored 92.5% on 227 photos. That figure was inflated: 215 of those test photos were taken in the same minute as a training photo. It is kept in `out/melon_random_split` and was not shipped.
+
+**Results (grouped split):** **85.9%** on 326 held-out photos of those fruits (CI 81.7–89.3%; baseline 37.4%). Recall is A 83%, B 81%, C 94%. Browser vs Python on 60: same grade on 59; browser 55 correct, Python 56.
 
 **It has never been tested on a melon.** The app says so under every melon grade and on the "How sure are we?" page. Retrain with Kulachi melon photos (see `COLLECTING.md`).
 

@@ -42,7 +42,7 @@ Dera Mandi treats these as one problem: a trusted grade, a reference price, and 
 |---|---|---|---|
 | Khajoor (Dhakki dates) | MobileNetV2, 224 px, trained on graded Pakistani khajoor photos | **72.0%** on 311 photos (95% CI 66.8–76.7%; always guessing the commonest grade: 42.8%) | No Dhakki in any public dataset |
 | Sugarcane | MobileNetV2, 224 px, good vs damaged billets | **82.3%** per photo on 452 photos (CI 78.5–85.5%; baseline 61.1%). **92.7%** per billet with its photos averaged, as the app does (96 billets, CI 85.7–96.4%) | Louisiana varieties on a dark background. Only good or damaged, so A or C. |
-| Kulachi melon | MobileNetV2, 224 px, trained on graded mango, papaya, apple, tomato and Burmese grape | **92.5%** on 227 photos of those fruit (CI 88.3–95.3%; baseline 33.9%) | **Never tested on a melon.** No graded melon photos exist in public. |
+| Kulachi melon | MobileNetV2, 224 px, trained on graded mango, papaya, apple, tomato and Burmese grape | **85.9%** on 326 photos of those fruit (CI 81.7–89.3%; baseline 37.4%), with shots of the same fruit kept in one split | **Never tested on a melon.** No graded melon photos exist in public. |
 | Wheat, other | Rule-based estimate from colour, coverage and dark spots | Not measured | Labelled as an estimate in the app |
 
 **About wheat.** We trained a kernel-by-kernel wheat model on GrainSet: 90.8% on scanner close-ups, and 82.9% on 2,003 held-out kernels cut out on cloth the way the app does. On synthetic "handful on a cloth" test photos, though, it read clean grain as damaged too often to grade a lot, so it is **not used** yet. The kernel finder, lot rule, confusion-matrix correction and tests are all in the repo, ready for a model that passes. See `ml/README.md`.
