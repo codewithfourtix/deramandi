@@ -1,4 +1,15 @@
-# Khajoor grade model
+# Grade models
+
+Three trained models ship in the app: khajoor (the main crop), sugarcane and a melon stand-in. A wheat kernel model was trained too but is not shipped (see Wheat). Every number below comes from one evaluation on an untouched test split, and the app shows the same numbers from the model cards the export scripts write.
+
+| Crop | Shipped | Held-out result |
+|---|---|---|
+| Khajoor | yes, `public/model/` | 72.0% on 311 photos (CI 66.8–76.7%), baseline 42.8% |
+| Sugarcane | yes, `public/models/sugarcane/` | 82.3% per photo on 452 (CI 78.5–85.5%), 92.7% per billet on 96 (CI 85.7–96.4%), baseline 61.1% |
+| Melon (stand-in) | yes, `public/models/melon/` | 92.5% on 227 photos of other fruit (CI 88.3–95.3%), baseline 33.9%; never tested on melon |
+| Wheat kernels | no | 82.9% on 2,003 app-style held-out kernels (CI 81.2–84.5%); failed the handful test |
+
+# Khajoor
 
 The model behind the khajoor grade in the app: MobileNetV2 (ImageNet weights), fine-tuned to tell Grade 1 / 2 / 3 dried khajoor apart. The app shows these as A / B / C. It runs in the browser with TensorFlow.js from `public/model/`.
 
@@ -101,3 +112,75 @@ The app averages three views of each photo (as is, mirrored, upside down), the s
 - **Lab photos only.** They are one fruit each, on a light background, under a ring light. Accuracy on field photos, piles, or fresh (doka) fruit will be lower.
 - **Guard in the app.** If a photo's colours fall well outside the dataset's dried-khajoor range (`colour_stats.py`), the app warns that the photos look unfamiliar.
 - **Next step:** 100 to 300 graded Dhakki photos from D.I. Khan growers, added to training.
+
+# Sugarcane
+
+**Data:** SugarcaneDeepLearning billet images (The77Lab, LSU AgCenter, [github.com/The77Lab/SugarcaneDeepLearning](https://github.com/The77Lab/SugarcaneDeepLearning)). There are 2,874 photos of cut billets from three Louisiana varieties (HoCP09-804, HoCP96-540, L01-299), each photographed from several sides on a dark background and labelled good or damaged. No licence file is published, so it is used here for a non-commercial prototype with attribution; license it or replace it before commercial use.
+
+**Split:** by billet. Files are named `<session>-<billet>-<view>.png`, and all views of one billet stay in one split, about 70/15/15 per variety and label, seed 1337.
+
+**Model:** MobileNetV2 α 1.0 at 224 px. The frozen backbone trains for 8 epochs, then the top 50% is fine-tuned with early stopping. Temperature is 0.75, fitted on validation.
+
+**Results:**
+
+| Measure | Result |
+|---|---|
+| Per photo, 452 test photos | **82.3%**, CI 78.5–85.5% |
+| Always guessing "damaged" | 61.1% |
+| Per billet, all its photos averaged (what the app does with several photos), 96 billets | **92.7%**, CI 85.7–96.4% |
+| Recall: good / damaged | 72% / 89% |
+| Browser vs Python, 60 test photos through the upload path | same grade on 58/60; browser 51/60 correct = Python |
+
+The first run (160 px, α 0.5) scored 76.3%. The shipped 224 px run is the second of two runs, both reported.
+
+**In the app:** two levels only, so good is A and damaged is C, never B. The photo tip asks for 2 or 3 lengthways photos of one piece on a dark cloth, turning it between shots, to match the data.
+
+# Melon (stand-in)
+
+No public dataset of graded melons exists. The melon grade comes from a model trained on **AFruitDB** (*A Dataset of Common Asian Fruits for Quality Grading*, Mendeley Data bz65dz2pbj, CC BY 4.0), which covers apple, Burmese grape, mango, papaya and tomato, each graded 1st/2nd/3rd (A/B/C). Banana was left out because it has only 2 third-grade photos.
+
+**Results:** **92.5%** on 227 held-out photos of those fruits (CI 88.3–95.3%; baseline 33.9%). Recall is A 92%, B 85%, C 100%. Browser vs Python on 60: same grade on 59; browser 56 correct, Python 57.
+
+**It has never been tested on a melon.** The app says so under every melon grade and on the "How sure are we?" page. Retrain with Kulachi melon photos (see `COLLECTING.md`).
+
+# Wheat (trained, not shipped)
+
+**Data:** GrainSet wheat (Fan et al., Figshare 22992317, CC BY 4.0). We took a balanced subset of its own train/test split: 450 training and 150 test images per class, over 8 classes (sound, fusarium/shrivelled, sprouted, mouldy, pest-attacked, broken, black point, impurity). Each image shows one kernel twice, front and back, on a scanner's black background, so `split_wheat_views.py` cuts it into two single views.
+
+**App design:** the grower photographs a handful spread on a dark cloth.
+- `src/lib/kernels.ts` finds each kernel: distance from the cloth colour, connected components, clumps skipped, and an 18% margin crop.
+- The model classifies every kernel.
+- The lot grade uses a stated rule: A needs at least 90% sound kernels and at most 2% seriously damaged; B needs at least 75% sound and at most 8% seriously damaged; anything else is C.
+- Counted shares are corrected with the model's test confusion matrix (adjusted classify-and-count), because the test set is balanced while real lots are mostly sound.
+
+**What happened:**
+
+| Run | Scanner views (2,400) | App-style held-out kernels (2,003) | Synthetic handfuls (12 photos, 385 kernels) |
+|---|---|---|---|
+| v1: views only, low-res augmentation | 89.1% | 63.7% (sound recall 24%) | clean lots read ~15% sound; every lot C |
+| v2: + the same training kernels pasted on random cloths and cut out the app's way (`make_wheat_appcrops.py`) | 90.8% | **82.9%** (sound recall 75%), quality group 87.0% | kernels found 358/385; sound-share error 0.32 raw, 0.20 corrected; clean lots still read 50–90% sound, every lot C |
+
+Grade-A and grade-C handfuls overlap in the estimated sound share, so no threshold separates them, and the model is not shipped: wheat uses the labelled rule estimate. The handfuls are composites of held-out kernels (`make_wheat_handfuls.py`), not real phone photos, so even a pass would only have proved the pipeline. The next step is real photos of graded wheat handfuls from D.I. Khan.
+
+# Commands for the other crops
+
+```bash
+# data (subsets only; the scripts read just the needed members of big zips with HTTP ranges)
+python fetch_zip_subset.py <zip url> <out dir> <per-folder cap> <folder prefix>
+python fetch_github_files.py <tree.json> The77Lab/SugarcaneDeepLearning master <out dir>
+
+python train_crop.py sugarcane      # IMG=224 ALPHA=1.0 UNFREEZE=0.5 for the shipped run
+python train_crop.py melon          # same settings
+python export_crop.py sugarcane     # -> public/models/<crop>/ and src/data/models/<crop>.json
+python parity_crop.py sugarcane     # then run the browser check (see the file header)
+
+# wheat
+python split_wheat_views.py
+python make_wheat_appcrops.py                  # training crops, app style (COPY=2 for a second set)
+SPLIT=test python make_wheat_appcrops.py       # held-out app-style test crops
+APPCROPS=1 LOWRES=1 python train_crop.py wheat
+python eval_wheat_appcrops.py                  # adds app_* metrics; export_crop headlines them
+python make_wheat_handfuls.py                  # synthetic handfuls for the end-to-end check
+```
+
+Data goes in `DERAMANDI_DATA` (default `../../data`), outputs in `DERAMANDI_OUT`.

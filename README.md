@@ -1,6 +1,6 @@
 # Dera Mandi · ڈیرہ منڈی
 
-A bilingual (Urdu first, with English) web app for crop growers in Dera Ismail Khan. A grower photographs the crop and gets a quality grade (A, B or C), the fair price band buyers pay for that grade, and matched buyers, storage and transport. Then they send a request.
+A bilingual (Urdu first, with English) web app for crop growers in Dera Ismail Khan. A grower photographs the crop and gets a quality grade (A, B or C), the fair price for that grade from today's public mandi rates, and the best way to sell. It also shows matched buyers, storage and transport, and a grade certificate. Then they send a request on WhatsApp.
 
 Built for **Imaginathon by Banao** by The Four Musketeers.
 
@@ -18,105 +18,102 @@ Dera Mandi treats these as one problem: a trusted grade, a reference price, and 
 
 ## The loop
 
-1. **List:** pick the crop, quantity (with a maund conversion) and village.
-2. **Photograph:** 1 to 3 photos, from the camera or the gallery.
-3. **Grade:** A, B or C, stamped on the grower's own photo.
-   - Khajoor: from a trained image model, with its probability for each grade and each photo's own grade.
-   - Other crops: a rule-based estimate with its reasons (size, colour, marks).
-4. **Price:** the fair band for that grade, the value of the whole lot, and a chart of all three grades.
-5. **Match:**
-   - Buyers who take that crop, grade and quantity.
-   - Storage and transport nearest the village, with cold storage first for fruit.
-   - When a lot is too small for an exporter, a note says it can be combined with nearby lots.
-6. **Request:** pick a buyer and, optionally, a store or truck, then send.
-7. **History:** My listings shows every listing with its grade, price and status, and each one can be deleted.
+1. **List:** crop, quantity (with maund conversion; the weight can be spoken), village. In helper mode, also whose crop it is.
+2. **Photograph:** a live camera guide with a crop-shaped frame and light and blur warnings, or the gallery.
+   - One sample (up to 3 photos) or a whole lot (up to 10 photos, one fruit each, graded one by one).
+3. **Grade:** A, B or C, stamped on the grower's own photo, with the evidence behind it:
+   - the model's certainty;
+   - its measured accuracy;
+   - what was measured from the photo;
+   - one selling tip.
+4. **Price:** today's public mandi rate for the crop (AMIS Punjab), split into thirds for C, B and A. The grower can type their own mandi's rate instead.
+5. **Decide:** sell now, send to Multan, or store and sell later, each with the take-home after commission, transport, storage and losses. Every assumption can be edited.
+6. **Show:** a PDF grade certificate (photo, grade, price, how the grade was made, dataset citation, QR check link) and a WhatsApp Status image.
+7. **Request:** pick a buyer and, optionally, storage or transport. In demo mode the request opens WhatsApp to the demo number.
+8. **History:** search, filter by status or grower, spreadsheet export, backup and restore.
+
+**Voice guide.** On first open the app offers, out loud, to speak each step.
+- A double tap anywhere on the screen, or the speaker button, turns it on or off.
+- Lines are recorded Urdu clips (numbers are joined from number clips), so it works offline and on phones with no Urdu voice.
+
+## How each crop is graded
+
+| Crop | Grader | Held-out result | What it has not seen |
+|---|---|---|---|
+| Khajoor (Dhakki dates) | MobileNetV2, 224 px, trained on graded Pakistani khajoor photos | **72.0%** on 311 photos (95% CI 66.8–76.7%; always guessing the commonest grade: 42.8%) | No Dhakki in any public dataset |
+| Sugarcane | MobileNetV2, 224 px, good vs damaged billets | **82.3%** per photo on 452 photos (CI 78.5–85.5%; baseline 61.1%). **92.7%** per billet with its photos averaged, as the app does (96 billets, CI 85.7–96.4%) | Louisiana varieties on a dark background. Only good or damaged, so A or C. |
+| Kulachi melon | MobileNetV2, 224 px, trained on graded mango, papaya, apple, tomato and Burmese grape | **92.5%** on 227 photos of those fruit (CI 88.3–95.3%; baseline 33.9%) | **Never tested on a melon.** No graded melon photos exist in public. |
+| Wheat, other | Rule-based estimate from colour, coverage and dark spots | Not measured | Labelled as an estimate in the app |
+
+**About wheat.** We trained a kernel-by-kernel wheat model on GrainSet: 90.8% on scanner close-ups, and 82.9% on 2,003 held-out kernels cut out on cloth the way the app does. On synthetic "handful on a cloth" test photos, though, it read clean grain as damaged too often to grade a lot, so it is **not used** yet. The kernel finder, lot rule, confusion-matrix correction and tests are all in the repo, ready for a model that passes. See `ml/README.md`.
+
+**Checks we ran.**
+- Every model was evaluated once on an untouched test split, with near-duplicate photos grouped before splitting.
+- The browser matches Python through the real upload path: khajoor 87/90, sugarcane 58/60, melon 59/60.
+- A headless Chrome run on the live site graded khajoor and sugarcane with the network cut, and took photos through the live camera guide.
 
 ## What is real and what is sample
 
 | Real | Sample |
 |---|---|
-| The full flow in Urdu (RTL, Nastaliq) and English | Every buyer, store and transporter (invented) |
-| A trained khajoor grade model, run on the device | Reference prices (illustrative, not live mandi rates) |
-| Photo checks (dark, washed out, no crop, unfamiliar) | |
-| Matching by crop, grade, quantity and distance | Request delivery: saved on the phone, never sent |
-| Listings and photos saved on the phone; installable and works offline | |
+| The whole flow in Urdu (RTL, Nastaliq) and English, with the voice guide | Every buyer, store and transporter (invented) |
+| Grade models for khajoor, sugarcane and melon, run on the phone | Buyer offers (scaled to today's rate) |
+| Public mandi rates from AMIS Punjab (live when online, a built-in snapshot offline) | Request delivery: WhatsApp to the demo number |
+| Grade certificate PDF, WhatsApp Status image, spreadsheet export and backup | |
+| Everything saved on the phone (IndexedDB); installable; grades offline | |
 
-**How the grade works:**
-
-- **Khajoor (the main crop): a trained image model.**
-  - It is MobileNetV2, fine-tuned on a public dataset of graded Pakistani khajoor photos (Mendeley, CC BY 4.0), and it runs in the browser with TensorFlow.js.
-  - **Measured on 311 held-out photos:** it gives the right grade (1/2/3 = A/B/C) **72.0%** of the time. The 95% interval is 66.8–76.7%, and always guessing the most common grade would score 42.8%.
-  - On a variety it never trained on (Fasli Toto), it called 66% of the Grade 1 fruit A.
-  - Its "% sure" is calibrated on validation data.
-  - Full method, the duplicate-removal fix, and the browser-vs-Python parity check are in [`ml/README.md`](ml/README.md).
-- **Limits:**
-  - The dataset has no Dhakki, and its photos are lab shots of one fruit each on a light background.
-  - Expect lower accuracy on field photos and piles, and treat the grade as a strong starting reference. The crop is checked in person before shipment.
-  - The next step is retraining with 100 to 300 graded Dhakki photos from D.I. Khan growers.
-- **Other crops: rule-based.** Melon, wheat, sugarcane and anything else get a rule-based colour, size and defect estimate, because no graded photo set exists for them. The app labels this as an estimate.
-- **Photo checks first.** A photo that is too dark, washed out, or has no crop in it gets a retake prompt, never a grade. Khajoor photos whose colours fall far outside the dataset's range are graded, but flagged as unfamiliar.
-
-**Sample photos:**
-
-- For khajoor, the photos step offers six real held-out test photos from the dataset, two per grade. The model never trained on them.
-- For other crops it offers labelled drawings.
+**Demo number.** In demo mode, which is on by default, requests open WhatsApp to 0313 4870456, a team member's number that is public in this repo and on the site. Switch demo mode off in Settings to save requests only on the phone.
 
 ## Stack
 
-Vite, React 19, TypeScript, Tailwind CSS v4, react-router, react-i18next, TensorFlow.js (loaded lazily, only when a khajoor listing is graded), vite-plugin-pwa and Vitest. The model is trained in Python with TensorFlow/Keras (`ml/`). Fonts are self-hosted: Archivo and Noto Nastaliq Urdu. There is no backend, no database, no accounts and no external API calls. The whole app is one static build, and the 4.5 MB model is cached for offline use after its first run.
+Vite, React 19, TypeScript, Tailwind CSS v4, react-router, react-i18next, TensorFlow.js (loaded lazily), pdf-lib, vite-plugin-pwa and Vitest. One Vercel serverless function (`api/prices.js`) fetches AMIS rates, because AMIS has no CORS. The models are trained in Python with TensorFlow/Keras (`ml/`). Voice clips are recorded with `scripts/make-voice.py`. There is no database and there are no accounts.
+
+**Offline.** The service worker installs the app, the khajoor model and the voice clips (about 10 MB). The sugarcane and melon models (9 MB) are cached on first use, or all at once from Settings > Ready for offline.
 
 ## Run it
 
 ```bash
 npm install
 npm run dev        # http://localhost:5173
-npm test           # tests: translations, seed data, matching, photo scoring, model card
+npm test           # translations, voice clips, matching, prices, sell options, photo and model checks
 npm run build      # type-check + production build into dist/
 npm start          # serve dist/ on $PORT (default 3000), with SPA fallback
 ```
 
-To try it on a phone on the same Wi-Fi, run `npm run dev -- --host` and open the network address it prints.
+To try it on a phone on the same Wi-Fi, run `npm run dev -- --host`. The live camera needs HTTPS or localhost, so on a LAN address the camera button falls back to the phone's camera app.
 
 ## Deploy
 
-The build is a static site. Every route falls back to `index.html`, so deep links like `/listing/abc` work after a refresh.
-
-- **Vercel:** import the GitHub repo. `vercel.json` sets the Vite build, the `dist` output and the SPA rewrite. No environment variables are needed.
-- **Netlify:** set the build command to `npm run build` and the publish directory to `dist`. `public/_redirects` handles the SPA fallback.
-- **Railway:** set the build command to `npm run build` and the start command to `npm start`. `serve` reads Railway's `$PORT` automatically.
+Import the GitHub repo into Vercel. `vercel.json` sets the Vite build, the `dist` output and the SPA rewrite, and Vercel picks up `api/prices.js` as a function by itself. No environment variables are needed. On a static-only host the app still works, with prices from the built-in snapshot.
 
 ## Where things live
 
 ```
 src/
-  pages/        Home, ListDetails, ListPhotos, Result, Sent, MyListings, About
-  components/   GradeStamp, PriceLadder, CropGlyph, Price, Layout, LanguageToggle
-  lib/grader.ts gradeCrop(images, crop): the single grading seam
-  lib/model.ts  khajoor model: preprocessing (mirrors ml/preprocess.py), TTA, calibration
-  data/modelCard.json  measured accuracy the app displays (written by ml/export.py)
-  lib/match.ts  price bands, buyer matching, logistics ranking
-  lib/samples.ts drawn sample photos (non-khajoor crops)
-public/model/   the TF.js khajoor model;  public/samples/  held-out khajoor test photos
-ml/             training pipeline, metrics.json, splits.json, README
-  data/         seeded buyers, logistics, reference prices, D.I. Khan locations
-  i18n/         en.json and ur.json (every user-facing string)
+  pages/          Home, ListDetails, ListPhotos, Result, Sent, MyListings, Prices, Settings, Accuracy, Check, About
+  components/     CameraGuide, Voice, ModelBreakdown, CropModelBreakdown, LotBreakdown, GradeAdvice,
+                  MarketRate, SellOptions, ShareActions, FarmerPicker, GradeStamp, PriceLadder, ...
+  lib/grader.ts   gradeCrop / gradeLot: the single grading seam
+  lib/model.ts    khajoor model (preprocessing mirrors ml/preprocess.py), TTA, calibration
+  lib/cropModels.ts  sugarcane, melon (and wheat, when a model ships): model cards, kernel pipeline, lot rule
+  lib/prices.ts   today's rate: your own > live AMIS > snapshot; grade bands
+  lib/decide.ts   sell now / Multan / store comparison
+  lib/voice.ts    voice guide playback; lib/spokenNumber.ts numbers for speech and spoken weights
+  lib/certificate.ts, statusImage.ts, share.ts, checkCode.ts   certificate, Status image, WhatsApp, QR check link
+  lib/storage.ts  IndexedDB listings and growers, backup and restore
+  data/           seeded buyers and logistics, price snapshot, model cards, voice manifest
+  i18n/           en.json and ur.json (every user-facing string)
+api/prices.js     AMIS Punjab rates (Vercel function)
+public/model/     khajoor model;  public/models/  sugarcane, melon;  public/voice/  Urdu clips
+ml/               training, export, parity and test tooling for every crop (see ml/README.md)
+scripts/          fetch-prices.mjs (price snapshot), make-voice.py (voice clips)
 ```
-
-**Retraining:** run `ml/` (see its README), then `python export.py`. That rewrites `public/model/`, the model card the app shows, and the samples. Every screen only calls `gradeCrop(images, crop)`, so nothing else changes.
-
-## Notes for the judges
-
-This is a farmer-first MVP. Everything the grower touches works end to end in Urdu and English, offline after the first visit, and nothing leaves the phone.
-
-**The khajoor grade is real.** It comes from a MobileNetV2 model we trained on a public graded Pakistani khajoor dataset, and it runs in the browser. On 311 held-out photos it scored 72% (95% interval 67–77%; the always-guess-most-common baseline is 43%). We found and removed train/test duplicates in the dataset before measuring.
-
-**Limits:**
-- The dataset has no Dhakki.
-- Its photos are lab shots of one fruit each.
-- Other crops use a labelled rule-based estimate.
-
-Buyers, storage, transport and prices are seeded sample data.
 
 ## Credits
 
-Khajoor training data: Maitlo, A. K. et al., *Date Fruit Dataset for Inspection and Grading*, Mendeley Data, V3 (2023), doi:10.17632/s5zfvsw5kv.3, licensed CC BY 4.0. We used only the original photos, removed duplicates, and cropped and resized photos for training and for the six in-app samples.
+- **Khajoor:** Maitlo, A. K. et al., *Date Fruit Dataset for Inspection and Grading*, Mendeley Data, V3 (2023), doi:10.17632/s5zfvsw5kv.3, CC BY 4.0.
+- **Sugarcane:** The77Lab (LSU AgCenter), SugarcaneDeepLearning billet images, github.com/The77Lab/SugarcaneDeepLearning. No licence is published, so we use it for a non-commercial prototype with attribution; license or replace it before any commercial use.
+- **Melon stand-in:** *AFruitDB: A Dataset of Common Asian Fruits for Quality Grading*, Mendeley Data bz65dz2pbj, CC BY 4.0.
+- **Wheat (trained, not shipped):** Fan, L. et al., *GrainSet*, Figshare 22992317, CC BY 4.0.
+- **Prices:** AMIS Punjab (amis.pk). Sugarcane: the 2025–26 indicative mill price.
+- **Voice:** Urdu clips generated with a Microsoft neural voice (ur-PK-AsadNeural) via edge-tts.

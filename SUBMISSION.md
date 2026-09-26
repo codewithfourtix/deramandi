@@ -6,17 +6,17 @@ Paste these into the Imaginathon dashboard. Character counts were checked by scr
 
 Dera Mandi
 
-## One-line description (142/160 characters)
+## One-line description (151/160 characters)
 
-Urdu-first web app for D.I. Khan farmers: photograph a crop, get a grade and fair price band, and reach matched buyers, storage and transport.
+Urdu-first app for D.I. Khan farmers: photograph a crop, get a grade, today's fair mandi price and the best way to sell, then reach buyers on WhatsApp.
 
 ## What it is about, in one line (183/240 characters)
 
 The price and spoilage gap for D.I. Khan growers of Dhakki dates and Kulachi melons: agents set the price, fruit spoils without cold storage, and small lots never reach export buyers.
 
-## What you built (697/800 characters)
+## What you built (682/800 characters)
 
-An Urdu-first bilingual web app (right-to-left Nastaliq, English one tap away) built for cheap Android phones and weak signal: installable, works offline. A grower lists crop, quantity and village, adds photos, and gets Grade A, B or C, the fair price band for that grade and the lot's value. Khajoor is graded by a MobileNetV2 model we trained on graded Pakistani khajoor photos, running on the phone: 72% correct on 311 held-out photos vs a 43% baseline. Dark or crop-less photos are refused. It then matches buyers by crop, grade and quantity, ranks nearby cold storage and transport, flags small lots for pooling toward export, and tracks requests. Buyers and logistics are seeded sample data.
+An Urdu-first web app (Nastaliq, English one tap away, a spoken Urdu voice guide toggled by a double tap) for cheap Android phones and weak signal: installable, grades offline. A grower photographs the crop through a camera guide and gets Grade A, B or C from models we trained, running on the phone: khajoor 72% on held-out photos (baseline 43%), sugarcane 93% per billet. The price comes from today's AMIS mandi rates, split by grade, with sell-now, Multan and cold-store options costed. It makes a grade certificate PDF with a QR check link and a WhatsApp Status image, grades a whole lot fruit by fruit, supports helpers listing for many growers, and sends requests on WhatsApp.
 
 ## Domain
 
@@ -30,6 +30,6 @@ https://deramandi.vercel.app
 
 https://github.com/codewithfourtix/deramandi
 
-## Notes for the judges (529/600 characters)
+## Notes for the judges (475/600 characters)
 
-Farmer-first MVP: every grower-facing step works end to end in Urdu and English, offline after first visit, and nothing leaves the phone. The khajoor grade is a real MobileNetV2 model trained on a public Pakistani khajoor grading dataset (Mendeley, CC BY 4.0), run in-browser: 72% on 311 held-out photos (95% CI 67-77%, baseline 43%), after removing train/test duplicates. Limits: no Dhakki in the data, lab photos of single fruits; other crops use a labelled rule-based estimate. Buyers, logistics and prices are seeded samples.
+Every step works end to end in Urdu and English, offline after first visit. Models run in-browser, each tested once on held-out data: khajoor 72% (CI 67-77%, baseline 43%), sugarcane 82% per photo, 93% per billet. Melon uses a model trained on other graded fruit, never tested on melon; wheat uses a labelled rule estimate (our wheat model failed its test). No Dhakki photos exist publicly. Prices are live AMIS rates; buyers are samples; demo requests go to a team WhatsApp.
