@@ -63,14 +63,6 @@ export function CloseIcon({ className = '' }: P) {
   )
 }
 
-export function PinIcon({ className = '' }: P) {
-  return (
-    <svg viewBox="0 0 24 24" width="18" height="18" className={className} {...base}>
-      <path d="M12 21s-6.5-6.2-6.5-11.2A6.5 6.5 0 0 1 18.5 9.8C18.5 14.8 12 21 12 21z" />
-      <circle cx="12" cy="10" r="2.3" />
-    </svg>
-  )
-}
 
 export function TrashIcon({ className = '' }: P) {
   return (

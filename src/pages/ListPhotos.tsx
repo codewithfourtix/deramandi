@@ -8,7 +8,7 @@ import { fileToDataUrl } from '../lib/image'
 import { drawSample, type SampleQuality } from '../lib/samples'
 import { priceBand } from '../lib/match'
 import { addListing, newId, StorageFullError } from '../lib/storage'
-import { useDraft } from '../state/draft'
+import { useDraft } from '../state/draftContext'
 import type { Listing } from '../types'
 
 const MAX_PHOTOS = 3

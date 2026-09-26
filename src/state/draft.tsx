@@ -1,13 +1,5 @@
-import { createContext, useCallback, useContext, useState, type ReactNode } from 'react'
-import type { CropId } from '../types'
-
-export interface Draft {
-  crop?: CropId
-  variety: string
-  quantityKg?: number
-  location: string
-  photos: string[]
-}
+import { useCallback, useState, type ReactNode } from 'react'
+import { DraftContext, type Draft } from './draftContext'
 
 const EMPTY: Draft = { variety: '', location: '', photos: [] }
 const KEY = 'deramandi.draft'
@@ -30,14 +22,6 @@ function writeDraft(d: Draft) {
   }
 }
 
-interface DraftCtx {
-  draft: Draft
-  update: (patch: Partial<Draft>) => void
-  reset: () => void
-}
-
-const Ctx = createContext<DraftCtx | null>(null)
-
 export function DraftProvider({ children }: { children: ReactNode }) {
   const [draft, setDraft] = useState<Draft>(readDraft)
 
@@ -54,11 +38,5 @@ export function DraftProvider({ children }: { children: ReactNode }) {
     setDraft(EMPTY)
   }, [])
 
-  return <Ctx.Provider value={{ draft, update, reset }}>{children}</Ctx.Provider>
-}
-
-export function useDraft() {
-  const ctx = useContext(Ctx)
-  if (!ctx) throw new Error('useDraft must be used inside DraftProvider')
-  return ctx
+  return <DraftContext.Provider value={{ draft, update, reset }}>{children}</DraftContext.Provider>
 }

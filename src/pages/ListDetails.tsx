@@ -5,7 +5,7 @@ import { CropGlyph } from '../components/CropGlyph'
 import { CheckIcon } from '../components/Icons'
 import { Steps } from '../components/Steps'
 import { crops, locations } from '../data'
-import { useDraft } from '../state/draft'
+import { useDraft } from '../state/draftContext'
 import type { CropId } from '../types'
 
 type Errors = Partial<Record<'crop' | 'quantity' | 'location', string>>
