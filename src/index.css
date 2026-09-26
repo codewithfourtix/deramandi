@@ -1,0 +1,187 @@
+@import '@fontsource-variable/archivo/wdth.css';
+@import '@fontsource/noto-nastaliq-urdu/400.css';
+@import '@fontsource/noto-nastaliq-urdu/700.css';
+@import 'tailwindcss';
+
+/*
+  Dera Mandi tokens.
+  Palette is pinned by the brief: dates, soil, the Indus, ripe fruit.
+  Type: Archivo in two widths. Expanded (wdth 125) for crate-label headings,
+  normal width for body. Noto Nastaliq Urdu replaces both when Urdu is active.
+*/
+@theme {
+  --color-soil: #3b2a1e;
+  --color-soil-soft: #6b5a4c;
+  --color-date: #c87a2c;
+  --color-date-deep: #9f5a1a;
+  --color-date-wash: #f6e6d2;
+  --color-field: #5c6b3c;
+  --color-field-wash: #e6ead9;
+  --color-indus: #2e5e5a;
+  --color-indus-wash: #dfe9e6;
+  --color-warn: #8e3b24;
+  --color-warn-wash: #f3dfd6;
+  --color-paper: #fbf7f0;
+  --color-sheet: #ffffff;
+  --color-line: #d8cfc2;
+
+  --font-display: 'Archivo Variable', 'Arial Narrow', sans-serif;
+  --font-body: 'Archivo Variable', 'Helvetica Neue', sans-serif;
+  --font-urdu: 'Noto Nastaliq Urdu', 'Jameel Noori Nastaleeq', serif;
+
+  --radius-sm: 4px;
+  --radius-md: 8px;
+}
+
+@layer base {
+  html {
+    background: var(--color-paper);
+    color: var(--color-soil);
+    font-family: var(--font-body);
+    font-size: 17px;
+    line-height: 1.5;
+    -webkit-text-size-adjust: 100%;
+    text-rendering: optimizeLegibility;
+  }
+
+  /* Nastaliq is tall and wide: bigger size, much more line height, no tracking. */
+  html[lang='ur'] {
+    font-family: var(--font-urdu);
+    font-size: 17px;
+    line-height: 2.1;
+  }
+  html[lang='ur'] * {
+    letter-spacing: 0 !important;
+  }
+
+  body {
+    margin: 0;
+    min-height: 100dvh;
+    background: var(--color-paper);
+  }
+
+  :focus-visible {
+    outline: 3px solid var(--color-indus);
+    outline-offset: 2px;
+  }
+
+  button,
+  input,
+  select {
+    font: inherit;
+    color: inherit;
+  }
+
+  img {
+    max-width: 100%;
+    display: block;
+  }
+}
+
+@layer components {
+  /* Crate-label display type. In Urdu it falls back to Nastaliq bold. */
+  .display {
+    font-family: var(--font-display);
+    font-stretch: 125%;
+    font-weight: 800;
+    letter-spacing: -0.01em;
+    line-height: 1.1;
+  }
+  html[lang='ur'] .display {
+    font-family: var(--font-urdu);
+    font-weight: 700;
+    line-height: 1.9;
+  }
+
+  /* Western numerals stay in Archivo in both languages, tabular for prices. */
+  .num {
+    font-family: var(--font-body);
+    font-variant-numeric: tabular-nums;
+    font-stretch: 100%;
+    line-height: 1.2;
+  }
+
+  .btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+    min-height: 3.25rem;
+    padding: 0.6rem 1.4rem;
+    border-radius: var(--radius-md);
+    font-weight: 700;
+    font-size: 1.05rem;
+    text-decoration: none;
+    cursor: pointer;
+    border: 2px solid transparent;
+    transition:
+      background-color 120ms ease,
+      border-color 120ms ease,
+      transform 80ms ease;
+  }
+  .btn:active:not(:disabled) {
+    transform: translateY(1px);
+  }
+  .btn:disabled {
+    cursor: not-allowed;
+    background: var(--color-line);
+    color: var(--color-soil-soft);
+    border-color: var(--color-line);
+  }
+
+  .btn-primary {
+    background: var(--color-date-deep);
+    color: #fff;
+  }
+  .btn-primary:hover:not(:disabled) {
+    background: #874a12;
+  }
+
+  .btn-quiet {
+    background: transparent;
+    border-color: var(--color-soil);
+    color: var(--color-soil);
+  }
+  .btn-quiet:hover:not(:disabled) {
+    background: var(--color-date-wash);
+  }
+
+  .field-label {
+    display: block;
+    font-weight: 700;
+    margin-bottom: 0.35rem;
+  }
+
+  .input {
+    width: 100%;
+    min-height: 3.25rem;
+    padding: 0.55rem 0.9rem;
+    border: 2px solid var(--color-line);
+    border-radius: var(--radius-md);
+    background: var(--color-sheet);
+    font-size: 1.1rem;
+  }
+  .input:focus {
+    border-color: var(--color-indus);
+    outline: none;
+    box-shadow: 0 0 0 3px var(--color-indus-wash);
+  }
+  .input[aria-invalid='true'] {
+    border-color: var(--color-warn);
+  }
+
+  /* Directional glyphs mirror in RTL. Numbers never do. */
+  html[dir='rtl'] .flip-rtl {
+    transform: scaleX(-1);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+}
