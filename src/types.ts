@@ -21,8 +21,18 @@ export interface GradeResult {
   unfamiliar?: boolean
 }
 
+/** Helper mode: one literate helper lists crops for many farmers. */
+export interface Farmer {
+  id: string
+  name: string
+  village: string // location id from locations.json
+  phone?: string
+  createdAt: string
+}
+
 export interface Listing {
   id: string
+  farmerId?: string // helper mode: whose crop this is
   crop: CropId
   variety?: string
   quantityKg: number

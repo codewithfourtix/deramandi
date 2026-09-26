@@ -109,7 +109,7 @@ export function ListPhotos() {
         status: 'listed',
         createdAt: new Date().toISOString(),
       }
-      addListing(listing)
+      await addListing(listing)
       setFinished(true)
       navigate(`/listing/${listing.id}`, { replace: true, state: { reveal: true } })
       reset()
