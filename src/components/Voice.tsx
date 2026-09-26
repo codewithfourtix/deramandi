@@ -1,7 +1,7 @@
 import { useEffect, useRef, useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import { getSettings, updateSettings, useSettings } from '../lib/settings'
-import { currentScreenLine, speak, stopSpeaking, unlockAudio, useVoiceState } from '../lib/voice'
+import { currentScreenLine, setVoice, speak, stopSpeaking, unlockAudio, useVoiceState } from '../lib/voice'
 import { RepeatIcon, SpeakerIcon } from './Icons'
 
 const INTERACTIVE = 'a,button,input,select,textarea,label,summary,[role="switch"],[role="button"],[role="radio"],[contenteditable]'
@@ -10,11 +10,6 @@ const DOUBLE_TAP_PX = 40
 
 let offeredThisVisit = false
 
-export function setVoice(on: boolean) {
-  updateSettings({ voice: on, voiceOffered: true })
-  if (on) speak(['voice.on', ...currentScreenLine()])
-  else speak(['voice.off'])
-}
 
 /**
  * Listens on the whole page: any touch unlocks sound (and plays the spoken

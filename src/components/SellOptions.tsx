@@ -1,4 +1,4 @@
-import { useMemo, useState } from 'react'
+import { useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import { bestOption, compareOptions, defaultAssumptions, type Assumptions } from '../lib/decide'
 import { useRatesVersion } from '../lib/prices'
@@ -19,9 +19,9 @@ const FIELDS: { key: keyof Assumptions; step: number }[] = [
 /** Take-home money three ways: sell here now, truck to Multan, or store and sell later. */
 export function SellOptions({ crop, grade, qtyKg }: { crop: CropId; grade: Grade; qtyKg: number }) {
   const { t } = useTranslation()
-  const ratesVersion = useRatesVersion()
+  useRatesVersion() // re-render when today's rates change: compareOptions reads them
   const [a, setA] = useState<Assumptions>(() => defaultAssumptions(crop))
-  const opts = useMemo(() => compareOptions(crop, grade, qtyKg, a), [crop, grade, qtyKg, a, ratesVersion])
+  const opts = compareOptions(crop, grade, qtyKg, a)
   const best = bestOption(opts)
   const local = opts[0]
 

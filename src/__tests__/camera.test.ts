@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest'
-import { measure } from '../components/CameraGuide'
+import { measure } from '../lib/frameCheck'
 
 function frame(fn: (x: number, y: number) => number, side = 96) {
   const px = new Uint8ClampedArray(side * side * 4)

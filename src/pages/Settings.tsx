@@ -1,6 +1,5 @@
 import { useRef, useState, type ChangeEvent, type ReactNode } from 'react'
 import { useTranslation } from 'react-i18next'
-import { setVoice } from '../components/Voice'
 import { FarmerForm } from '../components/FarmerPicker'
 import { TrashIcon } from '../components/Icons'
 import { listingsCsv } from '../lib/csv'
@@ -8,6 +7,7 @@ import { cropModelsMB, downloadAllModels } from '../lib/offlineModels'
 import { promptInstall, useInstallState } from '../lib/pwa'
 import { DEMO_NUMBER_DISPLAY, updateSettings, useSettings } from '../lib/settings'
 import { downloadFile } from '../lib/share'
+import { setVoice } from '../lib/voice'
 import { loadFarmers, loadListings, makeBackup, removeFarmer, restoreBackup, useFarmers, useListings } from '../lib/storage'
 
 function Toggle({ id, label, hint, checked, onChange }: { id: string; label: string; hint: ReactNode; checked: boolean; onChange: (v: boolean) => void }) {

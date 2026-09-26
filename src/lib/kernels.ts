@@ -72,10 +72,12 @@ export function findObjects(img: HTMLImageElement | HTMLCanvasElement, size: num
       if (x > c.x1) c.x1 = x
       if (y < c.y0) c.y0 = y
       if (y > c.y1) c.y1 = y
-      if (x > 0 && mask[q - 1] && !label[q - 1]) (label[q - 1] = id), stack.push(q - 1)
-      if (x < w - 1 && mask[q + 1] && !label[q + 1]) (label[q + 1] = id), stack.push(q + 1)
-      if (y > 0 && mask[q - w] && !label[q - w]) (label[q - w] = id), stack.push(q - w)
-      if (y < h - 1 && mask[q + w] && !label[q + w]) (label[q + w] = id), stack.push(q + w)
+      for (const n of [x > 0 ? q - 1 : -1, x < w - 1 ? q + 1 : -1, y > 0 ? q - w : -1, y < h - 1 ? q + w : -1]) {
+        if (n >= 0 && mask[n] && !label[n]) {
+          label[n] = id
+          stack.push(n)
+        }
+      }
     }
     comps.push(c)
   }

@@ -1,7 +1,7 @@
 import { useEffect, useSyncExternalStore } from 'react'
 import i18n from '../i18n'
 import manifest from '../data/voiceManifest.json'
-import { getSettings } from './settings'
+import { getSettings, updateSettings } from './settings'
 import { numberSegs } from './spokenNumber'
 
 /*
@@ -222,4 +222,11 @@ export function useVoiceLine(segs: Seg[] | null) {
 /** Say something once (an event, not a screen): only when the guide is on. */
 export function sayIfOn(segs: Seg[]) {
   if (getSettings().voice) speak(segs)
+}
+
+/** Switch the voice guide on (and say this screen) or off (and say so). */
+export function setVoice(on: boolean) {
+  updateSettings({ voice: on, voiceOffered: true })
+  if (on) speak(['voice.on', ...currentScreenLine()])
+  else speak(['voice.off'])
 }
