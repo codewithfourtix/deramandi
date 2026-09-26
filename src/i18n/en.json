@@ -1,5 +1,208 @@
 {
-  "app": { "name": "Dera Mandi", "nameAlt": "ڈیرہ منڈی" },
-  "lang": { "label": "Language", "en": "English", "ur": "اردو" },
-  "home": { "title": "Know your crop's grade and fair price before you sell." }
+  "app": {
+    "name": "Dera Mandi",
+    "nameAlt": "ڈیرہ منڈی",
+    "home": "Dera Mandi home"
+  },
+  "nav": {
+    "skip": "Skip to content",
+    "myListings": "My listings",
+    "main": "Main"
+  },
+  "lang": {
+    "label": "Language",
+    "en": "English",
+    "ur": "اردو"
+  },
+  "common": {
+    "back": "Back",
+    "kg": "kg",
+    "km": "km",
+    "grade": "Grade",
+    "sampleProviders": "Sample providers for this prototype, not real businesses.",
+    "loading": "Loading"
+  },
+  "price": {
+    "before": "PKR ",
+    "after": "/kg",
+    "totalBefore": "PKR ",
+    "totalAfter": "",
+    "unit": "PKR per kg"
+  },
+  "crops": {
+    "dhakki_dates": "Dhakki dates",
+    "kulachi_melon": "Kulachi melon",
+    "wheat": "Wheat",
+    "sugarcane": "Sugarcane",
+    "other": "Other crop"
+  },
+  "cropHints": {
+    "dhakki_dates": "Fresh (doka) or dried",
+    "kulachi_melon": "Summer melon",
+    "wheat": "Grain, after threshing",
+    "sugarcane": "Cut cane",
+    "other": "Any fruit or vegetable"
+  },
+  "places": {
+    "dik_city": "D.I. Khan city",
+    "dik_mandi": "D.I. Khan fruit mandi",
+    "kulachi": "Kulachi",
+    "paharpur": "Paharpur",
+    "paroa": "Paroa",
+    "daraban": "Daraban",
+    "chaudhwan": "Chaudhwan",
+    "yarik": "Yarik",
+    "band_kurai": "Band Kurai",
+    "lahore": "Lahore",
+    "karachi": "Karachi",
+    "multan": "Multan",
+    "karachi_dubai": "Karachi, ships to Dubai",
+    "karachi_doha": "Karachi, ships to Doha"
+  },
+  "buyerType": {
+    "local_wholesaler": "Local wholesaler",
+    "national_buyer": "National buyer",
+    "exporter": "Exporter"
+  },
+  "logisticsType": {
+    "storage": "Storage",
+    "transport": "Transport",
+    "both": "Storage and transport"
+  },
+  "home": {
+    "title": "Know your crop's grade and fair price before you sell.",
+    "lede": "Take a photo of your dates, melons or grain. Dera Mandi grades it, shows what buyers pay for that grade, and finds buyers, storage and transport near you.",
+    "cta": "List my crop",
+    "why": "Dhakki dates from D.I. Khan reach the Gulf and beyond, yet growers often sell to the first commission agent at the price he names, because the fruit will not keep and there is no fair price to point to.",
+    "howTitle": "How it works",
+    "step1": "Photograph your crop",
+    "step1d": "One to three photos, in daylight.",
+    "step2": "See its grade and fair price",
+    "step2d": "Grade A, B or C, and the price band buyers pay for it.",
+    "step3": "Send a request",
+    "step3d": "Pick a buyer, and a truck or cold store near you.",
+    "latest": "Your latest listing",
+    "seeAll": "See all listings"
+  },
+  "steps": {
+    "label": "Step {{n}} of 3",
+    "details": "Crop details",
+    "photos": "Photos",
+    "result": "Grade and buyers"
+  },
+  "details": {
+    "title": "What are you selling?",
+    "crop": "Crop",
+    "variety": "Variety (optional)",
+    "varietyPlaceholder": "For example: fresh (doka) or dried",
+    "quantity": "Quantity",
+    "quantityHint": "A rough weight is fine. 1 maund = 40 kg.",
+    "maund": "About {{count}} maund",
+    "location": "Where is the crop?",
+    "locationPlaceholder": "Choose your area",
+    "errCrop": "Choose a crop.",
+    "errQuantity": "Enter the quantity in kg.",
+    "errLocation": "Choose where the crop is.",
+    "next": "Next: add photos"
+  },
+  "photos": {
+    "title": "Add photos of your crop",
+    "tip": "Spread a handful on a plain cloth in daylight, and fill the frame.",
+    "camera": "Take photo",
+    "gallery": "Choose from gallery",
+    "count": "{{count}} of 3 photos",
+    "photoAlt": "Crop photo {{n}}",
+    "remove": "Remove photo {{n}}",
+    "empty": "No photos yet. Add at least one.",
+    "max": "You can add up to 3 photos.",
+    "readError": "That file could not be opened as a photo. Try another one.",
+    "grade": "Grade my crop",
+    "grading": "Checking size, colour and marks",
+    "gradeError": "Grading did not finish. Check the photos and try again.",
+    "storageFull": "This phone has no room left for the app. Use fewer photos and try again.",
+    "missingDetails": "Fill in the crop details first."
+  },
+  "result": {
+    "stampRing": "DERA MANDI GRADE",
+    "gradeOf": "Grade {{grade}} {{crop}}",
+    "summaryA": "Top quality. Exporters and national buyers look for this.",
+    "summaryB": "Good market quality. Sells well in national markets.",
+    "summaryC": "Lower grade. Best sold soon, and locally.",
+    "confidence": "{{value}}% sure",
+    "whyTitle": "Why this grade",
+    "factor": {
+      "size": "Size",
+      "color": "Colour",
+      "defects": "Marks and spots"
+    },
+    "level": {
+      "size": {
+        "good": "Large",
+        "fair": "Medium",
+        "poor": "Small"
+      },
+      "color": {
+        "good": "Rich and even",
+        "fair": "Slightly uneven",
+        "poor": "Pale or patchy"
+      },
+      "defects": {
+        "good": "Very few",
+        "fair": "Some",
+        "poor": "Many"
+      }
+    },
+    "gradeNote": "Estimated from the photos. The crop is checked in person at the store before any sale.",
+    "priceTitle": "Fair price for this grade",
+    "priceBody": "Buyers pay in this range for Grade {{grade}} {{crop}}. Do not settle for much less.",
+    "lotValue": "Your {{qty}} kg lot is worth about",
+    "ladderTitle": "Price by grade",
+    "ladderYou": "Your grade",
+    "samplePrices": "Illustrative prices for this prototype, not live mandi rates.",
+    "buyersTitle": "Buyers for this lot",
+    "buyersCount_one": "{{count}} buyer matches your crop, grade and quantity.",
+    "buyersCount_other": "{{count}} buyers match your crop, grade and quantity.",
+    "offers": "Offers",
+    "minQty": "Buys from {{qty}} kg",
+    "verified": "Verified",
+    "notVerified": "Not verified",
+    "buyersEmpty": "No buyer in the list takes this lot yet.",
+    "aggregate": "Your {{qty}} kg is below the {{min}} kg that {{name}} buys. Dera Mandi can combine your lot with nearby growers' lots to reach that size.",
+    "logisticsTitle": "Storage and transport near {{place}}",
+    "coldFirst": "This crop spoils fast, so cold storage is listed first.",
+    "distance": "About {{km}} km away",
+    "cold": "Cold chain",
+    "capacity": "Holds {{qty}} kg",
+    "noLogistics": "I don't need this",
+    "send": "Send request",
+    "sending": "Sending",
+    "sendHint": "Choose a buyer to send your request.",
+    "selected": "Selected",
+    "notFound": "This listing is not on this phone.",
+    "alreadySent": "Request already sent for this listing.",
+    "viewRequest": "View request"
+  },
+  "sent": {
+    "title": "Request sent",
+    "body": "{{buyer}} will be contacted about your lot. Keep the crop ready for inspection.",
+    "summary": "Request summary",
+    "crop": "Crop",
+    "quantity": "Quantity",
+    "grade": "Grade",
+    "price": "Fair price",
+    "buyer": "Buyer",
+    "logistics": "Storage or transport",
+    "none": "Not needed",
+    "demoNote": "Prototype: no message actually goes to the buyer.",
+    "toListings": "Go to my listings",
+    "another": "List another crop"
+  },
+  "listings": {
+    "title": "My listings",
+    "empty": "No listings yet. List your first crop to see its grade and price here.",
+    "status": {
+      "listed": "Listed",
+      "reserved": "Request sent"
+    }
+  }
 }

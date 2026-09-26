@@ -1,31 +1,24 @@
 import { useTranslation } from 'react-i18next'
 import type { Lang } from '../i18n'
 
-const OPTIONS: Lang[] = ['ur', 'en']
-
+// One button that names the other language, written in that language, so a
+// reader who can't read the current script still recognises their own.
 export function LanguageToggle() {
   const { t, i18n } = useTranslation()
   const current = i18n.language as Lang
+  const other: Lang = current === 'ur' ? 'en' : 'ur'
 
   return (
-    <div role="group" aria-label={t('lang.label')} className="flex rounded-md border-2 border-soil p-0.5">
-      {OPTIONS.map((lang) => {
-        const active = current === lang
-        return (
-          <button
-            key={lang}
-            type="button"
-            lang={lang}
-            aria-pressed={active}
-            onClick={() => i18n.changeLanguage(lang)}
-            className={`min-h-10 rounded-[3px] px-3 text-[0.95rem] font-bold leading-none ${
-              lang === 'ur' ? 'font-[family-name:var(--font-urdu)] pb-1' : 'font-[family-name:var(--font-body)]'
-            } ${active ? 'bg-soil text-paper' : 'text-soil hover:bg-date-wash'}`}
-          >
-            {t(`lang.${lang}`)}
-          </button>
-        )
-      })}
-    </div>
+    <button
+      type="button"
+      lang={other}
+      onClick={() => i18n.changeLanguage(other)}
+      aria-label={`${t('lang.label')}: ${t(`lang.${other}`)}`}
+      className={`flex min-h-11 items-center whitespace-nowrap rounded-md border-2 border-soil px-3 font-bold leading-none text-soil hover:bg-date-wash ${
+        other === 'ur' ? 'font-[family-name:var(--font-urdu)] pb-1 text-[1rem]' : 'font-[family-name:var(--font-body)] text-[0.95rem]'
+      }`}
+    >
+      {t(`lang.${other}`)}
+    </button>
   )
 }
