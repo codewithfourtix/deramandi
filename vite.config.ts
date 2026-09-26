@@ -1,7 +1,55 @@
 import tailwindcss from '@tailwindcss/vite'
 import react from '@vitejs/plugin-react'
 import { defineConfig } from 'vite'
+import { VitePWA } from 'vite-plugin-pwa'
 
 export default defineConfig({
-  plugins: [react(), tailwindcss()],
+  plugins: [
+    react(),
+    tailwindcss(),
+    // Installable, and works without signal after the first visit: the app
+    // shell, fonts and samples are precached; the grade model is cached the
+    // first time it is used.
+    VitePWA({
+      registerType: 'autoUpdate',
+      includeAssets: ['favicon.svg', 'apple-touch-icon.png'],
+      manifest: {
+        name: 'Dera Mandi · ڈیرہ منڈی',
+        short_name: 'Dera Mandi',
+        description: 'Grade your crop from a photo, see a fair price, and reach buyers, storage and transport in D.I. Khan.',
+        lang: 'ur',
+        dir: 'rtl',
+        start_url: '/',
+        scope: '/',
+        display: 'standalone',
+        orientation: 'portrait',
+        theme_color: '#3B2A1E',
+        background_color: '#FBF7F0',
+        categories: ['business', 'productivity'],
+        icons: [
+          { src: '/icon-any-192.png', sizes: '192x192', type: 'image/png', purpose: 'any' },
+          { src: '/icon-any-512.png', sizes: '512x512', type: 'image/png', purpose: 'any' },
+          { src: '/icon-maskable-192.png', sizes: '192x192', type: 'image/png', purpose: 'maskable' },
+          { src: '/icon-maskable-512.png', sizes: '512x512', type: 'image/png', purpose: 'maskable' },
+        ],
+      },
+      workbox: {
+        globPatterns: ['**/*.{js,css,html,svg,png,woff2,jpg}'],
+        globIgnores: ['model/**'],
+        maximumFileSizeToCacheInBytes: 4 * 1024 * 1024,
+        navigateFallback: '/index.html',
+        runtimeCaching: [
+          {
+            urlPattern: ({ url }) => url.pathname.startsWith('/model/'),
+            handler: 'CacheFirst',
+            options: {
+              cacheName: 'grade-model',
+              expiration: { maxEntries: 20 },
+              cacheableResponse: { statuses: [0, 200] },
+            },
+          },
+        ],
+      },
+    }),
+  ],
 })
