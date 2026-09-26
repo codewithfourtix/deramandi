@@ -25,9 +25,9 @@ function writeDraft(d: Draft) {
 export function DraftProvider({ children }: { children: ReactNode }) {
   const [draft, setDraft] = useState<Draft>(readDraft)
 
-  const update = useCallback((patch: Partial<Draft>) => {
+  const update = useCallback((patch: Partial<Draft> | ((prev: Draft) => Partial<Draft>)) => {
     setDraft((prev) => {
-      const next = { ...prev, ...patch }
+      const next = { ...prev, ...(typeof patch === 'function' ? patch(prev) : patch) }
       writeDraft(next)
       return next
     })

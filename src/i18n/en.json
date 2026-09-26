@@ -321,8 +321,8 @@
     "mode_sample": "One sample",
     "mode_sample_hint": "Up to 3 photos of the same produce",
     "mode_lot": "Whole lot",
-    "mode_lot_hint": "Up to 10 photos, one fruit each",
-    "tip": "Pick 5 to 10 fruits at random from the lot, not only the best ones, and photograph each one on its own on a plain cloth.",
+    "mode_lot_hint": "Up to 10 photos, one fruit or cane piece each",
+    "tip": "Pick 5 to 10 fruits or cane pieces at random from the lot, not only the best ones, and photograph each one on its own on a plain cloth.",
     "resultTitle": "Whole lot: {{count}} fruits graded one by one",
     "priceNote": "The fair price below mixes the three grade bands in these proportions."
   },
@@ -489,9 +489,26 @@
     "repeat": "Say it again",
     "stop": "Stop",
     "speaking": "Speaking",
-    "mic": "Say the weight",
+    "mic": "Speak",
     "micHeard": "Heard: {{text}}",
     "nowOn": "Voice guide on",
-    "nowOff": "Voice guide off"
+    "nowOff": "Voice guide off",
+    "micLabel": "Say the weight"
+  },
+  "camera": {
+    "title": "Camera",
+    "close": "Close camera",
+    "done": "Done",
+    "shutter": "Take photo",
+    "starting": "Opening the camera…",
+    "left": "{{count}} more",
+    "aim_circle": "Put one fruit inside the circle, close up, on a plain cloth.",
+    "aim_long": "Fit the cane piece inside the long box, lengthways.",
+    "aim_spread": "Spread the grain in one layer inside the box. Kernels should not touch.",
+    "check_ok": "Looks good. Press the button.",
+    "check_dark": "Too dark. Move to daylight.",
+    "check_bright": "Too bright. Move out of direct sun.",
+    "check_blurry": "Hold the phone still.",
+    "unavailable": "The camera could not open here. Press the camera button again to use your phone's camera app."
   }
 }

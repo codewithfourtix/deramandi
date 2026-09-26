@@ -160,6 +160,7 @@ export function ListDetails() {
               type="button"
               onClick={sayWeight}
               disabled={listening}
+              aria-label={t('voice.micLabel')}
               className={`btn min-h-12 shrink-0 gap-1 px-3 ${listening ? 'animate-pulse border-indus bg-indus text-paper' : 'btn-quiet'}`}
             >
               <MicIcon />

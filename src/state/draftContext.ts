@@ -15,7 +15,7 @@ export interface Draft {
 
 export interface DraftCtx {
   draft: Draft
-  update: (patch: Partial<Draft>) => void
+  update: (patch: Partial<Draft> | ((prev: Draft) => Partial<Draft>)) => void
   reset: () => void
 }
 
