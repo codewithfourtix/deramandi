@@ -3,15 +3,16 @@ import { useTranslation } from 'react-i18next'
 import { Navigate, useNavigate } from 'react-router'
 import { CameraIcon, CloseIcon, GalleryIcon } from '../components/Icons'
 import { Steps } from '../components/Steps'
-import { gradeCrop, ModelUnavailable, PhotoProblem } from '../lib/grader'
+import { gradeCrop, gradeLot, ModelUnavailable, PhotoProblem } from '../lib/grader'
 import { fileToDataUrl } from '../lib/image'
 import { drawSample, type SampleQuality } from '../lib/samples'
-import { priceBand } from '../lib/match'
+import { listingBand } from '../lib/match'
 import { addListing, newId, StorageFullError } from '../lib/storage'
 import { useDraft } from '../state/draftContext'
 import type { Listing } from '../types'
 
-const MAX_PHOTOS = 3
+const MAX_SAMPLE = 3
+const MAX_LOT = 10
 // Long enough that the check registers as a real step, short enough not to annoy.
 const MIN_GRADING_MS = 1400
 const SAMPLES_PER_GRADE = 2
@@ -32,7 +33,9 @@ export function ListPhotos() {
   }
 
   const photos = draft.photos
-  const full = photos.length >= MAX_PHOTOS
+  const lotMode = draft.mode === 'lot'
+  const maxPhotos = lotMode ? MAX_LOT : MAX_SAMPLE
+  const full = photos.length >= maxPhotos
   const isDates = draft.crop === 'dhakki_dates'
 
   async function addFiles(e: ChangeEvent<HTMLInputElement>) {
@@ -41,7 +44,7 @@ export function ListPhotos() {
     if (!files.length) return
     setError(null)
     setBadPhoto(null)
-    const room = MAX_PHOTOS - photos.length
+    const room = maxPhotos - photos.length
     if (files.length > room) setError(t('photos.max'))
     const added: string[] = []
     for (const file of files.slice(0, room)) {
@@ -87,11 +90,12 @@ export function ListPhotos() {
     setGrading(true)
     setError(null)
     try {
-      const [result] = await Promise.all([gradeCrop(photos, draft.crop), new Promise((r) => setTimeout(r, MIN_GRADING_MS))])
-      const band = priceBand(draft.crop, result.grade)
+      const crop = draft.crop
+      const [result] = await Promise.all([lotMode ? gradeLot(photos, crop) : gradeCrop(photos, crop), new Promise((r) => setTimeout(r, MIN_GRADING_MS))])
+      const band = listingBand({ crop, grade: result.grade, lotCounts: result.lotCounts })
       const listing: Listing = {
         id: newId(),
-        crop: draft.crop,
+        crop,
         variety: draft.variety.trim() || undefined,
         quantityKg: draft.quantityKg,
         location: draft.location,
@@ -103,6 +107,9 @@ export function ListPhotos() {
         gradeProbabilities: result.probabilities,
         gradePerPhoto: result.perPhoto,
         gradeUnfamiliar: result.unfamiliar,
+        lotCounts: result.lotCounts,
+        specs: result.specs,
+        farmerId: draft.farmerId,
         priceMin: band.min,
         priceMax: band.max,
         referencePrice: Math.round(((band.min + band.max) / 2) * 10) / 10,
@@ -130,7 +137,32 @@ export function ListPhotos() {
     <div>
       <Steps current={2} />
       <h1 className="display text-[1.7rem]">{t('photos.title')}</h1>
-      <p className="mt-2 text-soil-soft">{isDates ? t('photosDates.tip') : t('photos.tip')}</p>
+      <fieldset className="m-0 mt-4 border-0 p-0">
+        <legend className="field-label">{t('lot.modeLabel')}</legend>
+        <div className="grid grid-cols-2 gap-2">
+          {(['sample', 'lot'] as const).map((m) => {
+            const on = (draft.mode ?? 'sample') === m
+            return (
+              <label key={m} className={`flex min-h-11 cursor-pointer flex-col justify-center rounded-md border-2 px-3 py-2 has-[:focus-visible]:outline-3 has-[:focus-visible]:outline-indus ${on ? 'border-soil bg-date-wash' : 'border-line bg-sheet'}`}>
+                <input
+                  type="radio"
+                  name="grade-mode"
+                  value={m}
+                  checked={on}
+                  disabled={grading}
+                  onChange={() => update({ mode: m, photos: m === 'sample' ? photos.slice(0, MAX_SAMPLE) : photos })}
+                  className="sr-only"
+                />
+                <span className="font-bold">{t(`lot.mode_${m}`)}</span>
+                <span className="text-[0.9rem] text-soil-soft">{t(`lot.mode_${m}_hint`)}</span>
+              </label>
+            )
+          })}
+        </div>
+      </fieldset>
+      <p className="mt-3 text-soil-soft">
+        {lotMode ? t('lot.tip') : isDates ? t('photosDates.tip') : draft.crop === 'wheat' ? t('photosWheat.tip') : draft.crop === 'sugarcane' ? t('photosSugarcane.tip') : t('photos.tip')}
+      </p>
 
       {/* Two inputs on purpose: `capture` alone hides the gallery on Android. */}
       <input ref={cameraRef} type="file" accept="image/*" capture="environment" className="sr-only" tabIndex={-1} onChange={addFiles} aria-hidden="true" />
@@ -148,10 +180,10 @@ export function ListPhotos() {
       </div>
 
       <p className="mt-5 text-[0.95rem] font-bold" aria-live="polite">
-        {t('photos.count', { count: photos.length })}
+        {t('photos.count', { count: photos.length, max: maxPhotos })}
       </p>
-      <ul className="m-0 mt-2 grid list-none grid-cols-3 gap-2 p-0">
-        {Array.from({ length: MAX_PHOTOS }).map((_, i) => {
+      <ul className={`m-0 mt-2 grid list-none gap-2 p-0 ${lotMode ? 'grid-cols-4 sm:grid-cols-5' : 'grid-cols-3'}`}>
+        {Array.from({ length: maxPhotos }).map((_, i) => {
           const src = photos[i]
           return (
             <li key={i} className={`relative aspect-square overflow-hidden rounded-md ${badPhoto === i ? 'outline-4 outline-offset-2 outline-warn' : ''}`}>

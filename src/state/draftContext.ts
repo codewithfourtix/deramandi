@@ -7,6 +7,10 @@ export interface Draft {
   quantityKg?: number
   location: string
   photos: string[]
+  /** 'sample': up to 3 photos of one sample; 'lot': up to 10 fruits graded one by one. */
+  mode?: 'sample' | 'lot'
+  /** Helper mode: whose crop this is. */
+  farmerId?: string
 }
 
 export interface DraftCtx {

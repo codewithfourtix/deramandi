@@ -99,3 +99,18 @@ describe('matchLogistics', () => {
     expect(toMultan!.distanceKm).toBeLessThan(320)
   })
 })
+
+describe('whole-lot pricing', () => {
+  it('weights the three bands by how many photos got each grade', async () => {
+    const { listingBand, lotGrade, priceBand } = await import('../lib/match')
+    const A = priceBand('dhakki_dates', 'A')
+    const C = priceBand('dhakki_dates', 'C')
+    const mixed = listingBand({ crop: 'dhakki_dates', grade: 'A', lotCounts: [5, 0, 5] })
+    expect(Math.abs(mixed.min - (A.min + C.min) / 2)).toBeLessThanOrEqual(1) // whole-rupee rounding
+    expect(Math.abs(mixed.max - (A.max + C.max) / 2)).toBeLessThanOrEqual(1)
+    expect(listingBand({ crop: 'dhakki_dates', grade: 'A' })).toMatchObject({ min: A.min, max: A.max })
+    expect(lotGrade([7, 2, 1])).toBe('A')
+    expect(lotGrade([3, 3, 1])).toBe('B') // tie goes to the lower grade
+    expect(lotGrade([2, 4, 4])).toBe('C')
+  })
+})

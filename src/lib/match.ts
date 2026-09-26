@@ -7,6 +7,28 @@ export function priceBand(crop: CropId, grade: Grade): ReferencePrice {
   return bandFor(crop, grade)
 }
 
+/**
+ * The band for a whole listing. A graded lot (some A, some B, some C photos)
+ * gets the count-weighted mix of the three bands, so the price reflects the lot.
+ */
+export function listingBand(listing: Pick<Listing, 'crop' | 'grade' | 'lotCounts'>): { min: number; max: number } {
+  const counts = listing.lotCounts
+  const n = counts ? counts[0] + counts[1] + counts[2] : 0
+  if (!counts || n === 0) return priceBand(listing.crop, listing.grade)
+  const bands = (['A', 'B', 'C'] as Grade[]).map((g) => priceBand(listing.crop, g))
+  const w = (k: 'min' | 'max') => bands.reduce((s, b, i) => s + b[k] * counts[i], 0) / n
+  const r = (x: number) => (x >= 50 ? Math.round(x) : Math.round(x * 2) / 2)
+  return { min: r(w('min')), max: r(w('max')) }
+}
+
+/** Most common grade in a lot; a tie goes to the lower grade, to stay conservative. */
+export function lotGrade(counts: [number, number, number]): Grade {
+  const max = Math.max(...counts)
+  if (counts[2] === max) return 'C'
+  if (counts[1] === max) return 'B'
+  return 'A'
+}
+
 export function allBands(crop: CropId): ReferencePrice[] {
   return (['C', 'B', 'A'] as Grade[]).map((g) => priceBand(crop, g))
 }

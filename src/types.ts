@@ -19,6 +19,10 @@ export interface GradeResult {
   perPhoto?: Grade[]
   /** Model only: photo colours fall well outside the khajoor it learned from. */
   unfamiliar?: boolean
+  /** Whole-lot grading: photos graded A, B and C. */
+  lotCounts?: [number, number, number]
+  /** Measured from the photos, e.g. { key: 'patches', value: '6%' }. */
+  specs?: { key: string; value: string }[]
 }
 
 /** Helper mode: one literate helper lists crops for many farmers. */

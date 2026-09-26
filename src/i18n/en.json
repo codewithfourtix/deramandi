@@ -111,7 +111,7 @@
     "tip": "Spread a handful on a plain cloth in daylight, and fill the frame.",
     "camera": "Take photo",
     "gallery": "Choose from gallery",
-    "count": "{{count}} of 3 photos",
+    "count": "{{count}} of {{max}} photos",
     "photoAlt": "Crop photo {{n}}",
     "remove": "Remove photo {{n}}",
     "empty": "No photos yet. Add at least one.",
@@ -316,7 +316,15 @@
     "notProof": "This page shows what the certificate says. It is not proof on its own: anyone can make such a link. Check the reference code matches the paper, and inspect the crop in person."
   },
   "lot": {
-    "title": "Whole lot"
+    "title": "Whole lot",
+    "modeLabel": "What are you grading?",
+    "mode_sample": "One sample",
+    "mode_sample_hint": "Up to 3 photos of the same produce",
+    "mode_lot": "Whole lot",
+    "mode_lot_hint": "Up to 10 photos, one fruit each",
+    "tip": "Pick 5 to 10 fruits at random from the lot, not only the best ones, and photograph each one on its own on a plain cloth.",
+    "resultTitle": "Whole lot: {{count}} fruits graded one by one",
+    "priceNote": "The fair price below mixes the three grade bands in these proportions."
   },
   "rates": {
     "title": "Mandi prices",
@@ -386,5 +394,63 @@
     "a_storeCostPerKgWeek": "Storage (PKR per kg per week)",
     "a_storeRisePct": "Price rise after storing (%)",
     "a_storeLossPctPerWeek": "Lost in storage (% per week)"
+  },
+  "cropModel": {
+    "kernelsTitle": "What the wheat model saw in {{count}} kernels",
+    "group_A": "Sound",
+    "group_B": "Minor damage",
+    "group_C": "Serious damage",
+    "binary_A": "Good",
+    "binary_C": "Damaged",
+    "card_wheat_kernel_class": "Each kernel was checked by an image model trained on {{trained}} photos of single wheat kernels. On {{tested}} kernels it had never seen, it named the exact kernel type {{accuracy}}% of the time (likely range {{low}} to {{high}}%), and put the kernel in the right quality group (sound, minor or serious damage) {{group}}% of the time.",
+    "card_binary_good_damaged": "Graded by an image model trained on {{trained}} photos of sugarcane billets marked good or damaged. On {{tested}} billets it had never seen, it was right {{accuracy}}% of the time (likely range {{low}} to {{high}}%). It only knows good and damaged, so it gives A or C, never B.",
+    "card_grade3_proxy": "Graded by an image model trained on {{trained}} graded photos of other fruit (mango, papaya, apple, tomato, Burmese grape). On {{tested}} fruit photos it had never seen, it gave the right grade {{accuracy}}% of the time (likely range {{low}} to {{high}}%).",
+    "wheatRule": "Lot rule we use: Grade A needs at least 90% sound kernels and at most 2% seriously damaged; B at least 75% sound and at most 8% seriously damaged; anything worse is C.",
+    "melonProxy": "No public dataset of graded melons exists, so this model learned from other graded fruit and has never been tested on melons. Treat the grade as a rough guide until it is retrained on Kulachi melon photos."
+  },
+  "specs": {
+    "title": "Measured from the photo",
+    "note": "Measured directly from the photo pixels, not by the grading model.",
+    "coverage": "Fills the frame",
+    "evenness": "Colour evenness",
+    "patches": "Unusual patches",
+    "darkArea": "Dark area",
+    "kernels": "Kernels counted",
+    "wheat_normal": "Sound kernels",
+    "wheat_fusarium_shrivelled": "Fusarium or shrivelled",
+    "wheat_sprouted": "Sprouted",
+    "wheat_mouldy": "Mouldy",
+    "wheat_pest_attacked": "Pest-attacked",
+    "wheat_broken": "Broken",
+    "wheat_black_point": "Black point",
+    "wheat_impurity": "Impurities (not wheat)"
+  },
+  "advice": {
+    "title": "What pulled the grade down",
+    "patches": "Dark, grey or green patches on the produce",
+    "uneven": "Uneven colour",
+    "lotMix": "The lot is mixed: {{b}} fruits came out B and {{c}} came out C",
+    "tipLabel": "Tip:",
+    "tip_dhakki_dates_A": "Keep this lot together and sell it as Grade A. Show the certificate: buyers pay for grade they can trust.",
+    "tip_dhakki_dates_B": "Pick out the torn, dry or light-coloured fruit. The better fruit may then sell as Grade A, and the rest separately.",
+    "tip_dhakki_dates_C": "Sell soon and locally. Cold storage will not raise the grade of damaged fruit, and it keeps costing money.",
+    "tip_kulachi_melon_A": "Melons do not keep: sell within days, and ask for the upper end of the band.",
+    "tip_kulachi_melon_B": "Separate the cracked or bruised melons. Sound ones fetch more when they are not mixed with damaged ones.",
+    "tip_kulachi_melon_C": "Sell today at the local mandi. Every day now costs more than any better price.",
+    "tip_wheat_A": "Clean grain earns the top rate. Keep it dry in bags off the floor until it is sold.",
+    "tip_wheat_B": "Sieving out broken kernels and dust can move the lot up a grade.",
+    "tip_wheat_C": "Clean out mouldy grain, stones and chaff first, and keep damp grain apart. Mould spreads in storage.",
+    "tip_sugarcane_A": "Get it to the mill within a day of cutting: cane loses sugar and weight every day it waits.",
+    "tip_sugarcane_B": "Strip dry leaves and trim damaged ends before weighing at the mill.",
+    "tip_sugarcane_C": "Cut out damaged or red-rotted pieces before weighing. Mills can dock the whole load for them.",
+    "tip_other_A": "Keep the best produce together and show the grade to buyers.",
+    "tip_other_B": "Sort out the damaged pieces. The rest may then sell as Grade A.",
+    "tip_other_C": "Sell soon and locally; storing will not improve it."
+  },
+  "photosWheat": {
+    "tip": "Spread a handful of grain in one layer on a plain dark cloth, so the kernels do not touch. The app finds and checks every kernel."
+  },
+  "photosSugarcane": {
+    "tip": "Lay one cut piece of cane (about a forearm long) on a plain cloth and photograph it side-on. Add a photo of the cut end."
   }
 }

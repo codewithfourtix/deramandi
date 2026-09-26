@@ -54,6 +54,8 @@ export async function gradeCrop(images: string[], crop: CropId): Promise<GradeRe
     defects: level(1 - avg('defects'), 0.8, 0.6),
   }
 
+  const specs = measuredSpecs(perImage)
+
   if (crop === 'dhakki_dates') {
     try {
       const { gradeWithModel } = await import('./model')
@@ -67,6 +69,7 @@ export async function gradeCrop(images: string[], crop: CropId): Promise<GradeRe
         probabilities: m.probabilities,
         perPhoto: m.perPhoto,
         unfamiliar: m.unfamiliar,
+        specs,
       }
     } catch (err) {
       // No silent fallback: the rules scored below chance on khajoor, so a
@@ -76,7 +79,37 @@ export async function gradeCrop(images: string[], crop: CropId): Promise<GradeRe
     }
   }
 
-  return gradeByRules(perImage, factors)
+  const { hasCropModel, gradeWithCropModel } = await import('./cropModels')
+  if (hasCropModel(crop)) {
+    try {
+      const m = await gradeWithCropModel(images, crop)
+      const kernelSpecs = m.kernels
+        ? [
+            { key: 'kernels', value: String(m.kernels.total) },
+            ...Object.entries(m.kernels.byClass)
+              .filter(([, count]) => count > 0)
+              .map(([label, count]) => ({ key: `wheat_${label}`, value: `${Math.round((count / Math.max(1, m.kernels!.total)) * 100)}%` })),
+          ]
+        : []
+      return { ...m, factors, source: 'model', specs: m.kernels ? kernelSpecs : specs }
+    } catch (err) {
+      console.warn('Grade model unavailable', err)
+      throw new ModelUnavailable()
+    }
+  }
+
+  return { ...gradeByRules(perImage, factors), specs }
+}
+
+/** What was measured from the photos themselves, as plain percentages. */
+function measuredSpecs(perImage: ImageScores[]) {
+  const avg = (k: 'coverage' | 'evenness' | 'patches') => perImage.reduce((s, r) => s + (r[k] ?? 0), 0) / perImage.length
+  const pct = (x: number) => `${Math.round(x * 100)}%`
+  return [
+    { key: 'coverage', value: pct(avg('coverage')) },
+    { key: 'evenness', value: pct(avg('evenness')) },
+    { key: 'patches', value: pct(avg('patches')) },
+  ]
 }
 
 /** The rule-based path on its own, for comparing it with the model. */
@@ -90,6 +123,45 @@ export async function gradeCropRulesOnly(images: string[], crop: CropId): Promis
     color: level(avg('color'), 0.62, 0.4),
     defects: level(1 - avg('defects'), 0.8, 0.6),
   })
+}
+
+/**
+ * Whole-lot grading: each photo is one fruit from the lot, graded on its own.
+ * The lot's grade is the most common one (a tie goes to the lower grade), and
+ * lotCounts says how many fruits got A, B and C, which drives the mixed price.
+ */
+export async function gradeLot(images: string[], crop: CropId): Promise<GradeResult> {
+  if (images.length === 0) throw new Error('gradeLot needs at least one photo')
+  const results: GradeResult[] = []
+  for (let i = 0; i < images.length; i++) {
+    try {
+      results.push(await gradeCrop([images[i]], crop))
+    } catch (err) {
+      if (err instanceof PhotoProblem) throw new PhotoProblem(err.issue, i)
+      throw err
+    }
+  }
+  const order: Grade[] = ['A', 'B', 'C']
+  const counts = order.map((g) => results.filter((r) => r.grade === g).length) as [number, number, number]
+  const max = Math.max(...counts)
+  const grade: Grade = counts[2] === max ? 'C' : counts[1] === max ? 'B' : 'A'
+  const withProbs = results.filter((r) => r.probabilities)
+  const probabilities =
+    withProbs.length === results.length
+      ? (Object.fromEntries(order.map((g) => [g, withProbs.reduce((s, r) => s + r.probabilities![g], 0) / withProbs.length])) as Record<Grade, number>)
+      : undefined
+  const typical = results.find((r) => r.grade === grade)!
+  return {
+    grade,
+    confidence: Math.round((counts[order.indexOf(grade)] / results.length) * 100) / 100,
+    factors: typical.factors,
+    source: results[0].source,
+    probabilities,
+    perPhoto: results.map((r) => r.grade),
+    unfamiliar: results.some((r) => r.unfamiliar),
+    lotCounts: counts,
+    specs: typical.specs,
+  }
 }
 
 function gradeByRules(perImage: ImageScores[], factors: GradeResult['factors']): GradeResult {
@@ -118,6 +190,10 @@ interface ImageScores {
   color: number
   defects: number
   issue?: PhotoIssue
+  /** Raw measurements, shown to the user as "measured from photo". */
+  coverage?: number // share of the frame the produce fills
+  evenness?: number // 0..1, how even the produce brightness is
+  patches?: number // share of produce pixels that are very dark, grey-white or green
 }
 
 // Target hue (degrees) and ideal saturation band for ripe produce, per crop.
@@ -244,7 +320,7 @@ export function scorePixels(data: Uint8ClampedArray, crop: CropId): ImageScores 
   const color = clamp(0.7 * (colorHits / fg) + 0.3 * evenness, 0, 1)
   const defects = clamp((defectHits / fg) * 4, 0, 1)
 
-  return { size, color, defects }
+  return { size, color, defects, coverage, evenness, patches: defectHits / fg }
 }
 
 function isRipe(h: number, s: number, v: number, ripe: (typeof RIPE)[CropId]) {

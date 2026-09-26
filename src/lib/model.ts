@@ -23,31 +23,57 @@ export const GRADES: Grade[] = ['A', 'B', 'C']
 type Tf = typeof import('@tensorflow/tfjs-core')
 type LayersModel = import('@tensorflow/tfjs-layers').LayersModel
 
-let loading: Promise<{ tf: Tf; model: LayersModel }> | null = null
+const loaded = new Map<string, Promise<{ tf: Tf; model: LayersModel }>>()
 
-export function loadGradeModel() {
-  if (!loading) {
-    loading = (async () => {
+/** Load (once) any of the app's TF.js models: khajoor at /model/, others at /models/<crop>/. */
+export function loadModelAt(url: string) {
+  let p = loaded.get(url)
+  if (!p) {
+    p = (async () => {
       const [tf, layers] = await Promise.all([import('@tensorflow/tfjs-core'), import('@tensorflow/tfjs-layers')])
       await Promise.all([import('@tensorflow/tfjs-backend-webgl'), import('@tensorflow/tfjs-backend-cpu')])
-      try {
-        if (!(await tf.setBackend('webgl'))) throw new Error('webgl unavailable')
-      } catch {
-        await tf.setBackend('cpu') // old phones without WebGL still work, just slower
+      if (tf.getBackend() !== 'webgl' && tf.getBackend() !== 'cpu') {
+        try {
+          if (!(await tf.setBackend('webgl'))) throw new Error('webgl unavailable')
+        } catch {
+          await tf.setBackend('cpu') // old phones without WebGL still work, just slower
+        }
       }
       await tf.ready()
-      const model = await layers.loadLayersModel(MODEL_URL)
+      const model = await layers.loadLayersModel(url)
       return { tf, model }
     })().catch((err) => {
-      loading = null // allow a retry next time (e.g. after coming back online)
+      loaded.delete(url) // allow a retry next time (e.g. after coming back online)
       throw err
     })
+    loaded.set(url, p)
   }
-  return loading
+  return p
+}
+
+export function loadGradeModel() {
+  return loadModelAt(MODEL_URL)
+}
+
+/** Probabilities per image, averaged over three views (as is, mirrored, upside down). */
+export function predictTTA(tf: Tf, model: LayersModel, pixels: ImageData[]): number[][] {
+  return tf.tidy(() => {
+    const batch = tf.stack(pixels.map((p) => tf.cast(tf.browser.fromPixels(p, 3), 'float32'))) as import('@tensorflow/tfjs-core').Tensor4D
+    const views = [batch, tf.reverse(batch, 2), tf.reverse(batch, [1, 2])]
+    const probs = views.map((v) => model.predict(v) as import('@tensorflow/tfjs-core').Tensor2D)
+    return tf.div(tf.addN(probs), views.length).arraySync() as number[][]
+  })
+}
+
+/** Temperature scaling (softmax(logits / T) expressed on probabilities). */
+export function calibrateWith(p: number[], T: number): number[] {
+  const q = p.map((x) => Math.pow(Math.max(x, 1e-7), 1 / T))
+  const sum = q.reduce((a, b) => a + b, 0)
+  return q.map((x) => x / sum)
 }
 
 /** Crop the fruit out of a photo and return 224x224 RGBA pixels, like ml/preprocess.py. */
-export function cropToFruit(img: HTMLImageElement | HTMLCanvasElement): { pixels: ImageData; hue: number; val: number } {
+export function cropToFruit(img: HTMLImageElement | HTMLCanvasElement, size = SIZE): { pixels: ImageData; hue: number; val: number } {
   const w0 = img.width
   const h0 = img.height
   const scale = Math.min(1, WORK / Math.max(w0, h0))
@@ -118,14 +144,14 @@ export function cropToFruit(img: HTMLImageElement | HTMLCanvasElement): { pixels
 
   const side = Math.max(sw, sh)
   const out = document.createElement('canvas')
-  out.width = SIZE
-  out.height = SIZE
+  out.width = size
+  out.height = size
   const octx = out.getContext('2d', { willReadFrequently: true })!
   octx.fillStyle = `rgb(${Math.round(r)},${Math.round(g)},${Math.round(b)})`
-  octx.fillRect(0, 0, SIZE, SIZE)
-  const k = SIZE / side
+  octx.fillRect(0, 0, size, size)
+  const k = size / side
   octx.drawImage(work, sx, sy, sw, sh, ((side - sw) / 2) * k, ((side - sh) / 2) * k, sw * k, sh * k)
-  return { pixels: octx.getImageData(0, 0, SIZE, SIZE), hue: median(hues), val: median(vals) }
+  return { pixels: octx.getImageData(0, 0, size, size), hue: median(hues), val: median(vals) }
 }
 
 // Hue in -180..180 (khajoor sits around red-brown, near 0) and brightness 0..1.
@@ -179,12 +205,7 @@ export async function gradeWithModel(images: string[]): Promise<ModelGrade> {
   const crops = await Promise.all(images.map(async (src) => cropToFruit(await loadImage(src))))
   const pixels = crops.map((c) => c.pixels)
 
-  const perPhotoProbs = tf.tidy(() => {
-    const batch = tf.stack(pixels.map((p) => tf.cast(tf.browser.fromPixels(p, 3), 'float32'))) as import('@tensorflow/tfjs-core').Tensor4D
-    const views = [batch, tf.reverse(batch, 2), tf.reverse(batch, [1, 2])]
-    const probs = views.map((v) => model.predict(v) as import('@tensorflow/tfjs-core').Tensor2D)
-    return tf.div(tf.addN(probs), views.length).arraySync() as number[][]
-  })
+  const perPhotoProbs = predictTTA(tf, model, pixels)
 
   const avg = [0, 1, 2].map((c) => perPhotoProbs.reduce((s, p) => s + p[c], 0) / perPhotoProbs.length)
   const mean = calibrate(avg)
@@ -201,8 +222,5 @@ export async function gradeWithModel(images: string[]): Promise<ModelGrade> {
   right at that level. Same as softmax(logits / T); the chosen grade never changes.
 */
 function calibrate(p: number[]): number[] {
-  const T = (modelCard as { temperature?: number }).temperature ?? 1
-  const q = p.map((x) => Math.pow(Math.max(x, 1e-7), 1 / T))
-  const sum = q.reduce((a, b) => a + b, 0)
-  return q.map((x) => x / sum)
+  return calibrateWith(p, (modelCard as { temperature?: number }).temperature ?? 1)
 }

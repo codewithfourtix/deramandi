@@ -2,6 +2,9 @@ import { useEffect, useMemo, useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import { Link, useLocation, useNavigate, useParams } from 'react-router'
 import { GradeStamp } from '../components/GradeStamp'
+import { CropModelBreakdown, MeasuredSpecs } from '../components/CropModelBreakdown'
+import { GradeAdvice } from '../components/GradeAdvice'
+import { LotBreakdown } from '../components/LotBreakdown'
 import { ModelBreakdown } from '../components/ModelBreakdown'
 import { CheckIcon, SnowIcon, WhatsAppIcon } from '../components/Icons'
 import { ShareActions } from '../components/ShareActions'
@@ -12,7 +15,7 @@ import { Steps } from '../components/Steps'
 import { cropInfo } from '../data'
 import { GRADE_COLOR } from '../lib/format'
 import { Money, Num, Price, PriceStack } from '../components/Price'
-import { findBuyer, findLogistics, matchBuyers, matchLogistics, priceBand } from '../lib/match'
+import { findBuyer, findLogistics, listingBand, matchBuyers, matchLogistics } from '../lib/match'
 import { useRatesVersion } from '../lib/prices'
 import { DEMO_NUMBER, DEMO_NUMBER_DISPLAY, updateSettings, useSettings } from '../lib/settings'
 import { requestMessage, whatsappUrl } from '../lib/share'
@@ -60,7 +63,7 @@ function ResultView({ listing }: { listing: Listing }) {
   // is sent its price is frozen, so the certificate matches what was sent.
   useEffect(() => {
     if (listing.status !== 'listed') return
-    const band = priceBand(listing.crop, listing.grade)
+    const band = listingBand(listing)
     if (band.min !== listing.priceMin || band.max !== listing.priceMax) {
       updateListing(listing.id, { priceMin: band.min, priceMax: band.max, referencePrice: Math.round(((band.min + band.max) / 2) * 10) / 10 })
     }
@@ -125,18 +128,23 @@ function ResultView({ listing }: { listing: Listing }) {
           {t('result.confidence', { value: Math.round(listing.gradeConfidence * 100) })}
         </p>
 
-        {listing.gradeSource === 'model' && listing.gradeProbabilities ? (
+        {listing.lotCounts && <LotBreakdown counts={listing.lotCounts} />}
+        {listing.gradeSource === 'model' && listing.gradeProbabilities && listing.crop === 'dhakki_dates' ? (
           <>
             {listing.gradeUnfamiliar && <p className="mt-4 rounded-md bg-warn-wash px-3 py-2 font-bold text-warn">{t('model.unfamiliar')}</p>}
             <ModelBreakdown probabilities={listing.gradeProbabilities} perPhoto={listing.gradePerPhoto} grade={listing.grade} />
             <p className="mt-3 text-[0.95rem] text-soil-soft">{t('model.note')}</p>
           </>
+        ) : listing.gradeSource === 'model' && listing.gradeProbabilities ? (
+          <CropModelBreakdown listing={listing} />
         ) : (
           <>
             <FactorList factors={listing.gradeFactors} />
             <p className="mt-3 text-[0.95rem] text-soil-soft">{t('result.gradeNote')}</p>
           </>
         )}
+        <MeasuredSpecs listing={listing} />
+        <GradeAdvice listing={listing} />
       </section>
 
       <div className="mt-8">
