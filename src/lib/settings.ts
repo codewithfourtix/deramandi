@@ -17,7 +17,8 @@ export interface Settings {
 }
 
 export const DEMO_NUMBER = '923134870456' // WhatsApp format
-export const DEMO_NUMBER_DISPLAY = '0313 4870456'
+// isolated LTR so the two digit groups keep their order inside Urdu sentences
+export const DEMO_NUMBER_DISPLAY = '⁦0313 4870456⁩'
 
 const KEY = 'deramandi.settings'
 const DEFAULTS: Settings = { demoMode: true, largeText: false, voice: false, voiceOffered: false, helperMode: false }
