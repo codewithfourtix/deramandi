@@ -1,5 +1,6 @@
 import { BrowserRouter, Route, Routes } from 'react-router'
 import { Layout } from './components/Layout'
+import { About } from './pages/About'
 import { Home } from './pages/Home'
 import { ListDetails } from './pages/ListDetails'
 import { ListPhotos } from './pages/ListPhotos'
@@ -20,6 +21,7 @@ export default function App() {
             <Route path="listing/:id" element={<Result />} />
             <Route path="listing/:id/sent" element={<Sent />} />
             <Route path="listings" element={<MyListings />} />
+            <Route path="about" element={<About />} />
             <Route path="*" element={<Home />} />
           </Route>
         </Routes>

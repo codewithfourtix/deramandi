@@ -208,5 +208,44 @@
       "listed": "Listed",
       "reserved": "Request sent"
     }
+  },
+  "footer": {
+    "about": "How it works and what is real",
+    "note": "Prototype for Imaginathon by Banao. Buyers, logistics and prices are sample data.",
+    "privacy": "Your listings and photos stay on this phone."
+  },
+  "about": {
+    "title": "How Dera Mandi works",
+    "lede": "A tool for growers in Dera Ismail Khan to know what their crop is worth before they sell it.",
+    "problemTitle": "The problem in D.I. Khan",
+    "problem1": "D.I. Khan grows export-grade Dhakki dates and Kulachi melons, along with wheat and sugarcane. The value leaks out before it reaches the grower, for three linked reasons.",
+    "problemPrice": "Price is opaque. Most growers sell to a commission agent at the local mandi, under time pressure, at the price the agent names.",
+    "problemSpoil": "Fruit spoils. There is little cold storage and the road to Multan or Karachi is long, so fruit is sold fast and cheap, or rots.",
+    "problemLots": "Small lots cannot reach export. One grower rarely has enough graded fruit to interest an exporter, so the export premium goes to middlemen.",
+    "stepsTitle": "What the app does",
+    "steps1": "The grower photographs the crop and enters the quantity and village.",
+    "steps2": "The app grades it A, B or C and shows the price band buyers pay for that grade.",
+    "steps3": "It lists buyers who take that crop, grade and quantity, and nearby storage and transport, with cold storage first for fruit.",
+    "steps4": "The grower picks a buyer and sends a request.",
+    "gradeTitle": "How the grade is worked out",
+    "grade1": "The grade is worked out on the phone from the photos. It looks at how much of the frame the crop fills, how close its colour is to ripe for that crop and how even it is, and how much of it shows dark spots, mould or unripe patches.",
+    "grade2": "It is a rule-based estimate, not a trained AI model. It has not been measured against graded lots, so treat it as a starting reference. The crop is checked in person at the storage hub before anything is shipped.",
+    "grade3": "If a photo is too dark, washed out, or does not show the crop, the app asks for a retake instead of guessing.",
+    "grade4": "The next step is a small image model trained on photos of graded Dhakki dates, dropped in behind the same grading step.",
+    "lotsTitle": "Small lots, export size",
+    "lots1": "Dera Mandi's plan is to combine nearby lots of the same crop and grade until they reach the size an exporter buys. In this prototype, that shows as a note on the result screen when a lot is too small.",
+    "realTitle": "What is real in this prototype",
+    "real1": "Real: the full listing flow, the photo checks and grading, price bands, matching by crop, grade, quantity and distance, requests, and history, in Urdu and English.",
+    "real2": "Sample: every buyer, store and transporter is an invented sample provider, not a real business. Prices are illustrative, not live mandi rates. A request is saved on the phone but does not reach anyone.",
+    "real3": "Your listings and photos are kept only in this phone's browser. Nothing is uploaded.",
+    "faqTitle": "Common questions",
+    "faq1q": "What if a grower cannot read or has no smartphone?",
+    "faq1a": "The app opens in Urdu, uses large simple steps and crop pictures, and needs no account. One literate helper in a village can list crops for many growers.",
+    "faq2q": "Why trust a grade from a photo?",
+    "faq2a": "The photos stay with the listing so anyone can check them, and the crop is inspected in person before shipment. The grade is a fair starting point for the conversation, not a final verdict.",
+    "faq3q": "Cold storage barely exists in D.I. Khan.",
+    "faq3a": "True. Pooling demand from many growers is what makes shared storage worth building, and meanwhile the app routes toward existing cold hubs in Multan and Karachi.",
+    "team": "Built for Imaginathon by Banao by The Four Musketeers.",
+    "cta": "List my crop"
   }
 }

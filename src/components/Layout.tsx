@@ -1,6 +1,6 @@
 import { useEffect } from 'react'
 import { useTranslation } from 'react-i18next'
-import { Link, NavLink, Outlet, useLocation } from 'react-router'
+import { Link, NavLink, Outlet, useLocation, useMatch } from 'react-router'
 import { LanguageToggle } from './LanguageToggle'
 
 function Wordmark() {
@@ -20,6 +20,8 @@ function Wordmark() {
 export function Layout() {
   const { t, i18n } = useTranslation()
   const { pathname } = useLocation()
+  // The result screen has a fixed send bar; leave room so it never hides the footer.
+  const hasSendBar = Boolean(useMatch('/listing/:id'))
 
   // New screen: start at the top, as a farmer would expect.
   useEffect(() => {
@@ -56,9 +58,18 @@ export function Layout() {
           </nav>
         </div>
       </header>
-      <main id="main" className="mx-auto w-full max-w-2xl flex-1 px-4 pb-16 pt-6">
+      <main id="main" className="mx-auto w-full max-w-2xl flex-1 px-4 pb-12 pt-6">
         <Outlet />
       </main>
+      <footer className="border-t border-line">
+        <div className={`mx-auto max-w-2xl px-4 pt-5 text-[0.9rem] text-soil-soft ${hasSendBar ? 'pb-36' : 'pb-8'}`}>
+          <Link to="/about" className="inline-flex min-h-11 items-center font-bold text-indus underline underline-offset-4">
+            {t('footer.about')}
+          </Link>
+          <p className="mt-1">{t('footer.note')}</p>
+          <p>{t('footer.privacy')}</p>
+        </div>
+      </footer>
     </div>
   )
 }

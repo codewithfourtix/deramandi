@@ -63,7 +63,7 @@ function ResultView({ listing }: { listing: Listing }) {
   }
 
   return (
-    <div className="pb-28">
+    <div>
       {!reserved && <Steps current={3} />}
       {reserved && (
         <div className="mb-6 flex items-start gap-2 rounded-md bg-field-wash px-3 py-2 text-field">
