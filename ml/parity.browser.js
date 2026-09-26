@@ -26,4 +26,4 @@ for (const e of expected) {
     if (h.grade === G[e.label]) r.rulesCorrect++
   } catch {}
 }
-r
+console.log(r)

@@ -11,7 +11,10 @@ The photos show single dried khajoor fruits, shot from above under a ring light.
 **What we used, and why:**
 
 - **Only the 3,004 original photos.** The dataset also publishes augmented copies. Mixing those into a split would leak test images into training.
-- **Training varieties: Gajar and Kupro.** These are the only two with all three grades. Aseel and Fasli Toto are Grade 1 only. Training on them would teach "this variety means Grade A", so they are held out as an unseen-variety check.
+- **Training varieties: Gajar, Kupro and Aseel. Fasli Toto is never seen**, and serves as an unseen-variety check.
+  - Gajar and Kupro are the only varieties with all three grades.
+  - The first version trained on those two alone. It learned "lighter colour means worse grade" and called 95% of the Grade 1 Aseel and Fasli Toto fruit C.
+  - The shipped version adds Aseel (Grade 1 only) and uses strong colour augmentation, including 20% greyscale copies, so the model has to rely on wrinkles, damage and shape.
 - **Duplicates removed before splitting.** The dataset contains 45 byte-identical files and other near-identical shots of the same fruit. A naive random split put 12 test photos that were byte-identical to training photos.
   - Images are grouped by perceptual hash (dHash, ≤10 of 256 bits apart, joined with union-find).
   - Each group stays in one split, and only one image per group is used for validation and test.
@@ -22,10 +25,34 @@ The photos show single dried khajoor fruits, shot from above under a ring light.
 
 ## Results
 
-`metrics.json` holds the full numbers from the last run: per-grade precision and recall, the confusion matrix, per-variety accuracy, the unseen-variety check and the calibration temperature. `splits.json` lists exactly which files went where.
+These are from the shipped model. Test photos were used once, and TTA means each photo is scored as three views, as the app does.
 
-- The test split was used once, for the final report.
-- The early stopping, learning-rate schedule and calibration temperature were all chosen on validation only.
+| Measure | Result |
+|---|---|
+| **Gajar + Kupro test accuracy** (three grades, 311 photos) | **72.0%**, 95% Wilson interval 66.8–76.7% |
+| Always guessing the most common grade on that test set | 42.8% |
+| Per variety | Gajar 73.9%, Kupro 69.1% |
+| All test photos including Aseel (Grade 1 only, easy) | 77.1% of 384 |
+| **Unseen variety, Fasli Toto** (all Grade 1): share called A | **66%** (the rest were called C) |
+| Browser vs Python on 90 held-out photos, through the real upload path | same grade on 87/90. Browser accuracy 72% |
+| Old rule-based grader on the same 90 photos | 24% |
+
+**Confusion on all 384 test photos** (rows are the true grade, columns the predicted grade A, B, C):
+
+- A: 190, 14, 2
+- B: 43, 41, 15
+- C: 7, 7, 65
+
+Grade B is the hard one. It gets confused with both neighbours, and the dataset itself files 45 photos of the same fruit under two different grades.
+
+**How the shipped version was chosen:**
+
+- The first version (`metrics_v2_rejected.json`) scored 75.9% on Gajar + Kupro, but called 99.5% of unseen-variety Grade 1 fruit C.
+- The shipped version was preferred because Dhakki is also a variety the model has never seen.
+- This choice was made after looking at the unseen-variety numbers, so treat the Fasli Toto figure as indicative rather than a clean held-out measure.
+- Early stopping, the learning-rate schedule and the calibration temperature (T = 0.70) were chosen on validation only.
+
+`metrics.json` holds everything from the shipped run. `splits.json` lists exactly which files went where.
 
 ## Reproduce
 
@@ -36,7 +63,7 @@ python -m venv .venv && .venv/Scripts/pip install -r requirements.txt
 python list_files.py       # dataset file list (metadata only)
 python download_raw.py     # original photos only, ~184 MB, into data/raw
 python leak_check.py       # duplicate and near-duplicate report
-python train.py            # ~20 min on an 8-core laptop CPU; writes out/model.h5 + out/metrics.json
+python train.py            # ~10 min on an 8-core laptop CPU (defaults = shipped config); writes out/model.h5 + out/metrics.json
 python export.py           # TF.js model into ../public/model, model card, sample photos
 python parity_prep.py      # optional: files for the browser-vs-Python parity check
 ```

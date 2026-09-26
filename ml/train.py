@@ -29,7 +29,7 @@ from data import GRADES, RAW, SEED, collect, split  # noqa: E402
 from preprocess import to_square  # noqa: E402
 
 IMG = 224
-COLOUR_AUG = os.environ.get("COLOUR_AUG", "mild")
+COLOUR_AUG = os.environ.get("COLOUR_AUG", "strong")
 STORE = 256  # images are stored at 256 and randomly cropped/zoomed to 224
 LABELS = ["A", "B", "C"]
 HERE = os.path.dirname(os.path.abspath(__file__))
@@ -135,7 +135,7 @@ def evaluate(model, x, y, tta=True):
 def main():
     alpha = float(os.environ.get("ALPHA", "1.0"))
     t0 = time.time()
-    extra = [v for v in os.environ.get("EXTRA_VARIETIES", "").split(",") if v]
+    extra = [v for v in os.environ.get("EXTRA_VARIETIES", "Aseel").split(",") if v]
     train_varieties = ["Gajar", "Kupro"] + extra
     unseen_varieties = [v for v in ["Aseel", "Fasli Toto"] if v not in train_varieties]
     items = collect(train_varieties)
