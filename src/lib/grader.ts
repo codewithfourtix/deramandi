@@ -96,26 +96,35 @@ async function analyse(src: string, crop: CropId): Promise<ImageScores> {
   bb /= bn
 
   const ripe = RIPE[crop]
+  const isForeground = (i: number) => Math.hypot(data[i] - br, data[i + 1] - bg, data[i + 2] - bb) >= 48
+
+  // Pass 1: how bright is this produce overall? Dried Dhakki dates are dark
+  // brown, and the gaps between them cast deep shadows, so a fixed "very dark
+  // = rot" rule would mark a good lot down. The spot threshold scales instead.
   let fg = 0
-  let colorHits = 0
-  let defectHits = 0
   let lSum = 0
   let lSq = 0
-
   for (let i = 0; i < data.length; i += 4) {
-    const r = data[i]
-    const g = data[i + 1]
-    const b = data[i + 2]
-    if (Math.hypot(r - br, g - bg, b - bb) < 48) continue // looks like background
+    if (!isForeground(i)) continue
+    const v = Math.max(data[i], data[i + 1], data[i + 2]) / 255
     fg++
-    const [h, s, v] = rgbToHsv(r, g, b)
     lSum += v
     lSq += v * v
+  }
+  const mean = fg ? lSum / fg : 0
+  const spotBelow = Math.min(0.12, mean * 0.3)
+
+  // Pass 2: colour match and defects.
+  let colorHits = 0
+  let defectHits = 0
+  for (let i = 0; i < data.length; i += 4) {
+    if (!isForeground(i)) continue
+    const [h, s, v] = rgbToHsv(data[i], data[i + 1], data[i + 2])
 
     const hueDelta = Math.min(Math.abs(h - ripe.hue), 360 - Math.abs(h - ripe.hue))
     if (hueDelta <= ripe.hueWidth && s >= ripe.satMin && s <= ripe.satMax && v > 0.18) colorHits++
 
-    const blackSpot = v < 0.12
+    const blackSpot = v < spotBelow
     const mould = s < 0.12 && v > 0.55 && v < 0.92 // grey-white fuzz
     const unripeGreen = crop !== 'sugarcane' && h > 85 && h < 160 && s > 0.3
     if (blackSpot || mould || unripeGreen) defectHits++
@@ -129,7 +138,6 @@ async function analyse(src: string, crop: CropId): Promise<ImageScores> {
 
   const coverage = fg / total
   const size = clamp((coverage - 0.15) / 0.6, 0, 1)
-  const mean = lSum / fg
   const evenness = 1 - clamp(Math.sqrt(Math.max(0, lSq / fg - mean * mean)) / 0.3, 0, 1)
   const color = clamp(0.7 * (colorHits / fg) + 0.3 * evenness, 0, 1)
   const defects = clamp((defectHits / fg) * 4, 0, 1)
