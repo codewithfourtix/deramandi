@@ -2,13 +2,16 @@ import type { CropId, FactorLevel, Grade, GradeResult } from '../types'
 import { loadImage } from './image'
 
 /*
-  gradeCrop is the one seam between the app and the grader.
-  Callers only ever see this signature, so this rule-based analysis can later
-  be replaced by a trained image model (for example MobileNetV2 on TF.js)
-  without touching any screen.
+  gradeCrop is the one seam between the app and the graders.
 
-  Each photo is first checked (is it lit, and is there produce in it?), then
-  read for three things:
+  Khajoor (Dhakki dates): a MobileNetV2 image model trained on graded Pakistani
+  khajoor photos (see ml/ and src/lib/model.ts). If the model cannot load (for
+  example the very first visit is offline), it falls back to the rules below
+  and says so.
+
+  Every other crop: rule-based analysis, because no graded photo set exists for
+  them yet. Each photo is checked first (is it lit, is there produce in it?),
+  then read for:
     size    - how much of the frame the produce fills (a proxy, not a measurement)
     color   - how close the produce colour is to ripe for this crop, and how even it is
     defects - share of produce pixels that look like dark spots, bruising or mould
@@ -37,11 +40,50 @@ export async function gradeCrop(images: string[], crop: CropId): Promise<GradeRe
   if (bad !== -1) throw new PhotoProblem(perImage[bad].issue as PhotoIssue, bad)
 
   const avg = (k: 'size' | 'color' | 'defects') => perImage.reduce((s, r) => s + r[k], 0) / perImage.length
-  const size = avg('size')
-  const color = avg('color')
-  const defects = avg('defects') // 0 = clean, 1 = heavily marked
+  const factors = {
+    size: level(avg('size'), 0.55, 0.3),
+    color: level(avg('color'), 0.62, 0.4),
+    defects: level(1 - avg('defects'), 0.8, 0.6),
+  }
 
-  const score = combine(size, color, defects)
+  if (crop === 'dhakki_dates') {
+    try {
+      const { gradeWithModel } = await import('./model')
+      const m = await gradeWithModel(images)
+      const grade = (['A', 'B', 'C'] as Grade[]).reduce((best, g) => (m.probabilities[g] > m.probabilities[best] ? g : best), 'A' as Grade)
+      return {
+        grade,
+        confidence: Math.round(m.probabilities[grade] * 100) / 100,
+        factors,
+        source: 'model',
+        probabilities: m.probabilities,
+        perPhoto: m.perPhoto,
+        unfamiliar: m.unfamiliar,
+      }
+    } catch (err) {
+      console.warn('Grade model unavailable, using rules instead', err)
+    }
+  }
+
+  return gradeByRules(perImage, factors)
+}
+
+/** The rule-based path on its own, for comparing it with the model. */
+export async function gradeCropRulesOnly(images: string[], crop: CropId): Promise<GradeResult> {
+  const perImage = await Promise.all(images.map((src) => analyse(src, crop)))
+  const bad = perImage.findIndex((r) => r.issue)
+  if (bad !== -1) throw new PhotoProblem(perImage[bad].issue as PhotoIssue, bad)
+  const avg = (k: 'size' | 'color' | 'defects') => perImage.reduce((s, r) => s + r[k], 0) / perImage.length
+  return gradeByRules(perImage, {
+    size: level(avg('size'), 0.55, 0.3),
+    color: level(avg('color'), 0.62, 0.4),
+    defects: level(1 - avg('defects'), 0.8, 0.6),
+  })
+}
+
+function gradeByRules(perImage: ImageScores[], factors: GradeResult['factors']): GradeResult {
+  const avg = (k: 'size' | 'color' | 'defects') => perImage.reduce((s, r) => s + r[k], 0) / perImage.length
+  const score = combine(avg('size'), avg('color'), avg('defects'))
   const grade: Grade = score >= GRADE_A ? 'A' : score >= GRADE_B ? 'B' : 'C'
 
   // Confidence: distance from the nearest grade boundary, reduced when photos disagree.
@@ -50,16 +92,7 @@ export async function gradeCrop(images: string[], crop: CropId): Promise<GradeRe
   const spread = Math.max(...totals) - Math.min(...totals)
   const confidence = clamp(0.55 + boundaryGap * 2 - spread * 0.6 + (perImage.length - 1) * 0.03, 0.5, 0.9)
 
-  return {
-    grade,
-    confidence: Math.round(confidence * 100) / 100,
-    factors: {
-      size: level(size, 0.55, 0.3),
-      color: level(color, 0.62, 0.4),
-      defects: level(1 - defects, 0.8, 0.6),
-    },
-    source: 'heuristic',
-  }
+  return { grade, confidence: Math.round(confidence * 100) / 100, factors, source: 'heuristic' }
 }
 
 const GRADE_A = 0.66

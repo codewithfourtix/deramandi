@@ -14,6 +14,7 @@ import type { Listing } from '../types'
 const MAX_PHOTOS = 3
 // Long enough that the check registers as a real step, short enough not to annoy.
 const MIN_GRADING_MS = 1400
+const SAMPLES_PER_GRADE = 2
 
 export function ListPhotos() {
   const { t } = useTranslation()
@@ -32,6 +33,7 @@ export function ListPhotos() {
 
   const photos = draft.photos
   const full = photos.length >= MAX_PHOTOS
+  const isDates = draft.crop === 'dhakki_dates'
 
   async function addFiles(e: ChangeEvent<HTMLInputElement>) {
     const files = Array.from(e.target.files ?? [])
@@ -59,6 +61,21 @@ export function ListPhotos() {
     update({ photos: [...photos, drawSample(draft.crop, quality, photos.length + 1)] })
   }
 
+  // Khajoor samples are real held-out photos from the training dataset.
+  async function addDateSample(grade: 1 | 2 | 3) {
+    if (full) return
+    setError(null)
+    setBadPhoto(null)
+    try {
+      const n = (photos.length % SAMPLES_PER_GRADE) + 1
+      const blob = await (await fetch(`/samples/khajoor-g${grade}-${n}.jpg`)).blob()
+      const url = await fileToDataUrl(new File([blob], 'sample.jpg', { type: blob.type || 'image/jpeg' }))
+      update({ photos: [...photos, url] })
+    } catch {
+      setError(t('photos.readError'))
+    }
+  }
+
   function removePhoto(i: number) {
     update({ photos: photos.filter((_, idx) => idx !== i) })
     setError(null)
@@ -83,6 +100,9 @@ export function ListPhotos() {
         gradeConfidence: result.confidence,
         gradeFactors: result.factors,
         gradeSource: result.source,
+        gradeProbabilities: result.probabilities,
+        gradePerPhoto: result.perPhoto,
+        gradeUnfamiliar: result.unfamiliar,
         priceMin: band.min,
         priceMax: band.max,
         referencePrice: Math.round(((band.min + band.max) / 2) * 10) / 10,
@@ -108,7 +128,7 @@ export function ListPhotos() {
     <div>
       <Steps current={2} />
       <h1 className="display text-[1.7rem]">{t('photos.title')}</h1>
-      <p className="mt-2 text-soil-soft">{t('photos.tip')}</p>
+      <p className="mt-2 text-soil-soft">{isDates ? t('photosDates.tip') : t('photos.tip')}</p>
 
       {/* Two inputs on purpose: `capture` alone hides the gallery on Android. */}
       <input ref={cameraRef} type="file" accept="image/*" capture="environment" className="sr-only" tabIndex={-1} onChange={addFiles} aria-hidden="true" />
@@ -165,14 +185,22 @@ export function ListPhotos() {
       {photos.length === 0 && <p className="mt-3 text-soil-soft">{t('photos.empty')}</p>}
 
       <details className="group mt-5 rounded-md border-2 border-dashed border-line px-3 py-1 open:pb-3">
-        <summary className="flex min-h-11 cursor-pointer items-center font-bold text-indus">{t('photos.samplesToggle')}</summary>
-        <p className="text-[0.95rem] text-soil-soft">{t('photos.samplesNote')}</p>
+        <summary className="flex min-h-11 cursor-pointer items-center font-bold text-indus">
+          {isDates ? t('photosDates.samplesToggle') : t('photos.samplesToggle')}
+        </summary>
+        <p className="text-[0.95rem] text-soil-soft">{isDates ? t('photosDates.samplesNote') : t('photos.samplesNote')}</p>
         <div className="mt-3 grid grid-cols-3 gap-2">
-          {(['good', 'mixed', 'poor'] as const).map((q) => (
-            <button key={q} type="button" className="btn btn-quiet min-h-11 px-2 text-[0.95rem]" disabled={full || grading} onClick={() => addSample(q)}>
-              {t(`photos.sample.${q}`)}
-            </button>
-          ))}
+          {isDates
+            ? ([1, 2, 3] as const).map((g) => (
+                <button key={g} type="button" className="btn btn-quiet min-h-11 px-2 text-[0.95rem]" disabled={full || grading} onClick={() => addDateSample(g)}>
+                  {t(`photosDates.sample.g${g}`)}
+                </button>
+              ))
+            : (['good', 'mixed', 'poor'] as const).map((q) => (
+                <button key={q} type="button" className="btn btn-quiet min-h-11 px-2 text-[0.95rem]" disabled={full || grading} onClick={() => addSample(q)}>
+                  {t(`photos.sample.${q}`)}
+                </button>
+              ))}
         </div>
       </details>
 
@@ -189,7 +217,7 @@ export function ListPhotos() {
         onClick={grade}
         aria-busy={grading}
       >
-        {grading ? t('photos.grading') : t('photos.grade')}
+        {grading ? (isDates ? t('model.loading') : t('photos.grading')) : t('photos.grade')}
       </button>
       {grading && (
         <p className="sr-only" role="status">

@@ -13,6 +13,12 @@ export interface GradeResult {
   confidence: number // 0 to 1
   factors: GradeFactors
   source: 'heuristic' | 'model'
+  /** Model only: averaged probability for each grade. */
+  probabilities?: Record<Grade, number>
+  /** Model only: the grade each photo got on its own. */
+  perPhoto?: Grade[]
+  /** Model only: photo colours fall well outside the khajoor it learned from. */
+  unfamiliar?: boolean
 }
 
 export interface Listing {
@@ -26,6 +32,9 @@ export interface Listing {
   gradeConfidence: number
   gradeFactors: GradeFactors
   gradeSource: GradeResult['source']
+  gradeProbabilities?: Record<Grade, number>
+  gradePerPhoto?: Grade[]
+  gradeUnfamiliar?: boolean
   priceMin: number // PKR per kg
   priceMax: number
   referencePrice: number
