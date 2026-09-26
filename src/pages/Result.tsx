@@ -150,7 +150,9 @@ function ResultView({ listing }: { listing: Listing }) {
                     <span className="min-w-0 flex-1">
                       <span className="block font-bold leading-snug">{lang === 'ur' ? buyer.nameUr : buyer.name}</span>
                       <span className="block text-[0.95rem] text-soil-soft">
-                        {t(`buyerType.${buyer.type}`)}, {t(`places.${buyer.location}`)}
+                        {t(`buyerType.${buyer.type}`)}
+                        {t('common.sep')}
+                        {t(`places.${buyer.location}`)}
                       </span>
                       <span className="mt-1 flex flex-wrap gap-x-4 text-[0.9rem]">
                         {buyer.verified ? (
@@ -222,7 +224,9 @@ function ResultView({ listing }: { listing: Listing }) {
                     )}
                   </span>
                   <span className="block text-[0.95rem] text-soil-soft">
-                    {t(`logisticsType.${provider.type}`)}, {t(`places.${provider.location}`)}
+                    {t(`logisticsType.${provider.type}`)}
+                    {t('common.sep')}
+                    {t(`places.${provider.location}`)}
                   </span>
                   <span className="mt-1 block text-[0.9rem]">{provider.priceNote[lang]}</span>
                 </span>

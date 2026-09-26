@@ -39,11 +39,20 @@ export function Home() {
             {latest.photos[0] && <img src={latest.photos[0]} alt="" className="h-14 w-14 rounded-sm object-cover" />}
             <span className="min-w-0 flex-1">
               <span className="block font-bold">
-                {t(`crops.${latest.crop}`)}, <Num value={latest.quantityKg} /> {t('common.kg')}
+                {t(`crops.${latest.crop}`)}
+                {t('common.sep')}
+                <Num value={latest.quantityKg} /> {t('common.kg')}
               </span>
               <Price min={latest.priceMin} max={latest.priceMax} className="text-soil-soft" />
             </span>
-            <span className="num px-2 text-2xl font-extrabold">{latest.grade}</span>
+            <span className="px-2">
+              <span className="sr-only">
+                {t('common.grade')} {latest.grade}
+              </span>
+              <span className="num text-2xl font-extrabold" aria-hidden="true">
+                {latest.grade}
+              </span>
+            </span>
           </Link>
           <Link to="/listings" className="mt-2 inline-flex min-h-11 items-center font-bold text-indus underline underline-offset-4">
             {t('home.seeAll')}

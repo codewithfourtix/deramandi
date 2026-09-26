@@ -48,7 +48,9 @@ export function MyListings() {
                     )}
                     <span className="min-w-0 flex-1">
                       <span className="block font-bold leading-snug">
-                        {crop}, <Num value={l.quantityKg} /> {t('common.kg')}
+                        {crop}
+                        {t('common.sep')}
+                        <Num value={l.quantityKg} /> {t('common.kg')}
                       </span>
                       <Price min={l.priceMin} max={l.priceMax} className="block text-[0.95rem]" />
                       <span className="mt-0.5 flex flex-wrap items-center gap-x-3 text-[0.85rem] text-soil-soft">
@@ -58,7 +60,10 @@ export function MyListings() {
                         <span>{formatDate(l.createdAt, i18n.language)}</span>
                       </span>
                     </span>
-                    <span className="px-1" aria-label={`${t('common.grade')} ${l.grade}`}>
+                    <span className="px-1">
+                      <span className="sr-only">
+                        {t('common.grade')} {l.grade}
+                      </span>
                       <span className="num display text-[2rem]" style={{ color: GRADE_COLOR[l.grade] }} aria-hidden="true">
                         {l.grade}
                       </span>

@@ -20,7 +20,8 @@
     "km": "km",
     "grade": "Grade",
     "sampleProviders": "Sample providers for this prototype, not real businesses.",
-    "loading": "Loading"
+    "loading": "Loading",
+    "sep": ", "
   },
   "price": {
     "before": "PKR ",
