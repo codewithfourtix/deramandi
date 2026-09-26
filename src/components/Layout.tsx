@@ -8,13 +8,13 @@ import { VoiceGuide, VoiceToggle } from './Voice'
 function Wordmark() {
   const { t } = useTranslation()
   return (
-    <Link to="/" className="flex min-h-11 items-center gap-2 text-soil no-underline" aria-label={t('app.home')}>
-      <svg viewBox="0 0 64 64" width="30" height="30" aria-hidden="true">
+    <Link to="/" className="flex min-h-11 items-center gap-1.5 text-soil no-underline" aria-label={t('app.home')}>
+      <svg viewBox="0 0 64 64" width="28" height="28" aria-hidden="true">
         <circle cx="32" cy="32" r="29" fill="none" stroke="var(--color-date)" strokeWidth="4" />
         <circle cx="32" cy="32" r="21" fill="none" stroke="var(--color-date)" strokeWidth="2" />
         <path d="M25 21h7.5c6.2 0 10 4.2 10 11s-3.8 11-10 11H25z" fill="none" stroke="var(--color-soil)" strokeWidth="4.5" strokeLinejoin="round" />
       </svg>
-      <span className="display whitespace-nowrap text-[1.15rem] leading-none">{t('app.name')}</span>
+      <span className="display whitespace-nowrap text-[1rem] leading-none min-[420px]:text-[1.15rem]">{t('app.name')}</span>
     </Link>
   )
 }
@@ -48,13 +48,13 @@ export function Layout() {
         {t('nav.skip')}
       </a>
       <header className="border-b border-line bg-paper">
-        <div className="mx-auto flex max-w-2xl items-center justify-between gap-2 px-4 py-2">
+        <div className="mx-auto flex max-w-2xl items-center justify-between gap-1 px-3 py-2 sm:px-4">
           <Wordmark />
-          <nav aria-label={t('nav.main')} className="flex items-center gap-1 sm:gap-3">
+          <nav aria-label={t('nav.main')} className="flex items-center gap-0.5 sm:gap-3">
             <NavLink
               to="/listings"
               className={({ isActive }) =>
-                `flex min-h-11 items-center whitespace-nowrap rounded-md px-2 text-[0.95rem] font-bold underline-offset-4 hover:underline ${
+                `flex min-h-11 items-center whitespace-nowrap rounded-md px-1.5 text-[0.95rem] font-bold underline-offset-4 hover:underline ${
                   isActive ? 'text-date-deep underline' : 'text-soil'
                 }`
               }

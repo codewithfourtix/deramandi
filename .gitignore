@@ -27,7 +27,7 @@ dist-ssr
 .claude/
 
 # ML parity check files (local only)
-public/__parity/
+public/__parity*/
 
 # ML: dataset, weights, local envs (the exported model in public/model is committed)
 ml/data/

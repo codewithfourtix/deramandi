@@ -151,7 +151,7 @@ export function VoiceToggle() {
       aria-pressed={voice}
       aria-label={voice ? t('voice.toggleOn') : t('voice.toggleOff')}
       title={voice ? t('voice.toggleOn') : t('voice.toggleOff')}
-      className={`flex h-11 w-11 items-center justify-center rounded-md ${voice ? 'bg-indus text-paper' : 'text-soil hover:bg-date-wash'}`}
+      className={`flex h-11 w-10 shrink-0 items-center justify-center rounded-md ${voice ? 'bg-indus text-paper' : 'text-soil hover:bg-date-wash'}`}
     >
       <SpeakerIcon off={!voice} />
     </button>

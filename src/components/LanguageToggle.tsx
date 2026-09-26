@@ -14,7 +14,7 @@ export function LanguageToggle() {
       lang={other}
       onClick={() => i18n.changeLanguage(other)}
       aria-label={`${t('lang.label')}: ${t(`lang.${other}`)}`}
-      className={`flex min-h-11 items-center whitespace-nowrap rounded-md border-2 border-soil px-3 font-bold leading-none text-soil hover:bg-date-wash ${
+      className={`flex min-h-11 items-center whitespace-nowrap rounded-md border-2 border-soil px-2 font-bold min-[400px]:px-3 leading-none text-soil hover:bg-date-wash ${
         other === 'ur' ? 'font-[family-name:var(--font-urdu)] pb-1 text-[1rem]' : 'font-[family-name:var(--font-body)] text-[0.95rem]'
       }`}
     >
