@@ -125,6 +125,13 @@
       "no_crop": "Photo {{n}} doesn't show the crop clearly. Take it closer, with the crop spread on a plain cloth, then try again.",
       "too_dark": "Photo {{n}} is too dark to grade. Retake it in daylight, then try again.",
       "too_bright": "Photo {{n}} is washed out by glare. Retake it out of direct sun, then try again."
+    },
+    "samplesToggle": "No crop photos to hand? Use a drawn sample",
+    "samplesNote": "These are drawings for trying the app, not real photos. A grade from a drawing says nothing about a real crop.",
+    "sample": {
+      "good": "Good lot",
+      "mixed": "Mixed lot",
+      "poor": "Poor lot"
     }
   },
   "result": {

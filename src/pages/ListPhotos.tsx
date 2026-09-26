@@ -5,6 +5,7 @@ import { CameraIcon, CloseIcon, GalleryIcon } from '../components/Icons'
 import { Steps } from '../components/Steps'
 import { gradeCrop, PhotoProblem } from '../lib/grader'
 import { fileToDataUrl } from '../lib/image'
+import { drawSample, type SampleQuality } from '../lib/samples'
 import { priceBand } from '../lib/match'
 import { addListing, newId, StorageFullError } from '../lib/storage'
 import { useDraft } from '../state/draft'
@@ -49,6 +50,13 @@ export function ListPhotos() {
       }
     }
     if (added.length) update({ photos: [...photos, ...added] })
+  }
+
+  function addSample(quality: SampleQuality) {
+    if (!draft.crop || full) return
+    setError(null)
+    setBadPhoto(null)
+    update({ photos: [...photos, drawSample(draft.crop, quality, photos.length + 1)] })
   }
 
   function removePhoto(i: number) {
@@ -155,6 +163,18 @@ export function ListPhotos() {
       </ul>
 
       {photos.length === 0 && <p className="mt-3 text-soil-soft">{t('photos.empty')}</p>}
+
+      <details className="group mt-5 rounded-md border-2 border-dashed border-line px-3 py-1 open:pb-3">
+        <summary className="flex min-h-11 cursor-pointer items-center font-bold text-indus">{t('photos.samplesToggle')}</summary>
+        <p className="text-[0.95rem] text-soil-soft">{t('photos.samplesNote')}</p>
+        <div className="mt-3 grid grid-cols-3 gap-2">
+          {(['good', 'mixed', 'poor'] as const).map((q) => (
+            <button key={q} type="button" className="btn btn-quiet min-h-11 px-2 text-[0.95rem]" disabled={full || grading} onClick={() => addSample(q)}>
+              {t(`photos.sample.${q}`)}
+            </button>
+          ))}
+        </div>
+      </details>
 
       {error && (
         <p role="alert" className="mt-4 rounded-md bg-warn-wash px-3 py-2 font-bold text-warn">
