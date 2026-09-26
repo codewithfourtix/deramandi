@@ -586,7 +586,7 @@
     "recallAll": "Per grade, over all {{n}} test photos (Aseel included):",
     "headlineProxy": "right on {{n}} test photos of other graded fruit (never tested on melon)",
     "rulesTitle": "Wheat and other crops",
-    "wheatTried": "We did train a wheat model that checks each kernel: on 2,003 held-out kernels cut out the way the app does, it named the kernel type 83% of the time. But on test handfuls it read clean grain as damaged too often to grade a whole lot, so it is not used yet."
+    "wheatTried": "We did train a wheat model that checks each kernel: on 2,003 held-out kernels cut out the way the app does, the best run named the kernel type 87% of the time. But on test handfuls it read clean grain as damaged too often to grade a whole lot, so it is not used yet."
   },
   "offlineModels": {
     "title": "Ready for offline",

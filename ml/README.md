@@ -163,8 +163,9 @@ No public dataset of graded melons exists. The melon grade comes from a model tr
 |---|---|---|---|
 | v1: views only, low-res augmentation | 89.1% | 63.7% (sound recall 24%) | clean lots read ~15% sound; every lot C |
 | v2: + the same training kernels pasted on random cloths and cut out the app's way (`make_wheat_appcrops.py`) | 90.8% | **82.9%** (sound recall 75%), quality group 87.0% | kernels found 358/385; sound-share error 0.32 raw, 0.20 corrected; clean lots still read 50–90% sound, every lot C |
+| v3: 224 px, α 1.0, a second randomised crop set, kernels at any angle | 92.8% | **86.8%** (CI 85.2–88.2), quality group 89.8% | first 12: corrected error 0.15, grade right on 8 (always-C: 7); clean lots B, B, C. Fresh 24 (made before judging v3): error 0.13, right on 14 (always-C: 15) |
 
-Grade-A and grade-C handfuls overlap in the estimated sound share, so no threshold separates them, and the model is not shipped: wheat uses the labelled rule estimate. The handfuls are composites of held-out kernels (`make_wheat_handfuls.py`), not real phone photos, so even a pass would only have proved the pipeline. The next step is real photos of graded wheat handfuls from D.I. Khan.
+The corrected sound share now tracks the truth much better (error 0.13), but the lot rule's strict limits (at least 90% sound, at most 2% serious) still turn most clean handfuls into B or C. None of the three runs beats always answering C, so none is shipped: wheat uses the labelled rule estimate. The handfuls are composites of held-out kernels (`make_wheat_handfuls.py`), not real phone photos, so even a pass would only have proved the pipeline. The next step is real photos of graded wheat handfuls from D.I. Khan.
 
 # Commands for the other crops
 

@@ -45,7 +45,7 @@ Dera Mandi treats these as one problem: a trusted grade, a reference price, and 
 | Kulachi melon | MobileNetV2, 224 px, trained on graded mango, papaya, apple, tomato and Burmese grape | **85.9%** on 326 photos of those fruit (CI 81.7–89.3%; baseline 37.4%), with shots of the same fruit kept in one split | **Never tested on a melon.** No graded melon photos exist in public. |
 | Wheat, other | Rule-based estimate from colour, coverage and dark spots | Not measured | Labelled as an estimate in the app |
 
-**About wheat.** We trained a kernel-by-kernel wheat model on GrainSet: 90.8% on scanner close-ups, and 82.9% on 2,003 held-out kernels cut out on cloth the way the app does. On synthetic "handful on a cloth" test photos, though, it read clean grain as damaged too often to grade a lot, so it is **not used** yet. The kernel finder, lot rule, confusion-matrix correction and tests are all in the repo, ready for a model that passes. See `ml/README.md`.
+**About wheat.** We trained three kernel-by-kernel wheat models on GrainSet. The best scores 92.8% on scanner close-ups and 86.8% on 2,003 held-out kernels cut out on cloth the way the app does. On synthetic "handful on a cloth" test photos, though, it read clean grain as damaged too often to grade a lot, so it is **not used** yet. The kernel finder, lot rule, confusion-matrix correction and tests are all in the repo, ready for a model that passes. See `ml/README.md`.
 
 **Checks we ran.**
 - Every model was evaluated once on an untouched test split, with near-duplicate photos grouped before splitting.
