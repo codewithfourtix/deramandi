@@ -154,7 +154,13 @@ export function ListPhotos() {
         </p>
       )}
 
-      <button type="button" className="btn btn-primary mt-8 w-full" disabled={!photos.length || grading} onClick={grade} aria-busy={grading}>
+      <button
+        type="button"
+        className={`btn btn-primary mt-8 w-full ${grading ? 'disabled:border-soil disabled:bg-soil disabled:text-paper' : ''}`}
+        disabled={!photos.length || grading}
+        onClick={grade}
+        aria-busy={grading}
+      >
         {grading ? t('photos.grading') : t('photos.grade')}
       </button>
       {grading && (
