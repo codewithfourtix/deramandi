@@ -4,11 +4,13 @@ import { GradeStamp } from '../components/GradeStamp'
 import { Num, Price } from '../components/Price'
 import { getRate, useRatesVersion } from '../lib/prices'
 import { loadListings } from '../lib/storage'
+import { useVoiceLine } from '../lib/voice'
 
 export function Home() {
   const { t } = useTranslation()
   const latest = loadListings()[0]
   useRatesVersion()
+  useVoiceLine(['voice.home'])
 
   const steps = [
     { title: t('home.step1'), body: t('home.step1d') },

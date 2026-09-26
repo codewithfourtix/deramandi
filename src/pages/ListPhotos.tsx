@@ -9,6 +9,7 @@ import { drawSample, type SampleQuality } from '../lib/samples'
 import { listingBand } from '../lib/match'
 import { addListing, newId, StorageFullError } from '../lib/storage'
 import { useDraft } from '../state/draftContext'
+import { sayIfOn, useVoiceLine } from '../lib/voice'
 import type { Listing } from '../types'
 
 const MAX_SAMPLE = 3
@@ -27,6 +28,9 @@ export function ListPhotos() {
   const [finished, setFinished] = useState(false)
   const cameraRef = useRef<HTMLInputElement>(null)
   const galleryRef = useRef<HTMLInputElement>(null)
+  const tipKey =
+    draft.mode === 'lot' ? 'lot.tip' : ({ dhakki_dates: 'photosDates.tip', wheat: 'photosWheat.tip', sugarcane: 'photosSugarcane.tip' } as Record<string, string>)[draft.crop ?? ''] ?? 'photos.tip'
+  useVoiceLine(grading ? null : [tipKey, 'voice.photos'])
 
   if (!finished && (!draft.crop || !draft.quantityKg || !draft.location)) {
     return <Navigate to="/list" replace />
@@ -89,6 +93,7 @@ export function ListPhotos() {
     if (!photos.length || !draft.crop || !draft.quantityKg) return
     setGrading(true)
     setError(null)
+    sayIfOn(['voice.grading'])
     try {
       const crop = draft.crop
       const [result] = await Promise.all([lotMode ? gradeLot(photos, crop) : gradeCrop(photos, crop), new Promise((r) => setTimeout(r, MIN_GRADING_MS))])
@@ -126,6 +131,7 @@ export function ListPhotos() {
         setError(t('model.unavailable'))
       } else if (err instanceof PhotoProblem) {
         setBadPhoto(err.photoIndex)
+        sayIfOn(['voice.photoProblem'])
         setError(t(`photos.issue.${err.issue}`, { n: err.photoIndex + 1 }))
       } else {
         setError(err instanceof StorageFullError ? t('photos.storageFull') : t('photos.gradeError'))
@@ -161,7 +167,7 @@ export function ListPhotos() {
         </div>
       </fieldset>
       <p className="mt-3 text-soil-soft">
-        {lotMode ? t('lot.tip') : isDates ? t('photosDates.tip') : draft.crop === 'wheat' ? t('photosWheat.tip') : draft.crop === 'sugarcane' ? t('photosSugarcane.tip') : t('photos.tip')}
+        {t(tipKey)}
       </p>
 
       {/* Two inputs on purpose: `capture` alone hides the gallery on Android. */}

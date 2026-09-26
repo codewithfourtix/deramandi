@@ -1,4 +1,5 @@
 import khajoorCard from '../data/modelCard.json'
+import { CROP_CARDS } from './cropModels'
 import type { CropId, Listing } from '../types'
 
 /*
@@ -38,6 +39,27 @@ export function graderFor(crop: CropId, source: Listing['gradeSource'] = 'model'
       trainedOn: `${c.trainImages.toLocaleString('en-US')} graded khajoor photos (${c.trainVarieties.join(', ')})`,
       citation: KHAJOOR_CITATION,
       licence: 'CC BY 4.0',
+    }
+  }
+  const card = CROP_CARDS[crop]
+  if (card && source === 'model') {
+    const what = {
+      wheat_kernel_class: `photos of single wheat kernels in 8 classes; accuracy is per kernel`,
+      binary_good_damaged: `photos of sugarcane billets marked good or damaged`,
+      grade3_proxy: `graded photos of other fruit (no public melon set exists; never tested on melon)`,
+    }[card.task]
+    const names = { wheat_kernel_class: 'wheat kernel model', binary_good_damaged: 'sugarcane billet model', grade3_proxy: 'fruit grade model (melon stand-in)' }
+    return {
+      kind: 'model',
+      crop,
+      name: `MobileNetV2 ${names[card.task]}`,
+      accuracy: card.testAccuracy,
+      tested: card.testImages,
+      ci95: card.testAccuracyWilson95,
+      baseline: card.majorityBaseline,
+      trainedOn: `${card.trainImages.toLocaleString('en-US')} ${what}`,
+      citation: card.citation,
+      licence: card.licence,
     }
   }
   return { kind: 'rules', crop, name: 'Rule-based photo estimate (colour, coverage, dark spots)' }

@@ -406,7 +406,8 @@
     "card_binary_good_damaged": "Graded by an image model trained on {{trained}} photos of sugarcane billets marked good or damaged. On {{tested}} billets it had never seen, it was right {{accuracy}}% of the time (likely range {{low}} to {{high}}%). It only knows good and damaged, so it gives A or C, never B.",
     "card_grade3_proxy": "Graded by an image model trained on {{trained}} graded photos of other fruit (mango, papaya, apple, tomato, Burmese grape). On {{tested}} fruit photos it had never seen, it gave the right grade {{accuracy}}% of the time (likely range {{low}} to {{high}}%).",
     "wheatRule": "Lot rule we use: Grade A needs at least 90% sound kernels and at most 2% seriously damaged; B at least 75% sound and at most 8% seriously damaged; anything worse is C.",
-    "melonProxy": "No public dataset of graded melons exists, so this model learned from other graded fruit and has never been tested on melons. Treat the grade as a rough guide until it is retrained on Kulachi melon photos."
+    "melonProxy": "No public dataset of graded melons exists, so this model learned from other graded fruit and has never been tested on melons. Treat the grade as a rough guide until it is retrained on Kulachi melon photos.",
+    "card_group": "When all photos of one billet were combined, as the app does, it was right {{groupAcc}}% of the time over {{groupCount}} billets (likely range {{groupLow}} to {{groupHigh}}%)."
   },
   "specs": {
     "title": "Measured from the photo",
@@ -452,5 +453,45 @@
   },
   "photosSugarcane": {
     "tip": "Lay one cut piece of cane (about a forearm long) on a plain cloth and photograph it side-on. Add a photo of the cut end."
+  },
+  "voice": {
+    "offer": "Welcome to Dera Mandi. If you want the app to speak to you, tap the screen twice, anywhere.",
+    "on": "Voice guide is on. To turn it off, tap the screen twice again.",
+    "off": "Voice guide is off.",
+    "home": "To sell your crop, press the big button at the top, and take a photo of your produce.",
+    "details": "Choose your crop, then write the weight in kilos, and choose your village. You can also press the microphone and say the weight.",
+    "photos": "Take clear photos in daylight. Then press the button: check the grade.",
+    "grading": "Checking the grade. Please wait.",
+    "grade_A": "Your produce is Grade A.",
+    "grade_B": "Your produce is Grade B.",
+    "grade_C": "Your produce is Grade C.",
+    "priceIs": "Fair price:",
+    "to": "to",
+    "perKg": "rupees per kilo.",
+    "best_local": "Best choice: sell now at the local mandi.",
+    "best_multan": "Best choice: send it to Multan.",
+    "best_store": "Best choice: store it and sell later.",
+    "best_mill": "Sell to the sugar mill.",
+    "sendHint": "To send a request to the buyer, press the green button at the bottom.",
+    "sent": "Your request has been sent. Wait for the buyer's reply.",
+    "sentDemo": "This is a demo. The request went to the demo number, not to a real buyer.",
+    "listings": "These are your saved crops. Tap one to open it.",
+    "pricesIntro": "Today's mandi rates.",
+    "micListen": "Speak now.",
+    "micFail": "Sorry, I did not catch that. Please try again.",
+    "photoProblem": "One photo is not clear. Please take it again.",
+    "bannerTitle": "Voice guide",
+    "bannerBody": "Tap the screen twice, anywhere, and the app will speak each step aloud.",
+    "bannerYes": "Turn on voice",
+    "bannerNo": "No thanks",
+    "toggleOn": "Voice guide on. Tap to turn off",
+    "toggleOff": "Turn on voice guide",
+    "repeat": "Say it again",
+    "stop": "Stop",
+    "speaking": "Speaking",
+    "mic": "Say the weight",
+    "micHeard": "Heard: {{text}}",
+    "nowOn": "Voice guide on",
+    "nowOff": "Voice guide off"
   }
 }

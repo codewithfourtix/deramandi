@@ -1,5 +1,6 @@
 import { useState } from 'react'
 import { useTranslation } from 'react-i18next'
+import { useVoiceLine, type Seg } from '../lib/voice'
 import { MarketRate } from '../components/MarketRate'
 import { Price } from '../components/Price'
 import { formatDate } from '../lib/format'
@@ -14,6 +15,12 @@ export function Prices() {
   useRatesVersion()
   const [state, setState] = useState<'idle' | 'busy' | 'ok' | 'failed'>('idle')
   const fetched = liveFetchedAt()
+  const spoken: Seg[] = ['voice.pricesIntro']
+  for (const crop of ['dhakki_dates', 'kulachi_melon', 'wheat', 'sugarcane'] as const) {
+    const r = getRate(crop)
+    if (r) spoken.push(`crops.${crop}`, r.rate.min, 'voice.to', r.rate.max, 'voice.perKg')
+  }
+  useVoiceLine(spoken)
 
   async function refresh() {
     setState('busy')

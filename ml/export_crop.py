@@ -70,6 +70,10 @@ def main(crop):
         card["kernelGroupAccuracy"] = round(m["kernel_group_accuracy"], 4)
         card["kernelGroupWilson95"] = [round(x, 4) for x in m["kernel_group_wilson95"]]
         card["kernelGroupMap"] = m["kernel_group_map"]
+    if "billet_accuracy" in m:  # all photos of one billet averaged, as the app does
+        card["groupAccuracy"] = round(m["billet_accuracy"], 4)
+        card["groupWilson95"] = [round(x, 4) for x in m["billet_wilson95"]]
+        card["groupCount"] = m["billet_count"]
     os.makedirs(os.path.join(APP, "src", "data", "models"), exist_ok=True)
     with open(os.path.join(APP, "src", "data", "models", f"{crop}.json"), "w", newline="\n") as fh:
         json.dump(card, fh, indent=2)

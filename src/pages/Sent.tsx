@@ -8,12 +8,14 @@ import { findBuyer, findLogistics } from '../lib/match'
 import { DEMO_NUMBER, DEMO_NUMBER_DISPLAY } from '../lib/settings'
 import { requestMessage, whatsappUrl } from '../lib/share'
 import { getFarmer, getListing } from '../lib/storage'
+import { useVoiceLine } from '../lib/voice'
 
 export function Sent() {
   const { id = '' } = useParams()
   const { t, i18n } = useTranslation()
   const lang = i18n.language as 'ur' | 'en'
   const listing = getListing(id)
+  useVoiceLine(listing?.status === 'reserved' ? ['voice.sent', ...(listing.sentVia === 'whatsapp-demo' ? ['voice.sentDemo'] : [])] : null)
 
   if (!listing) return <Navigate to="/listings" replace />
   if (listing.status !== 'reserved') return <Navigate to={`/listing/${id}`} replace />

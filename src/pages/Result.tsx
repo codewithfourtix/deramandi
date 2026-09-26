@@ -17,6 +17,8 @@ import { GRADE_COLOR } from '../lib/format'
 import { Money, Num, Price, PriceStack } from '../components/Price'
 import { findBuyer, findLogistics, listingBand, matchBuyers, matchLogistics } from '../lib/match'
 import { useRatesVersion } from '../lib/prices'
+import { bestOption, compareOptions, defaultAssumptions } from '../lib/decide'
+import { useVoiceLine } from '../lib/voice'
 import { DEMO_NUMBER, DEMO_NUMBER_DISPLAY, updateSettings, useSettings } from '../lib/settings'
 import { requestMessage, whatsappUrl } from '../lib/share'
 import { getFarmer, updateListing, useListing } from '../lib/storage'
@@ -68,6 +70,20 @@ function ResultView({ listing }: { listing: Listing }) {
       updateListing(listing.id, { priceMin: band.min, priceMax: band.max, referencePrice: Math.round(((band.min + band.max) / 2) * 10) / 10 })
     }
   }, [ratesVersion, listing])
+
+  // What the voice guide says here: grade, fair price, the best way to sell, one tip.
+  const best = listing.crop === 'other' ? null : bestOption(compareOptions(listing.crop, listing.grade, listing.quantityKg, defaultAssumptions(listing.crop)))
+  useVoiceLine([
+    `voice.grade_${listing.grade}`,
+    'voice.priceIs',
+    listing.priceMin,
+    'voice.to',
+    listing.priceMax,
+    'voice.perKg',
+    ...(best ? [listing.crop === 'sugarcane' ? 'voice.best_mill' : `voice.best_${best.key}`] : []),
+    `advice.tip_${listing.crop}_${listing.grade}`,
+    ...(reserved ? [] : ['voice.sendHint']),
+  ])
 
   const cropName = t(`crops.${listing.crop}`)
   const exporterGap = tooSmallFor.find((m) => m.buyer.type === 'exporter') ?? tooSmallFor[0]

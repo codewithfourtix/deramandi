@@ -10,7 +10,7 @@ calibration on validation, and ONE evaluation on an untouched test split.
 Smaller backbone (alpha 0.5, 160 px) so all four models stay light on phones.
 
 Data folders (not committed) are read from DERAMANDI_DATA (default ../../data):
-  wheat/wheat/{train,test}/<class>/*.png        (GrainSet's own train/test split)
+  wheat_views/{train,test}/<class>/*_{a,b}.png  (GrainSet's own split, cut into single views by split_wheat_views.py)
   sugarcane/<variety>/{good,damaged}/*.png      (split by billet, so no billet is in two splits)
   afruit/Fruits Grade/Fruit grade/<fruit>/<1st|2nd|3rd grade>/*   (Banana left out: 2 third-grade photos)
 
@@ -39,9 +39,11 @@ HERE = os.path.dirname(os.path.abspath(__file__))
 DATA = os.environ.get("DERAMANDI_DATA", os.path.join(HERE, "..", "..", "data"))
 OUT_ROOT = os.environ.get("DERAMANDI_OUT", os.path.join(HERE, "out"))
 SEED = 1337
-IMG = 160
-STORE = 184
-ALPHA = 0.5
+IMG = int(os.environ.get("IMG", "160"))
+STORE = int(IMG * 1.15)
+ALPHA = float(os.environ.get("ALPHA", "0.5"))
+LOWRES = os.environ.get("LOWRES", "0") == "1"
+UNFREEZE = float(os.environ.get("UNFREEZE", "0.45"))  # top share of backbone layers fine-tuned
 IMAGE_EXT = (".png", ".jpg", ".jpeg", ".bmp")
 
 random.seed(SEED)
@@ -54,7 +56,8 @@ WHEAT_CLASSES = ["0_NOR", "1_F&S", "2_SD", "3_MY", "4_AP", "5_BN", "6_BP", "7_IM
 
 
 def wheat():
-    root = os.path.join(DATA, "wheat", "wheat")
+    # single-kernel views made by split_wheat_views.py; both views of one kernel stay in the same split
+    root = os.path.join(DATA, "wheat_views")
     def items(split):
         out = []
         for ci, c in enumerate(WHEAT_CLASSES):
@@ -65,16 +68,20 @@ def wheat():
     rng = random.Random(SEED)
     train, val = [], []
     for ci in range(len(WHEAT_CLASSES)):
-        group = [it for it in train_all if it[1] == ci]
-        rng.shuffle(group)
-        k = round(len(group) * 0.15)
-        val += group[:k]
-        train += group[k:]
+        kernels = {}
+        for it in train_all:
+            if it[1] == ci:
+                kernels.setdefault(os.path.basename(it[0]).rsplit("_", 1)[0], []).append(it)
+        keys = sorted(kernels)
+        rng.shuffle(keys)
+        k = round(len(keys) * 0.15)
+        val += [it for key in keys[:k] for it in kernels[key]]
+        train += [it for key in keys[k:] for it in kernels[key]]
     labels = ["normal", "fusarium_shrivelled", "sprouted", "mouldy", "pest_attacked", "broken", "black_point", "impurity"]
     info = {
         "task": "wheat_kernel_class",
         "labels": labels,
-        "dataset": "GrainSet wheat (Fan et al., Figshare 22992317, CC BY 4.0), balanced subset, GrainSet's own train/test split",
+        "dataset": "GrainSet wheat (Fan et al., Figshare 22992317, CC BY 4.0): balanced subset of GrainSet's own train/test split, each image cut into its two single-kernel views",
     }
     return train, val, test, info
 
@@ -88,7 +95,8 @@ def sugarcane():
             if not f.lower().endswith(IMAGE_EXT):
                 continue
             variety = os.path.basename(os.path.dirname(os.path.dirname(f)))
-            m = re.search(r"(b[a-z]?\d+)", os.path.basename(f).lower())
+            # files are <session>-<billet>-<view>.png, e.g. 6-bc001-3.png: group all views of one billet
+            m = re.match(r"(\d+-b[a-z]?\d+)", os.path.basename(f).lower())
             billet = m.group(1) if m else os.path.basename(f)
             groups.setdefault((variety, lab, billet), []).append((f, li))
     rng = random.Random(SEED)
@@ -162,6 +170,10 @@ def augment(img, label):
     crop = tf.cast(scale * STORE, tf.int32)
     img = tf.image.random_crop(img, [crop, crop, 3])
     img = tf.image.resize(img, [IMG, IMG])
+    if LOWRES:  # a kernel in a phone photo is often only 40 to 100 pixels across
+        side = tf.random.uniform([], 40, IMG, dtype=tf.int32)
+        small = tf.image.resize(img, [side, side])
+        img = tf.cond(tf.random.uniform([]) < 0.6, lambda: tf.image.resize(small, [IMG, IMG]), lambda: img)
     img = tf.image.random_brightness(img, 0.25)
     img = tf.image.random_contrast(img, 0.75, 1.25)
     img = tf.image.random_saturation(img, 0.75, 1.25)
@@ -225,7 +237,7 @@ def main(crop):
     model.compile(optimizer=keras.optimizers.Adam(1e-3), loss="sparse_categorical_crossentropy", metrics=["accuracy"])
     model.fit(dataset(xtr, ytr, True), validation_data=dataset(xva, yva, False), epochs=int(os.environ.get("STAGE1_EPOCHS", "8")), class_weight=cw, verbose=2)
     base.trainable = True
-    for layer in base.layers[: int(len(base.layers) * 0.55)]:
+    for layer in base.layers[: int(len(base.layers) * (1 - UNFREEZE))]:
         layer.trainable = False
     for layer in base.layers:
         if isinstance(layer, keras.layers.BatchNormalization):
@@ -278,6 +290,18 @@ def main(crop):
         metrics["kernel_group_accuracy"] = g_acc
         metrics["kernel_group_wilson95"] = wilson(g_acc, len(yte))
         metrics["kernel_group_map"] = group.tolist()
+    if crop == "sugarcane":  # a farmer photographs one billet several times: average its views
+        keys = [re.match(r"(\d+-b[a-z]?\d+)", os.path.basename(f).lower()) for f, _ in test]
+        billet = {}
+        for i, (f, y) in enumerate(test):
+            k = (os.path.dirname(f), keys[i].group(1) if keys[i] else f)
+            billet.setdefault(k, []).append(i)
+        bp = np.array([p[idx].mean(0).argmax() for idx in billet.values()])
+        by = np.array([yte[idx[0]] for idx in billet.values()])
+        b_acc = float((bp == by).mean())
+        metrics["billet_accuracy"] = b_acc
+        metrics["billet_count"] = int(len(by))
+        metrics["billet_wilson95"] = wilson(b_acc, len(by))
     print(json.dumps({k: metrics[k] for k in ("test_accuracy", "test_accuracy_wilson95", "majority_baseline", "temperature")}), flush=True)
     print(classification_report(yte, pred, labels=list(range(len(labels))), target_names=labels, zero_division=0), flush=True)
     json.dump(metrics, open(os.path.join(out, "metrics.json"), "w"), indent=1)

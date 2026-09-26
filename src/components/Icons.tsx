@@ -98,3 +98,36 @@ export function WhatsAppIcon({ className = '' }: P) {
     </svg>
   )
 }
+
+export function SpeakerIcon({ className = '', off = false }: P & { off?: boolean }) {
+  return (
+    <svg viewBox="0 0 24 24" width="24" height="24" className={className} {...base}>
+      <path d="M4 9.5h3.5L12 5.5v13l-4.5-4H4z" />
+      {off ? (
+        <path d="M16 9.5l5 5M21 9.5l-5 5" />
+      ) : (
+        <>
+          <path d="M15.5 9a4 4 0 0 1 0 6" />
+          <path d="M18.5 6.5a7.5 7.5 0 0 1 0 11" />
+        </>
+      )}
+    </svg>
+  )
+}
+
+export function MicIcon({ className = '' }: P) {
+  return (
+    <svg viewBox="0 0 24 24" width="24" height="24" className={className} {...base}>
+      <rect x="9" y="3" width="6" height="11" rx="3" />
+      <path d="M5.5 11a6.5 6.5 0 0 0 13 0M12 17.5V21" />
+    </svg>
+  )
+}
+
+export function RepeatIcon({ className = '' }: P) {
+  return (
+    <svg viewBox="0 0 24 24" width="20" height="20" className={className} {...base}>
+      <path d="M4 12a8 8 0 0 1 13.7-5.6L20 8.5M20 4v4.5h-4.5M20 12a8 8 0 0 1-13.7 5.6L4 15.5M4 20v-4.5h4.5" />
+    </svg>
+  )
+}

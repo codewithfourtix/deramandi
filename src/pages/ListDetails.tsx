@@ -2,10 +2,13 @@ import { useState, type FormEvent } from 'react'
 import { useTranslation } from 'react-i18next'
 import { useNavigate } from 'react-router'
 import { CropGlyph } from '../components/CropGlyph'
-import { CheckIcon } from '../components/Icons'
+import { CheckIcon, MicIcon } from '../components/Icons'
 import { Steps } from '../components/Steps'
 import { crops, locations } from '../data'
 import { useDraft } from '../state/draftContext'
+import { canListen, listenOnce } from '../lib/listen'
+import { parseSpokenKg } from '../lib/spokenNumber'
+import { sayIfOn, stopSpeaking, useVoiceLine } from '../lib/voice'
 import type { CropId } from '../types'
 
 type Errors = Partial<Record<'crop' | 'quantity' | 'location', string>>
@@ -13,14 +16,37 @@ type Errors = Partial<Record<'crop' | 'quantity' | 'location', string>>
 const DIK_AREAS = locations.map((l) => l.id)
 
 export function ListDetails() {
-  const { t } = useTranslation()
+  const { t, i18n } = useTranslation()
   const navigate = useNavigate()
+  useVoiceLine(['voice.details'])
+  const [listening, setListening] = useState(false)
+  const [heard, setHeard] = useState<string | null>(null)
   const { draft, update } = useDraft()
   const [qtyText, setQtyText] = useState(draft.quantityKg ? String(draft.quantityKg) : '')
   const [errors, setErrors] = useState<Errors>({})
 
   const qty = Number(qtyText.replace(/[^\d.]/g, ''))
   const maund = qty > 0 ? Math.round((qty / 40) * 10) / 10 : 0
+
+  async function sayWeight() {
+    stopSpeaking() // the mic must not hear the app
+    setListening(true)
+    setHeard(null)
+    try {
+      const alts = await listenOnce(i18n.language === 'ur' ? 'ur' : 'en')
+      const kg = alts.map(parseSpokenKg).find((v) => v !== null)
+      setHeard(alts[0])
+      if (kg) {
+        setQtyText(String(Math.min(kg, 9999999)))
+        setErrors((er) => ({ ...er, quantity: undefined }))
+        sayIfOn([kg])
+      } else sayIfOn(['voice.micFail'])
+    } catch {
+      sayIfOn(['voice.micFail'])
+    } finally {
+      setListening(false)
+    }
+  }
 
   function submit(e: FormEvent) {
     e.preventDefault()
@@ -112,7 +138,8 @@ export function ListDetails() {
         <label htmlFor="qty" className="field-label">
           {t('details.quantity')}
         </label>
-        <div className="relative">
+        <div className="flex gap-2">
+        <div className="relative flex-1">
           <input
             id="qty"
             className="input num pe-16 text-[1.25rem]"
@@ -128,6 +155,23 @@ export function ListDetails() {
           />
           <span className="pointer-events-none absolute inset-y-0 right-4 flex items-center font-bold text-soil-soft">{t('common.kg')}</span>
         </div>
+          {canListen() && (
+            <button
+              type="button"
+              onClick={sayWeight}
+              disabled={listening}
+              className={`btn min-h-12 shrink-0 gap-1 px-3 ${listening ? 'animate-pulse border-indus bg-indus text-paper' : 'btn-quiet'}`}
+            >
+              <MicIcon />
+              <span className="text-[0.95rem]">{listening ? t('voice.micListen') : t('voice.mic')}</span>
+            </button>
+          )}
+        </div>
+        {heard && (
+          <p className="mt-1 text-[0.9rem] text-soil-soft" aria-live="polite">
+            {t('voice.micHeard', { text: heard })}
+          </p>
+        )}
         <p id="qty-hint" className="mt-1 text-[0.95rem] text-soil-soft">
           {maund > 0 ? t('details.maund', { count: maund }) : t('details.quantityHint')}
         </p>

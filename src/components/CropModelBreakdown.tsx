@@ -62,6 +62,17 @@ export function CropModelBreakdown({ listing }: { listing: Listing }) {
           high: pct(card.testAccuracyWilson95[1]),
           group: card.kernelGroupAccuracy !== undefined ? pct(card.kernelGroupAccuracy) : '',
         })}
+        {card.groupAccuracy !== undefined && card.groupWilson95 && (
+          <>
+            {' '}
+            {t('cropModel.card_group', {
+              groupAcc: pct(card.groupAccuracy),
+              groupCount: card.groupCount,
+              groupLow: pct(card.groupWilson95[0]),
+              groupHigh: pct(card.groupWilson95[1]),
+            })}
+          </>
+        )}
       </p>
       {wheat && <p className="mt-2 text-[0.9rem] text-soil-soft">{t('cropModel.wheatRule')}</p>}
       {card.task === 'grade3_proxy' && <p className="mt-2 rounded-md bg-warn-wash px-3 py-2 text-[0.95rem] text-warn">{t('cropModel.melonProxy')}</p>}

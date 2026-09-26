@@ -57,6 +57,8 @@
   body {
     margin: 0;
     min-height: 100dvh;
+    /* no double-tap zoom: a double tap anywhere switches the voice guide */
+    touch-action: manipulation;
     background: var(--color-paper);
   }
 

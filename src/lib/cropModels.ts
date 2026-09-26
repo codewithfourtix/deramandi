@@ -36,6 +36,10 @@ export interface CropCard {
   kernelGroupAccuracy?: number
   kernelGroupWilson95?: [number, number]
   kernelGroupMap?: number[]
+  /** Sugarcane: accuracy when all photos of one billet are averaged, over groupCount billets. */
+  groupAccuracy?: number
+  groupWilson95?: [number, number]
+  groupCount?: number
 }
 
 const cards = import.meta.glob<{ default: CropCard }>('../data/models/*.json', { eager: true })

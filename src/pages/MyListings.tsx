@@ -1,5 +1,6 @@
 import { useState } from 'react'
 import { useTranslation } from 'react-i18next'
+import { useVoiceLine } from '../lib/voice'
 import { Link } from 'react-router'
 import { TrashIcon } from '../components/Icons'
 import { Num, Price } from '../components/Price'
@@ -8,6 +9,7 @@ import { loadListings, removeListing } from '../lib/storage'
 
 export function MyListings() {
   const { t, i18n } = useTranslation()
+  useVoiceLine(['voice.listings'])
   const [listings, setListings] = useState(loadListings)
   const [confirmId, setConfirmId] = useState<string | null>(null)
   const [notice, setNotice] = useState<string | null>(null)

@@ -3,6 +3,7 @@ import { useTranslation } from 'react-i18next'
 import { Link, NavLink, Outlet, useLocation, useMatch } from 'react-router'
 import { refreshLive } from '../lib/prices'
 import { LanguageToggle } from './LanguageToggle'
+import { VoiceGuide, VoiceToggle } from './Voice'
 
 function Wordmark() {
   const { t } = useTranslation()
@@ -60,11 +61,13 @@ export function Layout() {
             >
               {t('nav.myListings')}
             </NavLink>
+            <VoiceToggle />
             <LanguageToggle />
           </nav>
         </div>
       </header>
       <main id="main" className="mx-auto w-full max-w-2xl flex-1 px-4 pb-12 pt-6">
+        <VoiceGuide />
         <Outlet />
       </main>
       <footer className="border-t border-line">
