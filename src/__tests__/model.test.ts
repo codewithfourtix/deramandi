@@ -85,3 +85,21 @@ describe('shipped model files', () => {
     for (const g of [1, 2, 3]) for (const k of [1, 2]) expect(existsSync(join(PUBLIC, 'samples', `khajoor-g${g}-${k}.jpg`))).toBe(true)
   })
 })
+
+describe('wheat lot shares', () => {
+  it('undoes the known misreads: a clean lot reads clean again', async () => {
+    const { adjustShares, WHEAT_GROUP, CROP_CARDS } = await import('../lib/cropModels')
+    const card = CROP_CARDS.wheat!
+    expect(card.confusion).toBeTruthy()
+    // what the model would count on a 100% sound lot: row 0 of the confusion matrix
+    const row = card.confusion![0]
+    const total = row.reduce((a, b) => a + b, 0)
+    const q = [0, 0, 0]
+    row.forEach((n, j) => (q[WHEAT_GROUP[j]] += n / total))
+    expect(q[0]).toBeLessThan(0.9) // raw count would call it Grade B
+    const p = adjustShares(q, card.confusion!, WHEAT_GROUP)
+    expect(p[0]).toBeGreaterThan(0.97)
+    expect(p.reduce((a, b) => a + b, 0)).toBeCloseTo(1, 5)
+    expect(Math.min(...p)).toBeGreaterThanOrEqual(0)
+  })
+})

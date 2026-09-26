@@ -1,0 +1,169 @@
+{
+  "crop": "wheat",
+  "task": "wheat_kernel_class",
+  "labels": [
+    "normal",
+    "fusarium_shrivelled",
+    "sprouted",
+    "mouldy",
+    "pest_attacked",
+    "broken",
+    "black_point",
+    "impurity"
+  ],
+  "inputSize": 160,
+  "trainImages": 6842,
+  "valImages": 1216,
+  "testImages": 2400,
+  "testAccuracy": 0.8912,
+  "testAccuracyWilson95": [
+    0.8782,
+    0.9031
+  ],
+  "majorityBaseline": 0.125,
+  "temperature": 0.75,
+  "perClass": {
+    "normal": {
+      "precision": 0.717,
+      "recall": 0.863,
+      "n": 300
+    },
+    "fusarium_shrivelled": {
+      "precision": 0.947,
+      "recall": 0.89,
+      "n": 300
+    },
+    "sprouted": {
+      "precision": 0.914,
+      "recall": 0.953,
+      "n": 300
+    },
+    "mouldy": {
+      "precision": 0.902,
+      "recall": 0.923,
+      "n": 300
+    },
+    "pest_attacked": {
+      "precision": 0.808,
+      "recall": 0.617,
+      "n": 300
+    },
+    "broken": {
+      "precision": 0.986,
+      "recall": 0.93,
+      "n": 300
+    },
+    "black_point": {
+      "precision": 0.881,
+      "recall": 0.963,
+      "n": 300
+    },
+    "impurity": {
+      "precision": 1.0,
+      "recall": 0.99,
+      "n": 300
+    }
+  },
+  "confusion": [
+    [
+      259,
+      4,
+      6,
+      1,
+      22,
+      2,
+      6,
+      0
+    ],
+    [
+      6,
+      267,
+      6,
+      11,
+      3,
+      0,
+      7,
+      0
+    ],
+    [
+      1,
+      2,
+      286,
+      1,
+      2,
+      0,
+      8,
+      0
+    ],
+    [
+      4,
+      1,
+      5,
+      277,
+      7,
+      0,
+      6,
+      0
+    ],
+    [
+      80,
+      4,
+      8,
+      11,
+      185,
+      1,
+      11,
+      0
+    ],
+    [
+      9,
+      2,
+      1,
+      3,
+      5,
+      279,
+      1,
+      0
+    ],
+    [
+      2,
+      2,
+      1,
+      1,
+      5,
+      0,
+      289,
+      0
+    ],
+    [
+      0,
+      0,
+      0,
+      2,
+      0,
+      1,
+      0,
+      297
+    ]
+  ],
+  "backbone": "MobileNetV2 alpha=0.5, ImageNet weights, 160px",
+  "dataset": "GrainSet wheat (Fan et al., Figshare 22992317, CC BY 4.0): balanced subset of GrainSet's own train/test split, each image cut into its two single-kernel views",
+  "citation": "Fan, L. et al., GrainSet: a large-scale grain image dataset (wheat), Figshare 22992317, v2",
+  "licence": "CC BY 4.0",
+  "weightsMB": 1.43,
+  "kernelGroupAccuracy": 0.9108,
+  "kernelGroupWilson95": [
+    0.8988,
+    0.9216
+  ],
+  "kernelGroupMap": [
+    0,
+    2,
+    1,
+    2,
+    1,
+    1,
+    2,
+    2
+  ]
+}

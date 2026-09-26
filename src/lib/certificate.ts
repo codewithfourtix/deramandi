@@ -3,6 +3,7 @@ import type { Buyer, Farmer, Listing, LogisticsProvider } from '../types'
 import { checkUrl, payloadFor, referenceCode } from './checkCode'
 import { canvasToBlob, drawCover, drawStamp, fontsReady, GRADE_HEX, INK, INK_SOFT, LINE, loadImg, paragraph, text } from './drawing'
 import { fmtNum, fmtRange } from './format'
+import { CROP_CARDS } from './cropModels'
 import { graderFor, pct } from './modelInfo'
 
 /*
@@ -81,17 +82,21 @@ export async function renderCertificateCanvas({ listing, buyer, logistics, farme
   let y = paragraph(ctx, en(`result.summary${listing.grade}`), cx, photoY + 236, cw, { size: 24, lineHeight: 34, color: INK_SOFT })
 
   if (listing.gradeProbabilities) {
+    // Sugarcane's model only knows good/damaged (no B); wheat shows kernel shares per quality group.
+    const task = listing.gradeSource === 'model' ? CROP_CARDS[listing.crop]?.task : undefined
+    const names: Record<string, string> = task === 'wheat_kernel_class' ? { A: 'Sound', B: 'Minor', C: 'Serious' } : task === 'binary_good_damaged' ? { A: 'Good', C: 'Damaged' } : { A: 'A', B: 'B', C: 'C' }
+    const labelW = task && task !== 'grade3_proxy' ? 120 : 40
     y += 20
-    text(ctx, 'Model certainty', cx, y, { size: 22, weight: 700 })
+    text(ctx, task === 'wheat_kernel_class' ? 'Kernels by quality group (estimated share)' : 'Model certainty', cx, y, { size: 22, weight: 700 })
     y += 16
-    for (const g of ['A', 'B', 'C'] as const) {
+    for (const g of (['A', 'B', 'C'] as const).filter((g) => names[g])) {
       const v = listing.gradeProbabilities[g]
       y += 38
-      text(ctx, g, cx, y, { size: 26, weight: 800, color: g === listing.grade ? GRADE_HEX[g] : INK_SOFT })
+      text(ctx, names[g], cx, y, { size: task && task !== 'grade3_proxy' ? 22 : 26, weight: 800, color: g === listing.grade ? GRADE_HEX[g] : INK_SOFT })
       ctx.fillStyle = '#ece6dc'
-      ctx.fillRect(cx + 40, y - 20, cw - 130, 18)
+      ctx.fillRect(cx + labelW, y - 20, cw - 90 - labelW, 18)
       ctx.fillStyle = g === listing.grade ? GRADE_HEX[g] : '#b9ab9b'
-      ctx.fillRect(cx + 40, y - 20, Math.max(4, (cw - 130) * v), 18)
+      ctx.fillRect(cx + labelW, y - 20, Math.max(4, (cw - 90 - labelW) * v), 18)
       text(ctx, pct(v), W - M, y, { size: 24, weight: 700, align: 'right' })
     }
   }
@@ -114,7 +119,7 @@ export async function renderCertificateCanvas({ listing, buyer, logistics, farme
     ['Lot value', `PKR ${fmtRange(Math.round(listing.priceMin * listing.quantityKg), Math.round(listing.priceMax * listing.quantityKg))}`, 'مال کی مالیت'],
   ]
   if (listing.specs?.length) rows.push(['Measured from photo', listing.specs.map((s) => `${en(`specs.${s.key}`)}: ${s.value}`).join('; '), 'تصویر سے ناپا گیا'])
-  if (farmer) rows.push(['Grower', `${farmer.name}, ${en(`places.${farmer.village}`)}`, 'کاشتکار'])
+  if (farmer) rows.push(['Grower', [farmer.name, farmer.village, farmer.phone].filter(Boolean).join(', '), 'کاشتکار'])
   if (buyer) rows.push(['Request sent to', `${buyer.name} (${en(`buyerType.${buyer.type}`)})`, 'خریدار'])
   if (logistics) rows.push(['Storage / transport', logistics.name, 'گودام / ٹرانسپورٹ'])
 
@@ -138,23 +143,19 @@ export async function renderCertificateCanvas({ listing, buyer, logistics, farme
     grader.kind === 'model'
       ? `${grader.name}, running on the phone. On ${grader.tested} photos it had never seen, it gave the right grade ${pct(grader.accuracy)} of the time (95% range ${pct(grader.ci95?.[0])} to ${pct(grader.ci95?.[1])}); always guessing the commonest grade scores ${pct(grader.baseline)}. Trained on ${grader.trainedOn}.`
       : `${grader.name}. This is not a trained model and its accuracy has not been measured; treat the grade as a rough guide.`
-  ty = paragraph(ctx, how, M, ty, W - 2 * M - 260, { size: 22, lineHeight: 32 })
-  if (grader.citation) {
-    ty += 14
-    ty = paragraph(ctx, `Training data: ${grader.citation}, licensed ${grader.licence}.`, M, ty, W - 2 * M - 260, { size: 20, lineHeight: 29, color: INK_SOFT })
+  const cite = grader.citation ? `Training data: ${grader.citation}. Licence: ${grader.licence}.` : ''
+  const note = 'Estimated from photos. This is not an official inspection; confirm by inspecting the crop in person before sale.'
+  const noteUr = 'یہ اندازہ تصویروں سے لگایا گیا ہے، سرکاری معائنہ نہیں۔ فروخت سے پہلے فصل کا خود معائنہ کریں۔'
+  const textW = W - 2 * M - 260 // leaves room for the QR code
+  // Lay the section out at full size; shrink it only if it would run into the footer.
+  const section = (k: number, dry: boolean) => {
+    let y2 = paragraph(ctx, how, M, ty, textW, { size: 22 * k, lineHeight: 32 * k, dry })
+    if (cite) y2 = paragraph(ctx, cite, M, y2 + 14 * k, textW, { size: 20 * k, lineHeight: 29 * k, color: INK_SOFT, dry })
+    y2 = paragraph(ctx, note, M, y2 + 14 * k, textW, { size: 20 * k, lineHeight: 29 * k, color: INK_SOFT, dry })
+    return paragraph(ctx, noteUr, W - M - 260, y2 + 36 * k, textW, { size: 20 * k, lineHeight: 44 * k, urdu: true, color: INK_SOFT, dry })
   }
-  ty += 14
-  ty = paragraph(ctx, 'Estimated from photos. This is not an official inspection; confirm by inspecting the crop in person before sale.', M, ty, W - 2 * M - 260, {
-    size: 20,
-    lineHeight: 29,
-    color: INK_SOFT,
-  })
-  paragraph(ctx, 'یہ اندازہ تصویروں سے لگایا گیا ہے، سرکاری معائنہ نہیں۔ فروخت سے پہلے فصل کا خود معائنہ کریں۔', W - M - 260, ty + 36, W - 2 * M - 260, {
-    size: 20,
-    lineHeight: 44,
-    urdu: true,
-    color: INK_SOFT,
-  })
+  const scale = [1, 0.92, 0.85, 0.78, 0.72].find((k) => section(k, true) <= H - 95) ?? 0.72
+  section(scale, false)
 
   // QR code, bottom right
   const qrSize = 210

@@ -43,6 +43,7 @@ IMG = int(os.environ.get("IMG", "160"))
 STORE = int(IMG * 1.15)
 ALPHA = float(os.environ.get("ALPHA", "0.5"))
 LOWRES = os.environ.get("LOWRES", "0") == "1"
+APPCROPS = os.environ.get("APPCROPS", "0") == "1"
 UNFREEZE = float(os.environ.get("UNFREEZE", "0.45"))  # top share of backbone layers fine-tuned
 IMAGE_EXT = (".png", ".jpg", ".jpeg", ".bmp")
 
@@ -64,6 +65,11 @@ def wheat():
             out += [(f, ci) for f in sorted(glob.glob(os.path.join(root, split, c, "*"))) if f.lower().endswith(IMAGE_EXT)]
         return out
     train_all, test = items("train"), items("test")
+    # plus app-style crops of the same training kernels (make_wheat_appcrops.py): same kernel key, same split
+    if APPCROPS:
+        aroot = os.path.join(DATA, "wheat_appcrops", "train")
+        for ci, c in enumerate(WHEAT_CLASSES):
+            train_all += [(f, ci) for f in sorted(glob.glob(os.path.join(aroot, c, "*.png")))]
     # validation from the training split, stratified by class
     rng = random.Random(SEED)
     train, val = [], []
@@ -71,7 +77,7 @@ def wheat():
         kernels = {}
         for it in train_all:
             if it[1] == ci:
-                kernels.setdefault(os.path.basename(it[0]).rsplit("_", 1)[0], []).append(it)
+                kernels.setdefault(re.sub(r"_[ab](_c)?\.png$", "", os.path.basename(it[0])), []).append(it)
         keys = sorted(kernels)
         rng.shuffle(keys)
         k = round(len(keys) * 0.15)
@@ -81,7 +87,7 @@ def wheat():
     info = {
         "task": "wheat_kernel_class",
         "labels": labels,
-        "dataset": "GrainSet wheat (Fan et al., Figshare 22992317, CC BY 4.0): balanced subset of GrainSet's own train/test split, each image cut into its two single-kernel views",
+        "dataset": "GrainSet wheat (Fan et al., Figshare 22992317, CC BY 4.0): balanced subset of GrainSet's own train/test split, each image cut into its two single-kernel views, plus the same training kernels pasted on varied cloths and cut out the way the app does",
     }
     return train, val, test, info
 

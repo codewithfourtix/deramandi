@@ -40,6 +40,8 @@ export interface CropCard {
   groupAccuracy?: number
   groupWilson95?: [number, number]
   groupCount?: number
+  /** Test confusion matrix: rows are the true label, columns the prediction. */
+  confusion?: number[][]
 }
 
 const cards = import.meta.glob<{ default: CropCard }>('../data/models/*.json', { eager: true })
@@ -69,6 +71,44 @@ export function wheatLotGrade(shares: [number, number, number]): Grade {
   return 'C'
 }
 
+/**
+ * Correct counted shares for the model's known mistakes ("adjusted classify
+ * and count"). The test set is balanced, but a real lot is mostly sound
+ * kernels, and 14% of sound kernels are misread as damaged: raw counts would
+ * pull every clean lot down a grade. With M[i][j] = P(model says group j |
+ * true group i) from the test set, find true shares p (>= 0, summing to 1)
+ * whose expected counts M^T p best match the observed shares q.
+ */
+export function adjustShares(q: number[], confusion: number[][], group: number[]): number[] {
+  const G = 3
+  const M = Array.from({ length: G }, () => new Array(G).fill(0))
+  confusion.forEach((row, i) => row.forEach((n, j) => (M[group[i]][group[j]] += n)))
+  M.forEach((row) => {
+    const sum = row.reduce((a, b) => a + b, 0) || 1
+    row.forEach((_, j) => (row[j] /= sum))
+  })
+  // projected gradient descent on ||M^T p - q||^2 over the probability simplex
+  let p = [...q]
+  for (let it = 0; it < 2000; it++) {
+    const r = Array.from({ length: G }, (_, j) => p.reduce((s, pi, i) => s + pi * M[i][j], 0) - q[j])
+    const grad = p.map((_, i) => 2 * r.reduce((s, rj, j) => s + rj * M[i][j], 0))
+    p = projectSimplex(p.map((pi, i) => pi - 0.5 * grad[i]))
+  }
+  return p
+}
+
+function projectSimplex(v: number[]): number[] {
+  const u = [...v].sort((a, b) => b - a)
+  let css = 0
+  let theta = 0
+  for (let i = 0; i < u.length; i++) {
+    css += u[i]
+    const t = (css - 1) / (i + 1)
+    if (u[i] - t > 0) theta = t
+  }
+  return v.map((x) => Math.max(0, x - theta))
+}
+
 export interface KernelSummary {
   total: number
   byClass: Record<string, number>
@@ -91,7 +131,8 @@ export async function gradeWithCropModel(images: string[], crop: CropId): Promis
     const groups = [0, 0, 0]
     classes.forEach((c) => (groups[WHEAT_GROUP[c]] += 1))
     const n = Math.max(1, classes.length)
-    const shares = groups.map((g) => g / n) as [number, number, number]
+    const counted = groups.map((g) => g / n)
+    const shares = (card.confusion ? adjustShares(counted, card.confusion, WHEAT_GROUP) : counted) as [number, number, number]
     const grade = wheatLotGrade(shares)
     // per photo: the same rule applied to that photo's kernels
     let k = 0
@@ -100,13 +141,14 @@ export async function gradeWithCropModel(images: string[], crop: CropId): Promis
       for (let i = 0; i < f.crops.length; i++) g[WHEAT_GROUP[classes[k + i]]] += 1
       k += f.crops.length
       const m = Math.max(1, f.crops.length)
-      return wheatLotGrade([g[0] / m, g[1] / m, g[2] / m])
+      const q = [g[0] / m, g[1] / m, g[2] / m]
+      return wheatLotGrade((card.confusion ? adjustShares(q, card.confusion, WHEAT_GROUP) : q) as [number, number, number])
     })
     const meanTop = probs.reduce((s, p) => s + Math.max(...p), 0) / n
     return {
       grade,
       confidence: Math.round(meanTop * 100) / 100,
-      // for wheat these are SHARES OF KERNELS in each quality group, not probabilities
+      // for wheat these are estimated SHARES OF KERNELS in each quality group (corrected), not probabilities
       probabilities: { A: shares[0], B: shares[1], C: shares[2] },
       perPhoto,
       kernels: { total: classes.length, byClass, skipped: found.reduce((s, f) => s + f.skipped, 0) },

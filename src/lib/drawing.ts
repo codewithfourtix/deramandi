@@ -65,7 +65,7 @@ export function paragraph(
   x: number,
   y: number,
   maxWidth: number,
-  opts: { size: number; lineHeight: number; weight?: number; color?: string; urdu?: boolean; align?: CanvasTextAlign },
+  opts: { size: number; lineHeight: number; weight?: number; color?: string; urdu?: boolean; align?: CanvasTextAlign; dry?: boolean },
 ) {
   ctx.save()
   ctx.font = `${opts.weight ?? 400} ${opts.size}px ${opts.urdu ? URDU : LATIN}`
@@ -81,7 +81,8 @@ export function paragraph(
   }
   if (line) lines.push(line)
   ctx.restore()
-  lines.forEach((l, i) => text(ctx, l, x, y + i * opts.lineHeight, opts))
+  // dry: measure only (returns where the paragraph would end)
+  if (!opts.dry) lines.forEach((l, i) => text(ctx, l, x, y + i * opts.lineHeight, opts))
   return y + lines.length * opts.lineHeight
 }
 
