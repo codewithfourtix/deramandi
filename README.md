@@ -4,6 +4,8 @@ A bilingual (Urdu first, with English) web app for crop growers in Dera Ismail K
 
 Built for **Imaginathon by Banao** by The Four Musketeers.
 
+**Live:** https://deramandi.vercel.app
+
 ## The problem
 
 D.I. Khan grows export-grade Dhakki dates and Kulachi melons, plus wheat and sugarcane. Growers still lose most of that value, for three linked reasons:

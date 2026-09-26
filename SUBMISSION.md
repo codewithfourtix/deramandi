@@ -24,7 +24,7 @@ Agriculture (closest option on the portal)
 
 ## Main build link
 
-PASTE THE LIVE VERCEL / NETLIFY URL HERE AFTER DEPLOYING. Test it in a private window.
+https://deramandi.vercel.app
 
 ## Repository link
 
