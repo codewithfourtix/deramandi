@@ -164,7 +164,7 @@
         "poor": "Many"
       }
     },
-    "gradeNote": "Estimated from the photos. The crop is checked in person at the store before any sale.",
+    "gradeNote": "Estimated from the photos. The percentage shows how clearly the photos fit this grade under the app's rules; it is not a measured accuracy. The crop is checked in person at the store before any sale.",
     "priceTitle": "Fair price for this grade",
     "priceBody": "Buyers pay in this range for Grade {{grade}} {{crop}}. Do not settle for much less.",
     "lotValue": "Your {{qty}} kg lot is worth about",

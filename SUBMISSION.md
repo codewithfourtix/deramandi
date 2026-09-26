@@ -30,6 +30,6 @@ PASTE THE LIVE VERCEL / NETLIFY URL HERE AFTER DEPLOYING. Test it in a private w
 
 https://github.com/codewithfourtix/deramandi
 
-## Notes for the judges (520/600 characters)
+## Notes for the judges (549/600 characters)
 
-Farmer-first MVP. Everything the grower touches works end to end in Urdu and English, and nothing leaves the phone. Buyers, storage, transport and prices are seeded sample data, labelled in the app. The grade is rule-based colour, size and defect analysis in the browser, not a trained AI model, and we claim no accuracy figure. Dark or crop-less photos are refused, not guessed. Drawn sample photos let you try the flow without real ones. A trained image model is our next step and plugs into the same grading function.
+Farmer-first MVP. Everything the grower touches works end to end in Urdu and English, and nothing leaves the phone. Buyers, storage, transport and prices are seeded sample data, labelled in the app. The grade is rule-based colour, size and defect analysis in the browser, not a trained AI model. Its confidence shows fit to the rules, not measured accuracy. Dark or crop-less photos are refused, not guessed. Drawn sample photos let you try the flow without real ones. A trained image model is our next step and plugs into the same grading function.
