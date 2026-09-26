@@ -427,9 +427,9 @@
     "wheat_impurity": "Impurities (not wheat)"
   },
   "advice": {
-    "title": "What pulled the grade down",
-    "patches": "Dark, grey or green patches on the produce",
-    "uneven": "Uneven colour",
+    "title": "What we noticed in the photo",
+    "patches": "Dark, grey or green patches cover {{v}} of the produce",
+    "uneven": "Uneven colour: evenness is {{v}}",
     "lotMix": "The lot is mixed: {{b}} fruits came out B and {{c}} came out C",
     "tipLabel": "Tip:",
     "tip_dhakki_dates_A": "Keep this lot together and sell it as Grade A. Show the certificate: buyers pay for grade they can trust.",
@@ -510,5 +510,79 @@
     "check_bright": "Too bright. Move out of direct sun.",
     "check_blurry": "Hold the phone still.",
     "unavailable": "The camera could not open here. Press the camera button again to use your phone's camera app."
+  },
+  "settings": {
+    "title": "Settings",
+    "voiceHint": "The app speaks each step in Urdu. You can also tap the screen twice, anywhere.",
+    "largeText": "Large text",
+    "largeTextHint": "Bigger letters on every screen.",
+    "helper": "Helper mode",
+    "helperHint": "For one phone that lists crops for several growers. Each crop is saved under a grower's name, which goes on the certificate.",
+    "demoHint": "Requests open WhatsApp to the demo number {{number}} instead of a buyer. Buyers in this prototype are sample data.",
+    "dataTitle": "Your saved crops",
+    "dataIntro": "Everything stays on this phone. Download a spreadsheet, or a backup file you can restore on another phone.",
+    "exportCsv": "Download spreadsheet",
+    "backup": "Download backup",
+    "restore": "Restore from backup",
+    "restored": "Restored {{listings}} crops and {{farmers}} growers.",
+    "restoreFailed": "That file is not a Dera Mandi backup.",
+    "demo": "Demo mode"
+  },
+  "farmers": {
+    "title": "Growers",
+    "intro": "People whose crops you list from this phone.",
+    "name": "Grower's name",
+    "village": "Village",
+    "phone": "Phone (optional)",
+    "add": "Save grower",
+    "addNew": "Add a new grower",
+    "nameNeeded": "Write the grower's name.",
+    "whose": "Whose crop is this?",
+    "none": "Not set",
+    "crops": "{{count}} crops",
+    "remove": "Remove {{name}}",
+    "confirm": "Remove this grower? Their saved crops stay.",
+    "confirmRemove": "Remove",
+    "all": "All growers",
+    "label": "Grower"
+  },
+  "install": {
+    "title": "Put Dera Mandi on your home screen",
+    "body": "Opens like an app, works without internet, and grades khajoor offline.",
+    "button": "Install app",
+    "done": "Dera Mandi is installed on this phone."
+  },
+  "offline": {
+    "banner": "No internet. Grading and your saved crops still work. Prices are from the last update."
+  },
+  "history": {
+    "search": "Search crops, growers or villages",
+    "filterStatus": "Show",
+    "status_all": "All",
+    "results": "{{count}} shown",
+    "none": "Nothing matches.",
+    "export": "Download spreadsheet"
+  },
+  "footerLinks": {
+    "settings": "Settings",
+    "accuracy": "How sure are we?"
+  },
+  "accuracy": {
+    "title": "How sure are we?",
+    "intro": "Each grade comes from an image model trained on public photo collections. Below is how often each one was right on photos it never saw while learning, and what it has never seen.",
+    "howTested": "How we tested: photos were split before training, near-identical photos were kept together, and the test photos were used once, at the end. The likely range is a 95% interval: with more test photos it would narrow.",
+    "headline": "right on {{n}} test photos it never saw",
+    "range": "Likely between {{low}}% and {{high}}%.",
+    "baseline": "Always guessing the most common answer would score {{b}}%.",
+    "recallTitle": "When the real answer was this, it said so:",
+    "limitsTitle": "What it has not seen:",
+    "data": "Learned from {{n}} photos.",
+    "kernelGroup": "For the lot grade, what matters is the quality group of each kernel (sound, minor or serious damage): it got that right {{acc}}% of the time.",
+    "rules": "Other crops get a rule-based estimate from colour, coverage and dark spots in the photo. It is not a trained model and its accuracy has not been measured.",
+    "limits_dhakki_dates": "No Dhakki photos: it learned from Gajar, Kupro and Aseel dates. On a variety it had never seen it still gave grades, so treat a Dhakki grade as a guide until Dhakki photos are added.",
+    "limits_wheat": "It learned from close-up scanner photos of single kernels. A phone photo of a handful is coarser, and accuracy on phone photos has not been measured yet.",
+    "limits_sugarcane": "It learned from Louisiana cane varieties photographed on a dark background, and it only knows good or damaged. Local varieties and a sugar test at the mill are not covered.",
+    "limits_kulachi_melon": "No graded melon photos exist in public, so it learned from mango, papaya, apple, tomato and Burmese grape. It has never been tested on a melon.",
+    "recallAll": "Per grade, over all {{n}} test photos (Aseel included):"
   }
 }

@@ -123,7 +123,7 @@ function VoiceBar() {
       <span className={`flex h-9 w-9 shrink-0 items-center justify-center rounded-full ${speaking ? 'bg-indus text-paper' : 'bg-indus-wash text-indus'}`} aria-hidden="true">
         <SpeakerIcon />
       </span>
-      <p className="m-0 min-w-0 flex-1 truncate text-[0.95rem] text-soil-soft" aria-live="off">
+      <p className="m-0 line-clamp-2 min-w-0 flex-1 text-[0.95rem] leading-snug text-soil-soft" aria-live="off">
         {speaking ? caption : t('voice.nowOn')}
       </p>
       {speaking ? (

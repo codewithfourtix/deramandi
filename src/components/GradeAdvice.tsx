@@ -1,12 +1,13 @@
 import { useTranslation } from 'react-i18next'
 import type { Listing } from '../types'
+import { ltr } from '../lib/format'
 import { Num } from './Price'
 
 /*
-  What pulled the grade down, and one practical tip to sell better. Reasons
-  only point at things that were actually measured or counted (defect kernels
-  the wheat model found, patches and evenness measured from the photo); the
-  tip is standard selling advice for that crop and grade.
+  What we noticed, and one practical tip to sell better. Notes only point at
+  things that were actually measured or counted (defect kernels the wheat
+  model found, patches and evenness measured from the photo); they are not the
+  grading model's reasons. The tip is standard advice for that crop and grade.
 */
 export function GradeAdvice({ listing }: { listing: Listing }) {
   const { t } = useTranslation()
@@ -23,8 +24,8 @@ export function GradeAdvice({ listing }: { listing: Listing }) {
       .slice(0, 2)
     for (const d of defects) reasons.push({ text: t(`specs.${d.k}`), value: `${d.v}%` })
   } else {
-    if (num('patches') >= 8) reasons.push({ text: t('advice.patches'), value: specs.get('patches') })
-    if (specs.has('evenness') && num('evenness') < 60) reasons.push({ text: t('advice.uneven'), value: specs.get('evenness') })
+    if (num('patches') >= 8) reasons.push({ text: t('advice.patches', { v: ltr(specs.get('patches') ?? '') }) })
+    if (specs.has('evenness') && num('evenness') < 60) reasons.push({ text: t('advice.uneven', { v: ltr(specs.get('evenness') ?? '') }) })
     if (listing.lotCounts) {
       const [, b, c] = listing.lotCounts
       if (b + c > 0) reasons.push({ text: t('advice.lotMix', { b, c }) })

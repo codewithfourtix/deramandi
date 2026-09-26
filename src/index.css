@@ -44,6 +44,11 @@
     text-rendering: optimizeLegibility;
   }
 
+  html.large-text,
+  html.large-text[lang='ur'] {
+    font-size: 20px;
+  }
+
   /* Nastaliq is tall and wide: bigger size, much more line height, no tracking. */
   html[lang='ur'] {
     font-family: var(--font-urdu);
@@ -152,6 +157,42 @@
     display: block;
     font-weight: 700;
     margin-bottom: 0.35rem;
+  }
+
+  /* On/off switch: a checkbox with role="switch". 48x28, knob slides to the reading end. */
+  .switch {
+    appearance: none;
+    position: relative;
+    flex-shrink: 0;
+    width: 3rem;
+    height: 1.75rem;
+    border-radius: 999px;
+    background: var(--color-line);
+    border: 2px solid var(--color-soil-soft);
+    cursor: pointer;
+    transition: background-color 0.15s;
+  }
+  .switch::before {
+    content: '';
+    position: absolute;
+    top: 2px;
+    inset-inline-start: 2px;
+    width: 1.25rem;
+    height: 1.25rem;
+    border-radius: 999px;
+    background: var(--color-sheet);
+    box-shadow: 0 1px 2px rgb(0 0 0 / 0.3);
+    transition: transform 0.15s;
+  }
+  .switch:checked {
+    background: var(--color-field);
+    border-color: var(--color-field);
+  }
+  .switch:checked::before {
+    transform: translateX(1.25rem);
+  }
+  [dir='rtl'] .switch:checked::before {
+    transform: translateX(-1.25rem);
   }
 
   .input {

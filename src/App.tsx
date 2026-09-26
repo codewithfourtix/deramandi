@@ -1,6 +1,8 @@
 import { BrowserRouter, Route, Routes } from 'react-router'
 import { Layout } from './components/Layout'
 import { About } from './pages/About'
+import { Accuracy } from './pages/Accuracy'
+import { Settings } from './pages/Settings'
 import { Check } from './pages/Check'
 import { Prices } from './pages/Prices'
 import { Home } from './pages/Home'
@@ -26,6 +28,8 @@ export default function App() {
             <Route path="about" element={<About />} />
             <Route path="check" element={<Check />} />
             <Route path="prices" element={<Prices />} />
+            <Route path="settings" element={<Settings />} />
+            <Route path="accuracy" element={<Accuracy />} />
             <Route path="*" element={<Home />} />
           </Route>
         </Routes>

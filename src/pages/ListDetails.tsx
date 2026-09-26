@@ -2,6 +2,8 @@ import { useState, type FormEvent } from 'react'
 import { useTranslation } from 'react-i18next'
 import { useNavigate } from 'react-router'
 import { CropGlyph } from '../components/CropGlyph'
+import { FarmerPicker } from '../components/FarmerPicker'
+import { updateSettings, useSettings } from '../lib/settings'
 import { CheckIcon, MicIcon } from '../components/Icons'
 import { Steps } from '../components/Steps'
 import { crops, locations } from '../data'
@@ -21,6 +23,7 @@ export function ListDetails() {
   useVoiceLine(['voice.details'])
   const [listening, setListening] = useState(false)
   const [heard, setHeard] = useState<string | null>(null)
+  const settings = useSettings()
   const { draft, update } = useDraft()
   const [qtyText, setQtyText] = useState(draft.quantityKg ? String(draft.quantityKg) : '')
   const [errors, setErrors] = useState<Errors>({})
@@ -60,7 +63,7 @@ export function ListDetails() {
       document.getElementById(first)?.focus()
       return
     }
-    update({ quantityKg: Math.round(qty) })
+    update({ quantityKg: Math.round(qty), farmerId: settings.helperMode ? (draft.farmerId ?? settings.activeFarmerId) : undefined })
     navigate('/list/photos')
   }
 
@@ -68,6 +71,15 @@ export function ListDetails() {
     <form onSubmit={submit} noValidate>
       <Steps current={1} />
       <h1 className="display mb-6 text-[1.7rem]">{t('details.title')}</h1>
+      {settings.helperMode && (
+        <FarmerPicker
+          value={draft.farmerId ?? settings.activeFarmerId}
+          onChange={(id) => {
+            update({ farmerId: id })
+            updateSettings({ activeFarmerId: id })
+          }}
+        />
+      )}
 
       <fieldset className="m-0 border-0 p-0">
         <legend className="field-label">{t('details.crop')}</legend>
