@@ -14,9 +14,9 @@ Urdu-first web app for D.I. Khan farmers: photograph a crop, get a grade and fai
 
 The price and spoilage gap for D.I. Khan growers of Dhakki dates and Kulachi melons: agents set the price, fruit spoils without cold storage, and small lots never reach export buyers.
 
-## What you built (661/800 characters)
+## What you built (697/800 characters)
 
-A bilingual web app, Urdu first with right-to-left Nastaliq and English one tap away, built for low-end Android phones. A grower picks the crop, quantity and village, adds 1 to 3 photos, and gets Grade A, B or C with the reasons (size, colour, marks), the fair price band for that grade and the value of the whole lot. It then matches buyers by crop, grade and quantity, ranks nearby storage and transport with cold storage first for fruit, flags when a small lot should be pooled for export, and lets the grower send a request and track listings. Grading runs on the phone and refuses dark or crop-less photos. Buyers and logistics are seeded sample providers.
+An Urdu-first bilingual web app (right-to-left Nastaliq, English one tap away) built for cheap Android phones and weak signal: installable, works offline. A grower lists crop, quantity and village, adds photos, and gets Grade A, B or C, the fair price band for that grade and the lot's value. Khajoor is graded by a MobileNetV2 model we trained on graded Pakistani khajoor photos, running on the phone: 72% correct on 311 held-out photos vs a 43% baseline. Dark or crop-less photos are refused. It then matches buyers by crop, grade and quantity, ranks nearby cold storage and transport, flags small lots for pooling toward export, and tracks requests. Buyers and logistics are seeded sample data.
 
 ## Domain
 
@@ -30,6 +30,6 @@ PASTE THE LIVE VERCEL / NETLIFY URL HERE AFTER DEPLOYING. Test it in a private w
 
 https://github.com/codewithfourtix/deramandi
 
-## Notes for the judges (549/600 characters)
+## Notes for the judges (529/600 characters)
 
-Farmer-first MVP. Everything the grower touches works end to end in Urdu and English, and nothing leaves the phone. Buyers, storage, transport and prices are seeded sample data, labelled in the app. The grade is rule-based colour, size and defect analysis in the browser, not a trained AI model. Its confidence shows fit to the rules, not measured accuracy. Dark or crop-less photos are refused, not guessed. Drawn sample photos let you try the flow without real ones. A trained image model is our next step and plugs into the same grading function.
+Farmer-first MVP: every grower-facing step works end to end in Urdu and English, offline after first visit, and nothing leaves the phone. The khajoor grade is a real MobileNetV2 model trained on a public Pakistani khajoor grading dataset (Mendeley, CC BY 4.0), run in-browser: 72% on 311 held-out photos (95% CI 67-77%, baseline 43%), after removing train/test duplicates. Limits: no Dhakki in the data, lab photos of single fruits; other crops use a labelled rule-based estimate. Buyers, logistics and prices are seeded samples.
