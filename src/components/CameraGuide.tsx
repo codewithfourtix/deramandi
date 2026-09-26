@@ -35,9 +35,16 @@ export function CameraGuide({ crop, remaining, onPhoto, onClose, onUnavailable }
   const [ready, setReady] = useState(false)
   const [check, setCheck] = useState<Check>('ok')
   const [flash, setFlash] = useState(false)
-  const [taken, setTaken] = useState(0)
+  // one shot at a time: the shutter unlocks when the parent has stored the photo (remaining drops)
+  const [saving, setSaving] = useState(false)
   const shape = SHAPE[crop]
-  const left = remaining - taken
+  const left = remaining
+
+  useEffect(() => {
+    setSaving(false)
+    if (remaining <= 0) onClose()
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [remaining])
 
   useEffect(() => {
     let stream: MediaStream | null = null
@@ -87,19 +94,19 @@ export function CameraGuide({ crop, remaining, onPhoto, onClose, onUnavailable }
 
   function shoot() {
     const v = video.current
-    if (!v || !v.videoWidth || left <= 0) return
+    if (!v || !v.videoWidth || left <= 0 || saving) return
+    setSaving(true)
+    window.setTimeout(() => setSaving(false), 3000) // never stay locked if storing the photo failed
     const c = document.createElement('canvas')
     c.width = v.videoWidth
     c.height = v.videoHeight
     c.getContext('2d')!.drawImage(v, 0, 0)
     c.toBlob(
       (blob) => {
-        if (!blob) return
+        if (!blob) return setSaving(false)
         onPhoto(new File([blob], `photo-${Date.now()}.jpg`, { type: 'image/jpeg' }))
-        setTaken((n) => n + 1)
         setFlash(true)
         window.setTimeout(() => setFlash(false), 180)
-        if (left - 1 <= 0) window.setTimeout(onClose, 250)
       },
       'image/jpeg',
       0.9,
@@ -128,7 +135,7 @@ export function CameraGuide({ crop, remaining, onPhoto, onClose, onUnavailable }
         <button
           type="button"
           onClick={shoot}
-          disabled={!ready || left <= 0}
+          disabled={!ready || left <= 0 || saving}
           aria-label={t('camera.shutter')}
           className="h-[4.5rem] w-[4.5rem] shrink-0 rounded-full border-4 border-paper bg-paper/20 p-1 disabled:opacity-40"
         >
