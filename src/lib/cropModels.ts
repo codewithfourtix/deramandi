@@ -42,10 +42,13 @@ export interface CropCard {
   groupCount?: number
   /** Test confusion matrix: rows are the true label, columns the prediction. */
   confusion?: number[][]
+  /** Wheat: accuracy on GrainSet's scanner close-ups, before cutting out the app's way. */
+  scannerAccuracy?: number
+  scannerTestImages?: number
 }
 
 const cards = import.meta.glob<{ default: CropCard }>('../data/models/*.json', { eager: true })
-const MODEL_DIR: Record<string, string> = { wheat: 'wheat', sugarcane: 'sugarcane', kulachi_melon: 'melon' }
+export const MODEL_DIR: Record<string, string> = { wheat: 'wheat', sugarcane: 'sugarcane', kulachi_melon: 'melon' }
 
 export const CROP_CARDS: Partial<Record<CropId, CropCard>> = Object.fromEntries(
   Object.values(cards).map((m) => [m.default.crop, m.default]),

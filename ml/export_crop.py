@@ -66,6 +66,20 @@ def main(crop):
         "licence": CITATIONS[crop]["licence"],
         "weightsMB": round(size / 1e6, 2),
     }
+    if "app_accuracy" in m:  # wheat: held-out kernels cut out the app's way (eval_wheat_appcrops.py) are the headline
+        card.update(
+            {
+                "scannerAccuracy": round(m["scanner_test_accuracy"], 4),
+                "scannerTestImages": card["testImages"],
+                "testImages": m["app_count"],
+                "testAccuracy": round(m["app_accuracy"], 4),
+                "testAccuracyWilson95": [round(x, 4) for x in m["app_wilson95"]],
+                "majorityBaseline": round(m["app_majority_baseline"], 4),
+                "perClass": {k: {"precision": round(v["precision"], 3), "recall": round(v["recall"], 3), "n": int(v["support"])} for k, v in m["app_report"].items() if k in m["labels"]},
+                "confusion": m["app_confusion"],
+            }
+        )
+        m["kernel_group_accuracy"], m["kernel_group_wilson95"] = m["app_group_accuracy"], m["app_group_wilson95"]
     if "kernel_group_accuracy" in m:
         card["kernelGroupAccuracy"] = round(m["kernel_group_accuracy"], 4)
         card["kernelGroupWilson95"] = [round(x, 4) for x in m["kernel_group_wilson95"]]

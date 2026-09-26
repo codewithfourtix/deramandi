@@ -1,11 +1,10 @@
-import { CROP_CARDS } from './cropModels'
+import { CROP_CARDS, MODEL_DIR } from './cropModels'
 
 /*
   Fetch every crop model once so the service worker's crop-models cache holds
   it (vite.config.ts runtimeCaching). After this, all four crops grade offline.
 */
 
-const DIRS = ['wheat', 'sugarcane', 'melon']
 
 export function cropModelsMB() {
   return Math.round(Object.values(CROP_CARDS).reduce((s, c) => s + (c?.weightsMB ?? 0), 0))
@@ -13,7 +12,7 @@ export function cropModelsMB() {
 
 export async function downloadAllModels(onProgress?: (done: number, total: number) => void) {
   const files: string[] = []
-  for (const d of DIRS) {
+  for (const d of Object.keys(CROP_CARDS).map((c) => MODEL_DIR[c])) {
     const url = `/models/${d}/model.json`
     const res = await fetch(url)
     if (!res.ok) continue

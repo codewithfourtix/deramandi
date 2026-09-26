@@ -28,11 +28,15 @@ HERE = os.path.dirname(os.path.abspath(__file__))
 DATA = os.environ.get("DERAMANDI_DATA", os.path.join(HERE, "..", "..", "data"))
 # SPLIT=test makes a held-out app-style test set from test kernels (never used for training)
 SPLIT = os.environ.get("SPLIT", "train")
+# COPY=2 makes a second, differently randomised crop of every kernel (files *_c2.png)
+COPY = int(os.environ.get("COPY", "1"))
+SUFFIX = "_c" if COPY == 1 else f"_c{COPY}"
 SRC = os.path.join(DATA, "wheat_views", SPLIT)
 DST = os.path.join(DATA, "wheat_appcrops", SPLIT)
 THRESHOLD, MARGIN, OUT = 44, 0.18, 184
-rng = random.Random(21 if SPLIT == "train" else 99)
-nrng = np.random.default_rng(21 if SPLIT == "train" else 99)
+SEED = (21 if SPLIT == "train" else 99) + 1000 * (COPY - 1)
+rng = random.Random(SEED)
+nrng = np.random.default_rng(SEED)
 
 
 def cloth(w, h):
@@ -84,15 +88,15 @@ def main():
         cls = os.path.basename(os.path.dirname(f))
         out_dir = os.path.join(DST, cls)
         os.makedirs(out_dir, exist_ok=True)
-        out = os.path.join(out_dir, os.path.basename(f).replace(".png", "_c.png"))
+        out = os.path.join(out_dir, os.path.basename(f).replace(".png", f"{SUFFIX}.png"))
         if os.path.exists(out):
             continue
         got = cutout(f, rng.randint(45, 150))
         if not got:
             continue
         k, alpha = got
-        if rng.random() < 0.5:  # kernels lie at any angle on a cloth
-            angle = rng.uniform(-35, 35)
+        if rng.random() < (0.5 if COPY == 1 else 1.0):  # kernels lie at any angle on a cloth
+            angle = rng.uniform(-35, 35) if COPY == 1 else rng.uniform(0, 360)
             k, alpha = k.rotate(angle, expand=True, resample=Image.BICUBIC), alpha.rotate(angle, expand=True, resample=Image.BICUBIC)
         pad = int(max(k.size) * rng.uniform(0.6, 1.2))
         bg = cloth(k.width + 2 * pad, k.height + 2 * pad)

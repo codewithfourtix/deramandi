@@ -158,8 +158,9 @@ export function Accuracy() {
       })}
 
       <section className="border-t border-line pt-6">
-        <h2 className="display text-xl">{t('crops.other')}</h2>
+        <h2 className="display text-xl">{CROP_CARDS.wheat ? t('crops.other') : t('accuracy.rulesTitle')}</h2>
         <p className="mt-2">{t('accuracy.rules')}</p>
+        {!CROP_CARDS.wheat && <p className="mt-2 text-[0.95rem] text-soil-soft">{t('accuracy.wheatTried')}</p>}
       </section>
 
       <Link to="/about" className="inline-flex min-h-11 items-center font-bold text-indus underline underline-offset-4">

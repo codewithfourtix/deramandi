@@ -87,17 +87,16 @@ describe('shipped model files', () => {
 })
 
 describe('wheat lot shares', () => {
-  it('undoes the known misreads: a clean lot reads clean again', async () => {
-    const { adjustShares, WHEAT_GROUP, CROP_CARDS } = await import('../lib/cropModels')
-    const card = CROP_CARDS.wheat!
-    expect(card.confusion).toBeTruthy()
-    // what the model would count on a 100% sound lot: row 0 of the confusion matrix
-    const row = card.confusion![0]
+  it('undoes known misreads: a clean lot reads clean again', async () => {
+    const { adjustShares, WHEAT_GROUP } = await import('../lib/cropModels')
+    // 8x8 test confusion (rows true, columns predicted): 25% of sound kernels misread as damaged
+    const confusion = Array.from({ length: 8 }, (_, i) => Array.from({ length: 8 }, (_, j) => (i === j ? 75 : i === 0 ? 25 / 7 : 25 / 7)))
+    const row = confusion[0]
     const total = row.reduce((a, b) => a + b, 0)
     const q = [0, 0, 0]
     row.forEach((n, j) => (q[WHEAT_GROUP[j]] += n / total))
-    expect(q[0]).toBeLessThan(0.9) // raw count would call it Grade B
-    const p = adjustShares(q, card.confusion!, WHEAT_GROUP)
+    expect(q[0]).toBeLessThan(0.8) // raw counting would call a clean lot damaged
+    const p = adjustShares(q, confusion, WHEAT_GROUP)
     expect(p[0]).toBeGreaterThan(0.97)
     expect(p.reduce((a, b) => a + b, 0)).toBeCloseTo(1, 5)
     expect(Math.min(...p)).toBeGreaterThanOrEqual(0)

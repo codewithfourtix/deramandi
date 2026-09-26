@@ -402,7 +402,7 @@
     "group_C": "Serious damage",
     "binary_A": "Good",
     "binary_C": "Damaged",
-    "card_wheat_kernel_class": "Each kernel was checked by an image model trained on {{trained}} photos of single wheat kernels. On {{tested}} kernels it had never seen, it named the exact kernel type {{accuracy}}% of the time (likely range {{low}} to {{high}}%), and put the kernel in the right quality group (sound, minor or serious damage) {{group}}% of the time.",
+    "card_wheat_kernel_class": "Each kernel was checked by an image model trained on {{trained}} photos of single wheat kernels. Tested on {{tested}} kernels it had never seen, cut out on a cloth the way the app does, it named the exact kernel type {{accuracy}}% of the time (likely range {{low}} to {{high}}%), and put the kernel in the right quality group (sound, minor or serious damage) {{group}}% of the time.",
     "card_binary_good_damaged": "Graded by an image model trained on {{trained}} photos of sugarcane billets marked good or damaged. On {{tested}} billets it had never seen, it was right {{accuracy}}% of the time (likely range {{low}} to {{high}}%). It only knows good and damaged, so it gives A or C, never B.",
     "card_grade3_proxy": "Graded by an image model trained on {{trained}} graded photos of other fruit (mango, papaya, apple, tomato, Burmese grape). On {{tested}} fruit photos it had never seen, it gave the right grade {{accuracy}}% of the time (likely range {{low}} to {{high}}%).",
     "wheatRule": "Lot rule we use: Grade A needs at least 90% sound kernels and at most 2% seriously damaged; B at least 75% sound and at most 8% seriously damaged; anything worse is C.",
@@ -449,7 +449,7 @@
     "tip_other_C": "Sell soon and locally; storing will not improve it."
   },
   "photosWheat": {
-    "tip": "Spread a handful of grain in one layer on a plain dark cloth, so the kernels do not touch. The app finds and checks every kernel."
+    "tip": "Spread a handful of grain in one layer on a plain dark cloth, and photograph it close up in daylight."
   },
   "photosSugarcane": {
     "tip": "Lay one cut piece of cane (about a forearm long) on a plain dark cloth and photograph it from above, lengthways, filling the photo. Take 2 or 3 photos, turning the piece a little each time."
@@ -578,17 +578,19 @@
     "limitsTitle": "What it has not seen:",
     "data": "Learned from {{n}} photos.",
     "kernelGroup": "For the lot grade, what matters is the quality group of each kernel (sound, minor or serious damage): it got that right {{acc}}% of the time.",
-    "rules": "Other crops get a rule-based estimate from colour, coverage and dark spots in the photo. It is not a trained model and its accuracy has not been measured.",
+    "rules": "Wheat and other crops get a rule-based estimate from colour, coverage and dark spots in the photo. It is not a trained model and its accuracy has not been measured.",
     "limits_dhakki_dates": "No Dhakki photos: it learned from Gajar, Kupro and Aseel dates. On a variety it had never seen it still gave grades, so treat a Dhakki grade as a guide until Dhakki photos are added.",
     "limits_wheat": "It learned from close-up scanner photos of single kernels. A phone photo of a handful is coarser, and accuracy on phone photos has not been measured yet.",
     "limits_sugarcane": "It learned from Louisiana cane varieties photographed on a dark background, and it only knows good or damaged. Local varieties and a sugar test at the mill are not covered.",
     "limits_kulachi_melon": "No graded melon photos exist in public, so it learned from mango, papaya, apple, tomato and Burmese grape. It has never been tested on a melon.",
     "recallAll": "Per grade, over all {{n}} test photos (Aseel included):",
-    "headlineProxy": "right on {{n}} test photos of other graded fruit (never tested on melon)"
+    "headlineProxy": "right on {{n}} test photos of other graded fruit (never tested on melon)",
+    "rulesTitle": "Wheat and other crops",
+    "wheatTried": "We did train a wheat model that checks each kernel: on 2,003 held-out kernels cut out the way the app does, it named the kernel type 83% of the time. But on test handfuls it read clean grain as damaged too often to grade a whole lot, so it is not used yet."
   },
   "offlineModels": {
     "title": "Ready for offline",
-    "body": "Khajoor grading already works without internet. Download the wheat, sugarcane and melon models too ({{mb}} MB) so every crop grades offline.",
+    "body": "Khajoor grading already works without internet. Download the sugarcane and melon models too ({{mb}} MB) so those crops grade offline.",
     "button": "Download all models",
     "busy": "Downloading {{done}} of {{total}}…",
     "done": "All crop models are on this phone.",

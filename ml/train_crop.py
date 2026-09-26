@@ -77,7 +77,7 @@ def wheat():
         kernels = {}
         for it in train_all:
             if it[1] == ci:
-                kernels.setdefault(re.sub(r"_[ab](_c)?\.png$", "", os.path.basename(it[0])), []).append(it)
+                kernels.setdefault(re.sub(r"_[ab](_c\d*)?\.png$", "", os.path.basename(it[0])), []).append(it)
         keys = sorted(kernels)
         rng.shuffle(keys)
         k = round(len(keys) * 0.15)
