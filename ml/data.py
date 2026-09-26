@@ -17,16 +17,51 @@ from PIL import Image
 SEED = 1337
 GRADES = ["Grade-1", "Grade-2", "Grade-3"]
 HERE = os.path.dirname(os.path.abspath(__file__))
-RAW = os.path.join(HERE, "data", "raw")
-HASHES = os.path.join(HERE, "out", "dhash.json")
+# Both folders can live outside the repo (the dataset is not committed).
+RAW = os.environ.get("DERAMANDI_RAW", os.path.join(HERE, "data", "raw"))
+OUT = os.environ.get("DERAMANDI_OUT", os.path.join(HERE, "out"))
+HASHES = os.path.join(OUT, "dhash.json")
 NEAR = 10  # bits out of 256
+
+# The two Mendeley varieties that have all three grades.
+CORE_VARIETIES = ["Gajar", "Kupro"]
+# Khajoor from D.I. Khan itself, collected by the team (see COLLECTING.md).
+# When present in the test split, its accuracy becomes the headline number.
+LOCAL_VARIETIES = ["Dhakki"]
+IMAGE_EXT = (".jpg", ".jpeg", ".png")
+
+
+def _folder(name):
+    """Find a variety folder regardless of letter case, so dhakki/ and Dhakki/
+    both work on Linux as well as Windows. Returns the real folder name or None."""
+    if not os.path.isdir(RAW):
+        return None
+    for entry in os.listdir(RAW):
+        if entry.lower() == name.lower() and os.path.isdir(os.path.join(RAW, entry)):
+            return entry
+    return None
+
+
+def available_varieties():
+    return sorted(e for e in os.listdir(RAW) if os.path.isdir(os.path.join(RAW, e))) if os.path.isdir(RAW) else []
 
 
 def collect(varieties):
+    """(path, grade index, canonical variety name) for every photo.
+
+    Layout: RAW/<Variety>/<Size>/<Grade-N>/*.jpg (Mendeley), or the shorter
+    RAW/<Variety>/<Grade-N>/*.jpg for photos collected without size sorting.
+    """
     items = []
     for v in varieties:
+        folder = _folder(v)
+        if folder is None:
+            continue
         for gi, g in enumerate(GRADES):
-            for f in sorted(glob.glob(os.path.join(RAW, v, "*", g, "*.jpg"))):
+            files = set()
+            for pattern in (os.path.join(RAW, folder, "*", g, "*"), os.path.join(RAW, folder, g, "*")):
+                files.update(f for f in glob.glob(pattern) if f.lower().endswith(IMAGE_EXT))
+            for f in sorted(files):
                 items.append((f, gi, v))
     return items
 
@@ -112,3 +147,17 @@ def split(items, report=False):
         sizes = [len(g) for g in gs]
         print(f"{len(items)} images, {len(gs)} groups, {sum(s > 1 for s in sizes)} groups with duplicates, {dropped} images dropped for conflicting labels")
     return train, val, test
+
+
+def canonical(name):
+    """Canonical spelling for a variety name typed in any case."""
+    known = {v.lower(): v for v in CORE_VARIETIES + LOCAL_VARIETIES + ["Aseel", "Fasli Toto"]}
+    return known.get(name.strip().lower(), name.strip())
+
+
+def parse_rel(rel):
+    """'Gajar/Large/Grade-2/1.jpg' or 'Dhakki/Grade-2/1.jpg' -> ('Gajar', 1).
+    The variety comes back in the canonical spelling used by the scripts."""
+    parts = rel.replace("\\", "/").split("/")
+    grade = next(GRADES.index(p) for p in parts if p in GRADES)
+    return canonical(parts[0]), grade

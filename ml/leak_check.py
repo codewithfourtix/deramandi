@@ -10,7 +10,7 @@ import os
 import numpy as np
 from PIL import Image
 
-from data import collect, split
+from data import CORE_VARIETIES, OUT, available_varieties, canonical, collect, split
 from preprocess import to_square
 
 HERE = os.path.dirname(os.path.abspath(__file__))
@@ -21,7 +21,9 @@ def dhash(img, size=16):
     return (g[:, 1:] > g[:, :-1]).flatten()
 
 
-items = collect(["Gajar", "Kupro"])
+# Check the same varieties train.py will use.
+extra = [canonical(v) for v in os.environ.get("EXTRA_VARIETIES", "Aseel").split(",") if v.strip()]
+items = collect(CORE_VARIETIES + [v for v in extra if v not in CORE_VARIETIES])
 train, val, test = split(items)
 H = {f: dhash(to_square(Image.open(f).convert("RGB"), 128)) for f, _, _ in items}
 
@@ -44,7 +46,7 @@ import hashlib
 
 seen = {}
 dups = 0
-for f, _, _ in collect(["Gajar", "Kupro", "Aseel", "Fasli Toto"]):
+for f, _, _ in collect([canonical(v) for v in available_varieties()]):
     h = hashlib.md5(open(f, "rb").read()).hexdigest()
     if h in seen:
         dups += 1
@@ -53,16 +55,12 @@ print("exact duplicate files in dataset:", dups)
 
 # contact sheet of consecutive files 1..12 in two folders
 rows = []
-for folder in ("Gajar/Large/Grade-1", "Kupro/Large/Grade-2"):
-    ims = []
-    for i in range(1, 13):
-        p = os.path.join(HERE, "data", "raw", folder, f"{i}.jpg")
-        if os.path.exists(p):
-            ims.append(Image.open(p).convert("RGB").resize((90, 150)))
-    rows.append(ims)
+for variety in sorted({v for _, _, v in items})[:3]:
+    files = sorted(f for f, _, v in items if v == variety)[:12]
+    rows.append([Image.open(p).convert("RGB").resize((90, 150)) for p in files])
 sheet = Image.new("RGB", (90 * 12, 150 * len(rows)), "white")
 for r, ims in enumerate(rows):
     for c, im in enumerate(ims):
         sheet.paste(im, (c * 90, r * 150))
-sheet.save(os.path.join(HERE, "data", "consecutive_contact.jpg"), quality=85)
+sheet.save(os.path.join(OUT, "consecutive_contact.jpg"), quality=85)
 print("contact sheet written")

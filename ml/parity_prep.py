@@ -1,4 +1,4 @@
-"""Prepare a browser-vs-Python parity check.
+"""Prepare a browser-vs-Python parity check (run after export.py).
 
 Copies N held-out test photos into deramandi/public/__parity/ (gitignored) with
 the Keras model's probabilities for each (same TTA as the app), so the browser
@@ -16,17 +16,19 @@ import numpy as np  # noqa: E402
 import tf_keras as keras  # noqa: E402
 from PIL import Image  # noqa: E402
 
-from data import RAW  # noqa: E402
+from data import OUT, RAW, parse_rel  # noqa: E402
 from preprocess import to_square  # noqa: E402
 
 HERE = os.path.dirname(os.path.abspath(__file__))
 DEST = os.path.join(HERE, "..", "public", "__parity")
 N = int(os.environ.get("N", "90"))
 
-model = keras.models.load_model(os.path.join(HERE, "out", "model.h5"))
-splits = json.load(open(os.path.join(HERE, "out", "splits.json")))
-GR = {"Grade-1": 0, "Grade-2": 1, "Grade-3": 2}
-test = [(os.path.join(RAW, p), GR[p.split("/")[2]], p.split("/")[0]) for p in splits["test"] if p.split("/")[0] in ("Gajar", "Kupro")]
+model = keras.models.load_model(os.path.join(OUT, "model.h5"))
+splits = json.load(open(os.path.join(OUT, "splits.json")))
+# Same photos the app's headline number is about (Dhakki once it is trained in).
+card = json.load(open(os.path.join(HERE, "..", "src", "data", "modelCard.json")))
+headline = card["headlineVarieties"]
+test = [(os.path.join(RAW, r), *reversed(parse_rel(r))) for r in splits["test"] if parse_rel(r)[0] in headline]
 rows = random.Random(11).sample(test, min(N, len(test)))
 
 if os.path.isdir(DEST):

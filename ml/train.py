@@ -5,11 +5,12 @@ Maitlo et al., Shah Abdul Latif University, DOI 10.17632/s5zfvsw5kv.3.
 Only the ORIGINAL photos are used (never the published augmented copies).
 
 Grades: Grade-1 -> A, Grade-2 -> B, Grade-3 -> C.
-Training varieties: Gajar and Kupro, the only two with all three grades. Using
-Aseel / Fasli Toto (Grade-1 only) would teach "this variety = grade A", so they
-are held out and used as an unseen-variety check instead.
+Training varieties: Gajar and Kupro (the only Mendeley varieties with all three
+grades) plus EXTRA_VARIETIES (default "Aseel"; add Dhakki once the team's
+photos are in data/raw/Dhakki, see COLLECTING.md). Mendeley varieties left out
+of training are used as an unseen-variety check.
 
-Outputs (ml/out/): model.h5, metrics.json, splits.json.
+Outputs (DERAMANDI_OUT, default ml/out/): model.h5, metrics.json, splits.json.
 """
 import json
 import os
@@ -25,15 +26,13 @@ import tf_keras as keras  # noqa: E402
 from PIL import Image  # noqa: E402
 from sklearn.metrics import classification_report, confusion_matrix  # noqa: E402
 
-from data import GRADES, RAW, SEED, collect, split  # noqa: E402
+from data import CORE_VARIETIES, OUT, RAW, SEED, canonical, collect, split  # noqa: E402
 from preprocess import to_square  # noqa: E402
 
 IMG = 224
 COLOUR_AUG = os.environ.get("COLOUR_AUG", "strong")
 STORE = 256  # images are stored at 256 and randomly cropped/zoomed to 224
 LABELS = ["A", "B", "C"]
-HERE = os.path.dirname(os.path.abspath(__file__))
-OUT = os.path.join(HERE, "out")
 os.makedirs(OUT, exist_ok=True)
 
 random.seed(SEED)
@@ -135,11 +134,14 @@ def evaluate(model, x, y, tta=True):
 def main():
     alpha = float(os.environ.get("ALPHA", "1.0"))
     t0 = time.time()
-    extra = [v for v in os.environ.get("EXTRA_VARIETIES", "Aseel").split(",") if v]
-    train_varieties = ["Gajar", "Kupro"] + extra
+    extra = [canonical(v) for v in os.environ.get("EXTRA_VARIETIES", "Aseel").split(",") if v.strip()]
+    train_varieties = CORE_VARIETIES + [v for v in extra if v not in CORE_VARIETIES]
     unseen_varieties = [v for v in ["Aseel", "Fasli Toto"] if v not in train_varieties]
     items = collect(train_varieties)
-    train, val, test = split(items)
+    missing = [v for v in train_varieties if not any(it[2] == v for it in items)]
+    if missing:
+        raise SystemExit(f"No photos found for {missing} under {RAW}. Check the folder names (see COLLECTING.md).")
+    train, val, test = split(items, report=True)
     json.dump(
         {k: [os.path.relpath(f, RAW).replace("\\", "/") for f, _, _ in v] for k, v in (("train", train), ("val", val), ("test", test))},
         open(os.path.join(OUT, "splits.json"), "w"),
@@ -151,7 +153,7 @@ def main():
     xva, yva = load(val, STORE)
     xte, yte = load(test, STORE)
     unseen = collect(unseen_varieties)
-    xun, yun = load(unseen, STORE)
+    xun, yun = load(unseen, STORE) if unseen else (np.zeros((0, STORE, STORE, 3), np.uint8), np.zeros(0, np.int32))
     print(f"loaded in {time.time() - t0:.0f}s")
 
     counts = np.bincount(ytr, minlength=3)
@@ -164,7 +166,7 @@ def main():
 
     # stage 1: train the head on frozen ImageNet features
     model.compile(optimizer=keras.optimizers.Adam(1e-3), loss="sparse_categorical_crossentropy", metrics=["accuracy"])
-    model.fit(dtr, validation_data=dva, epochs=10, class_weight=class_weight, verbose=2)
+    model.fit(dtr, validation_data=dva, epochs=int(os.environ.get("STAGE1_EPOCHS", "10")), class_weight=class_weight, verbose=2)
 
     # stage 2: fine-tune the top of the backbone at a low learning rate
     base.trainable = True
@@ -215,13 +217,15 @@ def main():
     varieties = np.array([v for _, _, v in test])
     p = evaluate(model, xte, yte, True).argmax(1)
     per_variety = {str(v): float((p[varieties == v] == yte[varieties == v]).mean()) for v in sorted(set(varieties))}
-    core = np.isin(varieties, ["Gajar", "Kupro"])
+    per_variety_n = {str(v): int((varieties == v).sum()) for v in sorted(set(varieties))}
+    core = np.isin(varieties, CORE_VARIETIES)
     per_variety["Gajar+Kupro"] = float((p[core] == yte[core]).mean())
+    per_variety_n["Gajar+Kupro"] = int(core.sum())
     print("per-variety test accuracy:", per_variety)
 
     # unseen varieties: every photo is Grade-1, so this is the share predicted A
-    pu = evaluate(model, xun, yun, True).argmax(1)
-    unseen_share = {lab: float((pu == i).mean()) for i, lab in enumerate(LABELS)}
+    pu = evaluate(model, xun, yun, True).argmax(1) if len(xun) else np.zeros(0, int)
+    unseen_share = {lab: float((pu == i).mean()) if len(pu) else 0.0 for i, lab in enumerate(LABELS)}
     print("unseen varieties (all true Grade-1): predicted share", unseen_share)
 
     acc = results["tta"]["accuracy"]
@@ -242,6 +246,7 @@ def main():
         "counts": {"train": len(train), "val": len(val), "test": len(test), "unseen": len(unseen)},
         "test": results,
         "test_per_variety_tta": per_variety,
+        "test_per_variety_n": per_variety_n,
         "test_accuracy_wilson95": wilson,
         "majority_baseline": baseline,
         "temperature": temperature,
