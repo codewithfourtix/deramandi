@@ -132,7 +132,7 @@ async function analyse(src: string, crop: CropId): Promise<ImageScores> {
   const mean = lSum / fg
   const evenness = 1 - clamp(Math.sqrt(Math.max(0, lSq / fg - mean * mean)) / 0.3, 0, 1)
   const color = clamp(0.7 * (colorHits / fg) + 0.3 * evenness, 0, 1)
-  const defects = clamp((defectHits / fg) * 2.5, 0, 1)
+  const defects = clamp((defectHits / fg) * 4, 0, 1)
 
   return { size, color, defects }
 }
