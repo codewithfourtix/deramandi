@@ -18,10 +18,13 @@ from PIL import Image, ImageFilter
 HERE = os.path.dirname(os.path.abspath(__file__))
 DATA = os.environ.get("DERAMANDI_DATA", os.path.join(HERE, "..", "..", "data"))
 OUT_ROOT = os.environ.get("DERAMANDI_OUT", os.path.join(HERE, "out"))
-DEST = os.path.join(HERE, "..", "public", "__parity_wheat_lots")
+# SEED and N make a fresh set in another folder (e.g. SEED=8 N=24 -> __parity_wheat_lots_s8)
+SEED = int(os.environ.get("SEED", "7"))
+N_LOTS = int(os.environ.get("N", "12"))
+DEST = os.path.join(HERE, "..", "public", "__parity_wheat_lots" + ("" if SEED == 7 else f"_s{SEED}"))
 GROUP = [0, 2, 1, 2, 1, 1, 2, 2]
 W, H = 1600, 1200
-rng = random.Random(7)
+rng = random.Random(SEED)
 
 
 def lot_grade(shares):
@@ -71,6 +74,8 @@ def main():
     os.makedirs(DEST, exist_ok=True)
     # mixes: share of sound kernels, rest spread over defects
     mixes = [0.96, 0.95, 0.93, 0.85, 0.82, 0.8, 0.7, 0.6, 0.5, 0.4, 0.97, 0.78]
+    if SEED != 7:  # fresh set: a third of the lots clean, the rest spread over the range
+        mixes = [rng.choice([0.95, 0.96, 0.97, 0.98]) if i % 3 == 0 else rng.uniform(0.35, 0.94) for i in range(N_LOTS)]
     truth = []
     for i, sound in enumerate(mixes):
         n = rng.randint(25, 40)
