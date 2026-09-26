@@ -68,6 +68,24 @@ python export.py           # TF.js model into ../public/model, model card, sampl
 python parity_prep.py      # optional: files for the browser-vs-Python parity check
 ```
 
+| Setting | Default | What it does |
+|---|---|---|
+| `EXTRA_VARIETIES` | `Aseel` | Varieties trained on top of Gajar and Kupro. Use `Aseel,Dhakki` once Dhakki photos exist. |
+| `COLOUR_AUG` | `strong` | `mild` gives the rejected first version. |
+| `STAGE1_EPOCHS`, `FT_EPOCHS` | `10`, `30` | Frozen-backbone and fine-tune epochs. Early stopping usually ends fine-tuning sooner. |
+| `ALPHA` | `1.0` | MobileNetV2 width. |
+| `DERAMANDI_RAW` | `ml/data/raw` | Where the photos are. |
+| `DERAMANDI_OUT` | `ml/out` | Where `model.h5`, `metrics.json` and `splits.json` go. |
+| `DERAMANDI_APP` | the repo | Where `export.py` writes. Point it at a scratch folder for a dry run. |
+
+## Adding Dhakki (and other crops)
+
+See [`COLLECTING.md`](COLLECTING.md). It covers the photo protocol, draft grade definitions, the folder layout, `labels.csv`, the retrain steps, and the code a second crop will need.
+
+Nothing about the training set is hard-coded in `export.py`. The headline accuracy, the "trained on Dhakki" flag in the app and the colour thresholds of the unfamiliar-photo guard are all read from the training run. Retraining with Dhakki therefore updates what the app claims.
+
+**Verified with a dry run:** a stand-in `dhakki/` folder (lowercase, no size level) in a scratch copy of the data was found, trained and exported, and the card switched to a Dhakki headline with its own test count. The stand-in photos were Kupro, so those numbers meant nothing and were not shipped.
+
 **Preprocessing:** `preprocess.py` and `src/lib/model.ts` do the same thing:
 
 1. Find the fruit against the photo's border colour.
