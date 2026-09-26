@@ -1,0 +1,147 @@
+{
+ "dataset": "Mendeley Date Fruit Dataset for Inspection and Grading (CC BY 4.0), DOI 10.17632/s5zfvsw5kv.3",
+ "backbone": "MobileNetV2 alpha=1.0, ImageNet weights, 224px",
+ "train_varieties": [
+  "Gajar",
+  "Kupro",
+  "Aseel"
+ ],
+ "unseen_varieties": [
+  "Fasli Toto"
+ ],
+ "colour_aug": "strong",
+ "counts": {
+  "train": 1789,
+  "val": 379,
+  "test": 384,
+  "unseen": 390
+ },
+ "test": {
+  "plain": {
+   "accuracy": 0.75,
+   "within_one_grade": 0.9713541666666666,
+   "confusion": [
+    [
+     185,
+     19,
+     2
+    ],
+    [
+     42,
+     41,
+     16
+    ],
+    [
+     9,
+     8,
+     62
+    ]
+   ],
+   "report": {
+    "A": {
+     "precision": 0.7838983050847458,
+     "recall": 0.8980582524271845,
+     "f1-score": 0.8371040723981901,
+     "support": 206.0
+    },
+    "B": {
+     "precision": 0.6029411764705882,
+     "recall": 0.41414141414141414,
+     "f1-score": 0.49101796407185627,
+     "support": 99.0
+    },
+    "C": {
+     "precision": 0.775,
+     "recall": 0.7848101265822784,
+     "f1-score": 0.779874213836478,
+     "support": 79.0
+    },
+    "accuracy": 0.75,
+    "macro avg": {
+     "precision": 0.7206131605184446,
+     "recall": 0.6990032643836258,
+     "f1-score": 0.7026654167688414,
+     "support": 384.0
+    },
+    "weighted avg": {
+     "precision": 0.7354146544740777,
+     "recall": 0.75,
+     "f1-score": 0.7361048964849549,
+     "support": 384.0
+    }
+   }
+  },
+  "tta": {
+   "accuracy": 0.7708333333333334,
+   "within_one_grade": 0.9765625,
+   "confusion": [
+    [
+     190,
+     14,
+     2
+    ],
+    [
+     43,
+     41,
+     15
+    ],
+    [
+     7,
+     7,
+     65
+    ]
+   ],
+   "report": {
+    "A": {
+     "precision": 0.7916666666666666,
+     "recall": 0.9223300970873787,
+     "f1-score": 0.852017937219731,
+     "support": 206.0
+    },
+    "B": {
+     "precision": 0.6612903225806451,
+     "recall": 0.41414141414141414,
+     "f1-score": 0.5093167701863354,
+     "support": 99.0
+    },
+    "C": {
+     "precision": 0.7926829268292683,
+     "recall": 0.8227848101265823,
+     "f1-score": 0.8074534161490683,
+     "support": 79.0
+    },
+    "accuracy": 0.7708333333333334,
+    "macro avg": {
+     "precision": 0.7485466386921934,
+     "recall": 0.7197521071184584,
+     "f1-score": 0.7229293745183782,
+     "support": 384.0
+    },
+    "weighted avg": {
+     "precision": 0.7582630898133577,
+     "recall": 0.7708333333333334,
+     "f1-score": 0.754497070811167,
+     "support": 384.0
+    }
+   }
+  }
+ },
+ "test_per_variety_tta": {
+  "Aseel": 0.9863013698630136,
+  "Gajar": 0.7393617021276596,
+  "Kupro": 0.6910569105691057,
+  "Gajar+Kupro": 0.7202572347266881
+ },
+ "test_accuracy_wilson95": [
+  0.7262350670978344,
+  0.8100663508006067
+ ],
+ "majority_baseline": 0.5364583333333334,
+ "temperature": 0.7,
+ "unseen_varieties_grade1_predicted_share": {
+  "A": 0.6615384615384615,
+  "B": 0.0,
+  "C": 0.3384615384615385
+ },
+ "seconds": 592
+}

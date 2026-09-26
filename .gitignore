@@ -25,3 +25,17 @@ dist-ssr
 
 # local tooling
 .claude/
+
+# ML parity check files (local only)
+public/__parity/
+
+# ML: dataset, weights, local envs (the exported model in public/model is committed)
+ml/data/
+ml/out/*.h5
+ml/out/dhash.json
+ml/wheels/
+ml/.venv/
+ml/pip*.json
+ml/*.log
+ml/files.json
+ml/splits_local/
