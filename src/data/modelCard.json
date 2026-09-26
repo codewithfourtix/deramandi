@@ -1,0 +1,64 @@
+{
+  "trainImages": 1789,
+  "valImages": 379,
+  "testImages": 311,
+  "testAccuracy": 0.7203,
+  "testAccuracyWilson95": [
+    0.6679,
+    0.7672
+  ],
+  "majorityBaseline": 0.4277,
+  "overallTestAccuracyInclAseel": 0.7708,
+  "overallTestImagesInclAseel": 384,
+  "temperature": 0.7,
+  "perGradeAllTest": {
+    "A": {
+      "precision": 0.792,
+      "recall": 0.922
+    },
+    "B": {
+      "precision": 0.661,
+      "recall": 0.414
+    },
+    "C": {
+      "precision": 0.793,
+      "recall": 0.823
+    }
+  },
+  "confusionAllTest": [
+    [
+      190,
+      14,
+      2
+    ],
+    [
+      43,
+      41,
+      15
+    ],
+    [
+      7,
+      7,
+      65
+    ]
+  ],
+  "unseenVariety": "Fasli Toto",
+  "unseenVarietiesPredictedShare": {
+    "A": 0.6615,
+    "B": 0.0,
+    "C": 0.3385
+  },
+  "testPerVariety": {
+    "Aseel": 0.9863,
+    "Gajar": 0.7394,
+    "Kupro": 0.6911,
+    "Gajar+Kupro": 0.7203
+  },
+  "trainVarieties": [
+    "Gajar",
+    "Kupro",
+    "Aseel"
+  ],
+  "backbone": "MobileNetV2 alpha=1.0, ImageNet weights, 224px",
+  "dataset": "Mendeley Date Fruit Dataset for Inspection and Grading (CC BY 4.0), DOI 10.17632/s5zfvsw5kv.3"
+}
