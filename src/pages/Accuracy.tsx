@@ -80,7 +80,7 @@ function Block({ crop, name, acc, ci, n, baseline, trained, dataset, citation, l
       <p className="mt-3 text-[0.95rem]">
         <strong>{t('accuracy.limitsTitle')}</strong> {t(`accuracy.limits_${crop}`)}
       </p>
-      <p className="mt-2 text-[0.85rem] text-soil-soft">
+      <p className="mt-2 text-[0.85rem] text-soil-soft [overflow-wrap:anywhere]">
         {t('accuracy.data', { n: trained.toLocaleString('en-US') })} <bdi>{dataset}</bdi>
         <br />
         <bdi>{citation}</bdi> · <bdi>{licence}</bdi>
