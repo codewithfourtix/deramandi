@@ -5,9 +5,9 @@ import { loadImage } from './image'
   gradeCrop is the one seam between the app and the graders.
 
   Khajoor (Dhakki dates): a MobileNetV2 image model trained on graded Pakistani
-  khajoor photos (see ml/ and src/lib/model.ts). If the model cannot load (for
-  example the very first visit is offline), it falls back to the rules below
-  and says so.
+  khajoor photos (see ml/ and src/lib/model.ts). If the model cannot load, no
+  grade is given (ModelUnavailable): the rules below measured below chance on
+  khajoor, so they are not used as a fallback for it.
 
   Every other crop: rule-based analysis, because no graded photo set exists for
   them yet. Each photo is checked first (is it lit, is there produce in it?),
@@ -29,6 +29,14 @@ export class PhotoProblem extends Error {
     this.name = 'PhotoProblem'
     this.issue = issue
     this.photoIndex = photoIndex
+  }
+}
+
+/** The khajoor model could not load (e.g. first use while offline). */
+export class ModelUnavailable extends Error {
+  constructor() {
+    super('grade model unavailable')
+    this.name = 'ModelUnavailable'
   }
 }
 
@@ -61,7 +69,10 @@ export async function gradeCrop(images: string[], crop: CropId): Promise<GradeRe
         unfamiliar: m.unfamiliar,
       }
     } catch (err) {
-      console.warn('Grade model unavailable, using rules instead', err)
+      // No silent fallback: the rules scored below chance on khajoor, so a
+      // wrong-but-confident grade is worse than asking to try again.
+      console.warn('Grade model unavailable', err)
+      throw new ModelUnavailable()
     }
   }
 

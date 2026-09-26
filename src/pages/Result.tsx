@@ -110,7 +110,6 @@ function ResultView({ listing }: { listing: Listing }) {
         ) : (
           <>
             <FactorList factors={listing.gradeFactors} />
-            {listing.crop === 'dhakki_dates' && <p className="mt-3 rounded-md bg-warn-wash px-3 py-2 text-[0.95rem] text-warn">{t('model.fallback')}</p>}
             <p className="mt-3 text-[0.95rem] text-soil-soft">{t('result.gradeNote')}</p>
           </>
         )}

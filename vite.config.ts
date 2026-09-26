@@ -8,8 +8,8 @@ export default defineConfig({
     react(),
     tailwindcss(),
     // Installable, and works without signal after the first visit: the app
-    // shell, fonts and samples are precached; the grade model is cached the
-    // first time it is used.
+    // shell, fonts, samples AND the khajoor grade model are precached when the
+    // service worker installs, so grading works offline in the field.
     VitePWA({
       registerType: 'autoUpdate',
       includeAssets: ['favicon.svg', 'apple-touch-icon.png'],
@@ -34,21 +34,10 @@ export default defineConfig({
         ],
       },
       workbox: {
-        globPatterns: ['**/*.{js,css,html,svg,png,woff2,jpg}'],
-        globIgnores: ['model/**'],
-        maximumFileSizeToCacheInBytes: 4 * 1024 * 1024,
+        globPatterns: ['**/*.{js,css,html,svg,png,woff2,jpg,json,bin}'],
+        globIgnores: ['__parity/**'],
+        maximumFileSizeToCacheInBytes: 8 * 1024 * 1024,
         navigateFallback: '/index.html',
-        runtimeCaching: [
-          {
-            urlPattern: ({ url }) => url.pathname.startsWith('/model/'),
-            handler: 'CacheFirst',
-            options: {
-              cacheName: 'grade-model',
-              expiration: { maxEntries: 20 },
-              cacheableResponse: { statuses: [0, 200] },
-            },
-          },
-        ],
       },
     }),
   ],

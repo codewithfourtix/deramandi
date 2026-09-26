@@ -3,7 +3,7 @@ import { useTranslation } from 'react-i18next'
 import { Navigate, useNavigate } from 'react-router'
 import { CameraIcon, CloseIcon, GalleryIcon } from '../components/Icons'
 import { Steps } from '../components/Steps'
-import { gradeCrop, PhotoProblem } from '../lib/grader'
+import { gradeCrop, ModelUnavailable, PhotoProblem } from '../lib/grader'
 import { fileToDataUrl } from '../lib/image'
 import { drawSample, type SampleQuality } from '../lib/samples'
 import { priceBand } from '../lib/match'
@@ -115,7 +115,9 @@ export function ListPhotos() {
       reset()
     } catch (err) {
       setGrading(false)
-      if (err instanceof PhotoProblem) {
+      if (err instanceof ModelUnavailable) {
+        setError(t('model.unavailable'))
+      } else if (err instanceof PhotoProblem) {
         setBadPhoto(err.photoIndex)
         setError(t(`photos.issue.${err.issue}`, { n: err.photoIndex + 1 }))
       } else {

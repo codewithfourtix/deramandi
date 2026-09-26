@@ -267,9 +267,9 @@
     "photo": "Photo {{n}}",
     "card": "Graded by an image model trained on {{trained}} graded Pakistani khajoor photos. On {{tested}} photos it had never seen, it gave the right grade {{accuracy}}% of the time. It has not been trained on Dhakki photos yet.",
     "note": "The percentages are how sure the model is for these photos. The crop is still checked in person at the store before any sale.",
-    "fallback": "The grading model could not load, so this is a rough rule-based estimate. Connect to the internet once and grade again for the model's grade.",
     "loading": "Loading the grading model (first time only)",
-    "unfamiliar": "These photos look different from the dried khajoor the model learned from (it may be fresh doka fruit, or another crop). Treat this grade with caution, and check the crop you picked."
+    "unfamiliar": "These photos look different from the dried khajoor the model learned from (it may be fresh doka fruit, or another crop). Treat this grade with caution, and check the crop you picked.",
+    "unavailable": "The khajoor grading model hasn't downloaded to this phone yet. Connect to the internet once and tap grade again. Your photos are kept."
   },
   "photosDates": {
     "tip": "Photograph one khajoor at a time, from above, on a plain light cloth, in daylight. Add up to 3 different fruits.",
