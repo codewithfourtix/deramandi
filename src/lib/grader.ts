@@ -2,21 +2,41 @@ import type { CropId, FactorLevel, Grade, GradeResult } from '../types'
 import { loadImage } from './image'
 
 /*
-  gradeCrop is the one seam between the app and the grading model.
-  Callers only ever see this signature, so the heuristic below can be replaced
-  by the trained MobileNetV2 (TF.js) without touching any screen.
+  gradeCrop is the one seam between the app and the grader.
+  Callers only ever see this signature, so this rule-based analysis can later
+  be replaced by a trained image model (for example MobileNetV2 on TF.js)
+  without touching any screen.
 
-  The heuristic reads three things from each photo:
+  Each photo is first checked (is it lit, and is there produce in it?), then
+  read for three things:
     size    - how much of the frame the produce fills (a proxy, not a measurement)
     color   - how close the produce colour is to ripe for this crop, and how even it is
     defects - share of produce pixels that look like dark spots, bruising or mould
   Same photo in, same grade out.
 */
+
+export type PhotoIssue = 'no_crop' | 'too_dark' | 'too_bright'
+
+/** Thrown when a photo can't be graded fairly. The farmer should retake it. */
+export class PhotoProblem extends Error {
+  readonly issue: PhotoIssue
+  readonly photoIndex: number
+  constructor(issue: PhotoIssue, photoIndex: number) {
+    super(`photo ${photoIndex + 1}: ${issue}`)
+    this.name = 'PhotoProblem'
+    this.issue = issue
+    this.photoIndex = photoIndex
+  }
+}
+
 export async function gradeCrop(images: string[], crop: CropId): Promise<GradeResult> {
   if (images.length === 0) throw new Error('gradeCrop needs at least one photo')
   const perImage = await Promise.all(images.map((src) => analyse(src, crop)))
 
-  const avg = (k: keyof ImageScores) => perImage.reduce((s, r) => s + r[k], 0) / perImage.length
+  const bad = perImage.findIndex((r) => r.issue)
+  if (bad !== -1) throw new PhotoProblem(perImage[bad].issue as PhotoIssue, bad)
+
+  const avg = (k: 'size' | 'color' | 'defects') => perImage.reduce((s, r) => s + r[k], 0) / perImage.length
   const size = avg('size')
   const color = avg('color')
   const defects = avg('defects') // 0 = clean, 1 = heavily marked
@@ -28,7 +48,7 @@ export async function gradeCrop(images: string[], crop: CropId): Promise<GradeRe
   const boundaryGap = Math.min(Math.abs(score - GRADE_A), Math.abs(score - GRADE_B))
   const totals = perImage.map((r) => combine(r.size, r.color, r.defects))
   const spread = Math.max(...totals) - Math.min(...totals)
-  const confidence = clamp(0.58 + boundaryGap * 2.2 - spread * 0.6 + (perImage.length - 1) * 0.03, 0.5, 0.94)
+  const confidence = clamp(0.55 + boundaryGap * 2 - spread * 0.6 + (perImage.length - 1) * 0.03, 0.5, 0.9)
 
   return {
     grade,
@@ -53,6 +73,7 @@ interface ImageScores {
   size: number
   color: number
   defects: number
+  issue?: PhotoIssue
 }
 
 // Target hue (degrees) and ideal saturation band for ripe produce, per crop.
@@ -65,8 +86,9 @@ const RIPE: Record<CropId, { hue: number; hueWidth: number; satMin: number; satM
 }
 
 const SAMPLE = 96
+const BACKGROUND_DISTANCE = 48
 
-async function analyse(src: string, crop: CropId): Promise<ImageScores> {
+export async function analyse(src: string, crop: CropId): Promise<ImageScores> {
   const img = await loadImage(src)
   const canvas = document.createElement('canvas')
   canvas.width = SAMPLE
@@ -74,66 +96,102 @@ async function analyse(src: string, crop: CropId): Promise<ImageScores> {
   const ctx = canvas.getContext('2d', { willReadFrequently: true })
   if (!ctx) throw new Error('canvas unavailable')
   ctx.drawImage(img, 0, 0, SAMPLE, SAMPLE)
-  const { data } = ctx.getImageData(0, 0, SAMPLE, SAMPLE)
+  return scorePixels(ctx.getImageData(0, 0, SAMPLE, SAMPLE).data, crop)
+}
 
-  // Background estimate: mean colour of the outer border ring.
+/** Pure pixel scoring, separated from canvas so it can be unit tested. */
+export function scorePixels(data: Uint8ClampedArray, crop: CropId): ImageScores {
+  const total = data.length / 4
+  const side = Math.round(Math.sqrt(total))
+  const ripe = RIPE[crop]
+  const hsv = new Float32Array(total * 3)
+
+  // Whole-frame lighting, plus ripe-colour share over the whole frame.
+  let vAll = 0
+  let ripeAll = 0
+  for (let p = 0; p < total; p++) {
+    const [h, s, v] = rgbToHsv(data[p * 4], data[p * 4 + 1], data[p * 4 + 2])
+    hsv[p * 3] = h
+    hsv[p * 3 + 1] = s
+    hsv[p * 3 + 2] = v
+    vAll += v
+    if (isRipe(h, s, v, ripe)) ripeAll++
+  }
+  const meanAll = vAll / total
+  if (meanAll < 0.14) return { size: 0, color: 0, defects: 1, issue: 'too_dark' }
+  if (meanAll > 0.94) return { size: 0, color: 0, defects: 1, issue: 'too_bright' }
+
+  // Background estimate: mean and spread of the outer border ring.
   let br = 0
   let bg = 0
   let bb = 0
   let bn = 0
-  for (let y = 0; y < SAMPLE; y++) {
-    for (let x = 0; x < SAMPLE; x++) {
-      if (x > 3 && x < SAMPLE - 4 && y > 3 && y < SAMPLE - 4) continue
-      const i = (y * SAMPLE + x) * 4
+  const border: number[] = []
+  for (let y = 0; y < side; y++) {
+    for (let x = 0; x < side; x++) {
+      if (x > 3 && x < side - 4 && y > 3 && y < side - 4) continue
+      const i = (y * side + x) * 4
       br += data[i]
       bg += data[i + 1]
       bb += data[i + 2]
       bn++
+      border.push(i)
     }
   }
   br /= bn
   bg /= bn
   bb /= bn
+  const borderSpread = Math.sqrt(border.reduce((s, i) => s + (data[i] - br) ** 2 + (data[i + 1] - bg) ** 2 + (data[i + 2] - bb) ** 2, 0) / bn)
 
-  const ripe = RIPE[crop]
-  const isForeground = (i: number) => Math.hypot(data[i] - br, data[i + 1] - bg, data[i + 2] - bb) >= 48
-
-  // Pass 1: how bright is this produce overall? Dried Dhakki dates are dark
-  // brown, and the gaps between them cast deep shadows, so a fixed "very dark
-  // = rot" rule would mark a good lot down. The spot threshold scales instead.
+  // A textured border means the produce runs to the edge of the photo (a
+  // close-up), so the whole frame is produce, not background.
+  const fullFrame = borderSpread > 38
+  const fgMask = new Uint8Array(total)
   let fg = 0
+  for (let p = 0; p < total; p++) {
+    const i = p * 4
+    if (fullFrame || Math.hypot(data[i] - br, data[i + 1] - bg, data[i + 2] - bb) >= BACKGROUND_DISTANCE) {
+      fgMask[p] = 1
+      fg++
+    }
+  }
+
+  if (fg < total * 0.05) {
+    // Nothing stands out from the background. Either an even close-up of the
+    // crop (then most of the frame is ripe-coloured) or no crop at all.
+    if (ripeAll / total > 0.4) {
+      fgMask.fill(1)
+      fg = total
+    } else {
+      return { size: 0, color: 0, defects: 1, issue: 'no_crop' }
+    }
+  }
+
+  // Produce brightness. Dried Dhakki dates are dark brown and the gaps between
+  // them cast deep shadows, so the dark-spot threshold scales with the produce.
   let lSum = 0
   let lSq = 0
-  for (let i = 0; i < data.length; i += 4) {
-    if (!isForeground(i)) continue
-    const v = Math.max(data[i], data[i + 1], data[i + 2]) / 255
-    fg++
+  for (let p = 0; p < total; p++) {
+    if (!fgMask[p]) continue
+    const v = hsv[p * 3 + 2]
     lSum += v
     lSq += v * v
   }
-  const mean = fg ? lSum / fg : 0
+  const mean = lSum / fg
   const spotBelow = Math.min(0.12, mean * 0.3)
 
-  // Pass 2: colour match and defects.
   let colorHits = 0
   let defectHits = 0
-  for (let i = 0; i < data.length; i += 4) {
-    if (!isForeground(i)) continue
-    const [h, s, v] = rgbToHsv(data[i], data[i + 1], data[i + 2])
-
-    const hueDelta = Math.min(Math.abs(h - ripe.hue), 360 - Math.abs(h - ripe.hue))
-    if (hueDelta <= ripe.hueWidth && s >= ripe.satMin && s <= ripe.satMax && v > 0.18) colorHits++
-
+  for (let p = 0; p < total; p++) {
+    if (!fgMask[p]) continue
+    const h = hsv[p * 3]
+    const s = hsv[p * 3 + 1]
+    const v = hsv[p * 3 + 2]
+    if (isRipe(h, s, v, ripe)) colorHits++
     const blackSpot = v < spotBelow
     const mould = s < 0.12 && v > 0.55 && v < 0.92 // grey-white fuzz
     const unripeGreen = crop !== 'sugarcane' && h > 85 && h < 160 && s > 0.3
     if (blackSpot || mould || unripeGreen) defectHits++
-  }
-
-  const total = SAMPLE * SAMPLE
-  if (fg < total * 0.05) {
-    // Nothing separable from the background: a weak, uncertain photo.
-    return { size: 0.2, color: 0.35, defects: 0.35 }
   }
 
   const coverage = fg / total
@@ -143,6 +201,11 @@ async function analyse(src: string, crop: CropId): Promise<ImageScores> {
   const defects = clamp((defectHits / fg) * 4, 0, 1)
 
   return { size, color, defects }
+}
+
+function isRipe(h: number, s: number, v: number, ripe: (typeof RIPE)[CropId]) {
+  const hueDelta = Math.min(Math.abs(h - ripe.hue), 360 - Math.abs(h - ripe.hue))
+  return hueDelta <= ripe.hueWidth && s >= ripe.satMin && s <= ripe.satMax && v > 0.13
 }
 
 function rgbToHsv(r: number, g: number, b: number): [number, number, number] {

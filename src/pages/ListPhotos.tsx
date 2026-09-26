@@ -3,7 +3,7 @@ import { useTranslation } from 'react-i18next'
 import { Navigate, useNavigate } from 'react-router'
 import { CameraIcon, CloseIcon, GalleryIcon } from '../components/Icons'
 import { Steps } from '../components/Steps'
-import { gradeCrop } from '../lib/grader'
+import { gradeCrop, PhotoProblem } from '../lib/grader'
 import { fileToDataUrl } from '../lib/image'
 import { priceBand } from '../lib/match'
 import { addListing, newId, StorageFullError } from '../lib/storage'
@@ -20,6 +20,7 @@ export function ListPhotos() {
   const { draft, update, reset } = useDraft()
   const [error, setError] = useState<string | null>(null)
   const [grading, setGrading] = useState(false)
+  const [badPhoto, setBadPhoto] = useState<number | null>(null)
   const [finished, setFinished] = useState(false)
   const cameraRef = useRef<HTMLInputElement>(null)
   const galleryRef = useRef<HTMLInputElement>(null)
@@ -36,6 +37,7 @@ export function ListPhotos() {
     e.target.value = '' // allow picking the same file again
     if (!files.length) return
     setError(null)
+    setBadPhoto(null)
     const room = MAX_PHOTOS - photos.length
     if (files.length > room) setError(t('photos.max'))
     const added: string[] = []
@@ -52,6 +54,7 @@ export function ListPhotos() {
   function removePhoto(i: number) {
     update({ photos: photos.filter((_, idx) => idx !== i) })
     setError(null)
+    setBadPhoto(null)
   }
 
   async function grade() {
@@ -84,7 +87,12 @@ export function ListPhotos() {
       reset()
     } catch (err) {
       setGrading(false)
-      setError(err instanceof StorageFullError ? t('photos.storageFull') : t('photos.gradeError'))
+      if (err instanceof PhotoProblem) {
+        setBadPhoto(err.photoIndex)
+        setError(t(`photos.issue.${err.issue}`, { n: err.photoIndex + 1 }))
+      } else {
+        setError(err instanceof StorageFullError ? t('photos.storageFull') : t('photos.gradeError'))
+      }
     }
   }
 
@@ -116,7 +124,7 @@ export function ListPhotos() {
         {Array.from({ length: MAX_PHOTOS }).map((_, i) => {
           const src = photos[i]
           return (
-            <li key={i} className="relative aspect-square overflow-hidden rounded-md">
+            <li key={i} className={`relative aspect-square overflow-hidden rounded-md ${badPhoto === i ? 'outline-4 outline-offset-2 outline-warn' : ''}`}>
               {src ? (
                 <>
                   <img src={src} alt={t('photos.photoAlt', { n: i + 1 })} className="h-full w-full object-cover" />

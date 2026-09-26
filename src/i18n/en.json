@@ -120,10 +120,14 @@
     "grading": "Checking size, colour and marks",
     "gradeError": "Grading did not finish. Check the photos and try again.",
     "storageFull": "This phone has no room left for the app. Use fewer photos and try again.",
-    "missingDetails": "Fill in the crop details first."
+    "missingDetails": "Fill in the crop details first.",
+    "issue": {
+      "no_crop": "Photo {{n}} doesn't show the crop clearly. Take it closer, with the crop spread on a plain cloth, then try again.",
+      "too_dark": "Photo {{n}} is too dark to grade. Retake it in daylight, then try again.",
+      "too_bright": "Photo {{n}} is washed out by glare. Retake it out of direct sun, then try again."
+    }
   },
   "result": {
-    "stampRing": "DERA MANDI GRADE",
     "gradeOf": "Grade {{grade}} {{crop}}",
     "summaryA": "Top quality. Exporters and national buyers look for this.",
     "summaryB": "Good market quality. Sells well in national markets.",
