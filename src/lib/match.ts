@@ -1,14 +1,28 @@
-import { buyers, cropInfo, locations, logistics, referencePrices } from '../data'
+import { buyers, cropInfo, locations, logistics } from '../data'
 import type { Buyer, BuyerOffer, CropId, Grade, Listing, LogisticsProvider, ReferencePrice } from '../types'
+import { bandFor, referenceBand } from './prices'
 
+/** Fair band for a crop and grade: from today's market range when there is one (see prices.ts). */
 export function priceBand(crop: CropId, grade: Grade): ReferencePrice {
-  const band = referencePrices.find((p) => p.crop === crop && p.grade === grade)
-  if (!band) throw new Error(`No reference price for ${crop} grade ${grade}`)
-  return band
+  return bandFor(crop, grade)
 }
 
 export function allBands(crop: CropId): ReferencePrice[] {
   return (['C', 'B', 'A'] as Grade[]).map((g) => priceBand(crop, g))
+}
+
+/*
+  The seeded buyer offers were written against the reference table. When the
+  band moves to today's market, each offer moves by the same factor, so a buyer
+  who paid a little above the band still does.
+*/
+function scaleOffer(offer: BuyerOffer): BuyerOffer {
+  const ref = referenceBand(offer.crop, offer.grade)
+  const now = priceBand(offer.crop, offer.grade)
+  const k = (now.min + now.max) / (ref.min + ref.max)
+  if (!Number.isFinite(k) || Math.abs(k - 1) < 0.001) return offer
+  const r = (x: number) => (x >= 50 ? Math.round(x) : Math.round(x * 2) / 2)
+  return { ...offer, min: r(offer.min * k), max: r(offer.max * k) }
 }
 
 export interface BuyerMatch {
@@ -30,8 +44,9 @@ export function matchBuyers(listing: Pick<Listing, 'crop' | 'grade' | 'quantityK
   const tooSmallFor: BuyerMatch[] = []
 
   for (const buyer of buyers) {
-    const offer = buyer.offers.find((o) => o.crop === listing.crop && o.grade === listing.grade)
-    if (!offer) continue
+    const raw = buyer.offers.find((o) => o.crop === listing.crop && o.grade === listing.grade)
+    if (!raw) continue
+    const offer = scaleOffer(raw)
     if (listing.quantityKg >= buyer.minQuantityKg) matches.push({ buyer, offer })
     else tooSmallFor.push({ buyer, offer })
   }

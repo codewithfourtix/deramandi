@@ -2,11 +2,13 @@ import { useTranslation } from 'react-i18next'
 import { Link } from 'react-router'
 import { GradeStamp } from '../components/GradeStamp'
 import { Num, Price } from '../components/Price'
+import { getRate, useRatesVersion } from '../lib/prices'
 import { loadListings } from '../lib/storage'
 
 export function Home() {
   const { t } = useTranslation()
   const latest = loadListings()[0]
+  useRatesVersion()
 
   const steps = [
     { title: t('home.step1'), body: t('home.step1d') },
@@ -59,6 +61,26 @@ export function Home() {
           </Link>
         </section>
       )}
+
+      <section className="mt-10 border-t border-line pt-6" aria-labelledby="prices-title">
+        <h2 id="prices-title" className="display text-xl">
+          {t('rates.homeTitle')}
+        </h2>
+        <ul className="m-0 mt-3 list-none divide-y divide-line border-y border-line p-0">
+          {(['dhakki_dates', 'kulachi_melon', 'wheat', 'sugarcane'] as const).map((crop) => {
+            const r = getRate(crop)
+            return (
+              <li key={crop} className="flex items-baseline justify-between gap-3 py-2">
+                <span className="font-bold">{t(`crops.${crop}`)}</span>
+                {r ? <Price min={r.rate.min} max={r.rate.max} className="text-[0.95rem]" /> : <span className="text-soil-soft">{t('rates.none')}</span>}
+              </li>
+            )
+          })}
+        </ul>
+        <Link to="/prices" className="mt-2 inline-flex min-h-11 items-center font-bold text-indus underline underline-offset-4">
+          {t('rates.allMarkets')}
+        </Link>
+      </section>
 
       <section className="mt-10 border-t border-line pt-6" aria-labelledby="how-title">
         <h2 id="how-title" className="display text-xl">

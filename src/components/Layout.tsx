@@ -1,6 +1,7 @@
 import { useEffect } from 'react'
 import { useTranslation } from 'react-i18next'
 import { Link, NavLink, Outlet, useLocation, useMatch } from 'react-router'
+import { refreshLive } from '../lib/prices'
 import { LanguageToggle } from './LanguageToggle'
 
 function Wordmark() {
@@ -31,6 +32,11 @@ export function Layout() {
   useEffect(() => {
     document.title = i18n.language === 'ur' ? 'ڈیرہ منڈی · Dera Mandi' : 'Dera Mandi · ڈیرہ منڈی'
   }, [i18n.language])
+
+  // Fresh AMIS rates when online; the built-in snapshot covers offline use.
+  useEffect(() => {
+    if (navigator.onLine) refreshLive()
+  }, [])
 
   return (
     <div className="flex min-h-dvh flex-col">
@@ -63,9 +69,14 @@ export function Layout() {
       </main>
       <footer className="border-t border-line">
         <div className={`mx-auto max-w-2xl px-4 pt-5 text-[0.9rem] text-soil-soft ${hasSendBar ? 'pb-36' : 'pb-8'}`}>
-          <Link to="/about" className="inline-flex min-h-11 items-center font-bold text-indus underline underline-offset-4">
-            {t('footer.about')}
-          </Link>
+          <div className="flex flex-wrap gap-x-5">
+            <Link to="/about" className="inline-flex min-h-11 items-center font-bold text-indus underline underline-offset-4">
+              {t('footer.about')}
+            </Link>
+            <Link to="/prices" className="inline-flex min-h-11 items-center font-bold text-indus underline underline-offset-4">
+              {t('rates.title')}
+            </Link>
+          </div>
           <p className="mt-1">{t('footer.note')}</p>
           <p>{t('footer.privacy')}</p>
         </div>

@@ -10,12 +10,14 @@ describe('reference prices', () => {
     for (const c of crops) for (const g of GRADES) expect(() => priceBand(c.id, g)).not.toThrow()
   })
 
-  it('rank grade A clearly above B, and B above C', () => {
+  it('rank grade A above B, and B above C, with no overlap', () => {
     for (const c of crops) {
       const [C, B, A] = allBands(c.id)
-      expect(A.min, c.id).toBeGreaterThan(B.max)
-      expect(B.min, c.id).toBeGreaterThan(C.max)
-      for (const band of [A, B, C]) expect(band.min).toBeLessThanOrEqual(band.max)
+      expect(A.min, c.id).toBeGreaterThanOrEqual(B.max)
+      expect(B.min, c.id).toBeGreaterThanOrEqual(C.max)
+      expect(A.max, c.id).toBeGreaterThan(B.max)
+      expect(B.max, c.id).toBeGreaterThan(C.max)
+      for (const band of [A, B, C]) expect(band.min).toBeLessThan(band.max)
     }
   })
 })

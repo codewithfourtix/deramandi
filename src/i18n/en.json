@@ -317,5 +317,47 @@
   },
   "lot": {
     "title": "Whole lot"
+  },
+  "rates": {
+    "title": "Mandi prices",
+    "homeTitle": "Today's mandi prices",
+    "lede": "Daily rates from AMIS Punjab (the government's Agriculture Marketing Information Service), nearest markets to D.I. Khan first. AMIS does not cover D.I. Khan itself or Dhakki dates, so you can type in your own mandi's rate for any crop.",
+    "marketToday": "Mandi rate:",
+    "yourRate": "Your mandi's rate:",
+    "mine": "You entered this rate on {{date}}. All bands and offers for this crop use it.",
+    "amis": "AMIS Punjab, {{date}}, typical markets for {{what}}.",
+    "reference": "No public rate for this crop: these are illustrative prices.",
+    "thirds": "Grade C is the bottom third of this range, B the middle third, A the top third.",
+    "noDhakki": "AMIS lists Aseel and Irani dates, not Dhakki. Enter your mandi's Dhakki rate for a closer price.",
+    "setMine": "Enter my mandi's rate",
+    "useMarket": "Use the AMIS rate again",
+    "allMarkets": "See all mandi prices",
+    "unit": "Rate is",
+    "per_maund": "per maund (40 kg)",
+    "per_kg": "per kg",
+    "low": "Lowest (PKR)",
+    "high": "Highest (PKR)",
+    "save": "Save rate",
+    "cancel": "Cancel",
+    "error": "Enter a lowest and a highest rate, with the highest bigger than the lowest.",
+    "refresh": "Get latest prices",
+    "refreshing": "Getting prices",
+    "refreshed": "Updated just now.",
+    "refreshFailed": "Could not reach the price service. Showing the last prices saved on this phone.",
+    "lastFetched": "Last updated {{date}}.",
+    "builtIn": "Showing prices built into the app.",
+    "nearest": "Nearest markets",
+    "market": "Market",
+    "kind": "Type",
+    "range": "PKR per kg",
+    "sourceLabel": "Source:",
+    "none": "no public rate",
+    "commodity": {
+      "Wheat": "wheat",
+      "Dates_Aseel": "Aseel dates",
+      "Dates_Irani": "Irani dates",
+      "Sweet_Musk_Melon": "musk melon",
+      "Sugarcane_mill_gate": "sugarcane at the mill gate"
+    }
   }
 }

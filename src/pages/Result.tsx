@@ -1,19 +1,21 @@
-import { useMemo, useState } from 'react'
+import { useEffect, useMemo, useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import { Link, useLocation, useNavigate, useParams } from 'react-router'
 import { GradeStamp } from '../components/GradeStamp'
 import { ModelBreakdown } from '../components/ModelBreakdown'
 import { CheckIcon, SnowIcon, WhatsAppIcon } from '../components/Icons'
 import { ShareActions } from '../components/ShareActions'
+import { MarketRate } from '../components/MarketRate'
 import { PriceLadder } from '../components/PriceLadder'
 import { Steps } from '../components/Steps'
 import { cropInfo } from '../data'
 import { GRADE_COLOR } from '../lib/format'
 import { Money, Num, Price, PriceStack } from '../components/Price'
-import { findBuyer, findLogistics, matchBuyers, matchLogistics } from '../lib/match'
+import { findBuyer, findLogistics, matchBuyers, matchLogistics, priceBand } from '../lib/match'
+import { useRatesVersion } from '../lib/prices'
 import { DEMO_NUMBER, DEMO_NUMBER_DISPLAY, updateSettings, useSettings } from '../lib/settings'
 import { requestMessage, whatsappUrl } from '../lib/share'
-import { getFarmer, getListing, updateListing } from '../lib/storage'
+import { getFarmer, updateListing, useListing } from '../lib/storage'
 import type { FactorLevel, GradeFactors, Listing } from '../types'
 
 const NO_LOGISTICS = 'none'
@@ -21,7 +23,7 @@ const NO_LOGISTICS = 'none'
 export function Result() {
   const { id = '' } = useParams()
   const { t } = useTranslation()
-  const listing = useMemo(() => getListing(id), [id])
+  const listing = useListing(id)
 
   if (!listing) {
     return (
@@ -51,6 +53,17 @@ function ResultView({ listing }: { listing: Listing }) {
   const [logisticsId, setLogisticsId] = useState<string>(listing.reservedLogisticsId ?? '')
   const [sending, setSending] = useState(false)
   const settings = useSettings()
+  const ratesVersion = useRatesVersion()
+
+  // An open listing follows today's rate (or the grower's own); once a request
+  // is sent its price is frozen, so the certificate matches what was sent.
+  useEffect(() => {
+    if (listing.status !== 'listed') return
+    const band = priceBand(listing.crop, listing.grade)
+    if (band.min !== listing.priceMin || band.max !== listing.priceMax) {
+      updateListing(listing.id, { priceMin: band.min, priceMax: band.max, referencePrice: Math.round(((band.min + band.max) / 2) * 10) / 10 })
+    }
+  }, [ratesVersion, listing])
 
   const cropName = t(`crops.${listing.crop}`)
   const exporterGap = tooSmallFor.find((m) => m.buyer.type === 'exporter') ?? tooSmallFor[0]
@@ -143,7 +156,7 @@ function ResultView({ listing }: { listing: Listing }) {
         <div className="mt-6">
           <PriceLadder crop={listing.crop} grade={listing.grade} />
         </div>
-        <p className="mt-3 text-[0.9rem] text-soil-soft">{t('result.samplePrices')}</p>
+        <MarketRate crop={listing.crop} />
       </section>
 
       <section className="mt-10 border-t-2 border-soil pt-5" aria-labelledby="buyers-title">

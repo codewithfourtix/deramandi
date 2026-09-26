@@ -1,0 +1,750 @@
+{
+  "fetchedAt": "2026-09-26T18:36:20.551Z",
+  "crops": {
+    "wheat": {
+      "date": "2026-09-26",
+      "min": 92.5,
+      "max": 120,
+      "median": 111.3,
+      "markets": [
+        {
+          "market": "Kalurkot",
+          "commodity": "Wheat",
+          "min": 110,
+          "max": 134
+        },
+        {
+          "market": "DGKHAN",
+          "commodity": "Wheat",
+          "min": 92.5,
+          "max": 95
+        },
+        {
+          "market": "Layyah",
+          "commodity": "Wheat",
+          "min": 100,
+          "max": 112
+        },
+        {
+          "market": "BahawalPur",
+          "commodity": "Wheat",
+          "min": 95,
+          "max": 96
+        },
+        {
+          "market": "Faisalabad",
+          "commodity": "Wheat",
+          "min": 115,
+          "max": 120
+        },
+        {
+          "market": "Fortabas",
+          "commodity": "Wheat",
+          "min": 110,
+          "max": 112.5
+        },
+        {
+          "market": "HaroonAbad",
+          "commodity": "Wheat",
+          "min": 112,
+          "max": 112.5
+        },
+        {
+          "market": "Kamalia",
+          "commodity": "Wheat",
+          "min": 112.5,
+          "max": 115
+        },
+        {
+          "market": "Lodhran",
+          "commodity": "Wheat",
+          "min": 107,
+          "max": 115
+        },
+        {
+          "market": "Rawalpindi",
+          "commodity": "Wheat",
+          "min": 115,
+          "max": 120
+        },
+        {
+          "market": "Sahiwal",
+          "commodity": "Wheat",
+          "min": 105,
+          "max": 107
+        },
+        {
+          "market": "TTSingh",
+          "commodity": "Wheat",
+          "min": 85,
+          "max": 95
+        }
+      ],
+      "commodities": [
+        "Wheat"
+      ],
+      "source": "AMIS Punjab (amis.pk)",
+      "urls": [
+        "http://www.amis.pk/ViewPrices.aspx?searchType=0&commodityId=1"
+      ]
+    },
+    "kulachi_melon": {
+      "date": "2026-09-26",
+      "min": 136,
+      "max": 202,
+      "median": 175.5,
+      "markets": [
+        {
+          "market": "Layyah",
+          "commodity": "Sweet Musk Melon",
+          "min": 140,
+          "max": 146
+        },
+        {
+          "market": "Multan",
+          "commodity": "Sweet Musk Melon",
+          "min": 190,
+          "max": 200
+        },
+        {
+          "market": "AhmadPurEast",
+          "commodity": "Sweet Musk Melon",
+          "min": 80,
+          "max": 100
+        },
+        {
+          "market": "BahawalNagar",
+          "commodity": "Sweet Musk Melon",
+          "min": 190,
+          "max": 195
+        },
+        {
+          "market": "ChackJhumra",
+          "commodity": "Sweet Musk Melon",
+          "min": 190,
+          "max": 200
+        },
+        {
+          "market": "Chichawatni",
+          "commodity": "Sweet Musk Melon",
+          "min": 150,
+          "max": 170
+        },
+        {
+          "market": "Chistian",
+          "commodity": "Sweet Musk Melon",
+          "min": 171,
+          "max": 186
+        },
+        {
+          "market": "Daska",
+          "commodity": "Sweet Musk Melon",
+          "min": 161,
+          "max": 168
+        },
+        {
+          "market": "Faisalabad",
+          "commodity": "Sweet Musk Melon",
+          "min": 180,
+          "max": 190
+        },
+        {
+          "market": "GujarKhan",
+          "commodity": "Sweet Musk Melon",
+          "min": 174,
+          "max": 180
+        },
+        {
+          "market": "Gujranwala",
+          "commodity": "Sweet Musk Melon",
+          "min": 170,
+          "max": 178
+        },
+        {
+          "market": "Jhang",
+          "commodity": "Sweet Musk Melon",
+          "min": 190,
+          "max": 200
+        },
+        {
+          "market": "Jhelum",
+          "commodity": "Sweet Musk Melon",
+          "min": 153,
+          "max": 162
+        },
+        {
+          "market": "Kahrorpacca",
+          "commodity": "Sweet Musk Melon",
+          "min": 210,
+          "max": 210
+        },
+        {
+          "market": "Kanganpur",
+          "commodity": "Sweet Musk Melon",
+          "min": 180,
+          "max": 188
+        },
+        {
+          "market": "kotmoman",
+          "commodity": "Sweet Musk Melon",
+          "min": 150,
+          "max": 160
+        },
+        {
+          "market": "Nankana",
+          "commodity": "Sweet Musk Melon",
+          "min": 171,
+          "max": 180
+        },
+        {
+          "market": "PakPattan",
+          "commodity": "Sweet Musk Melon",
+          "min": 136,
+          "max": 145
+        },
+        {
+          "market": "Patoki",
+          "commodity": "Sweet Musk Melon",
+          "min": 180,
+          "max": 188
+        },
+        {
+          "market": "Rawalpindi",
+          "commodity": "Sweet Musk Melon",
+          "min": 168,
+          "max": 182
+        },
+        {
+          "market": "Sambrial",
+          "commodity": "Sweet Musk Melon",
+          "min": 169,
+          "max": 180
+        },
+        {
+          "market": "Sanglahill",
+          "commodity": "Sweet Musk Melon",
+          "min": 171,
+          "max": 180
+        },
+        {
+          "market": "Shorkot",
+          "commodity": "Sweet Musk Melon",
+          "min": 198,
+          "max": 202
+        },
+        {
+          "market": "Sraialamgir",
+          "commodity": "Sweet Musk Melon",
+          "min": 90,
+          "max": 94
+        },
+        {
+          "market": "Vehari",
+          "commodity": "Sweet Musk Melon",
+          "min": 230,
+          "max": 330
+        }
+      ],
+      "commodities": [
+        "Sweet Musk Melon"
+      ],
+      "source": "AMIS Punjab (amis.pk)",
+      "urls": [
+        "http://www.amis.pk/ViewPrices.aspx?searchType=0&commodityId=100"
+      ]
+    },
+    "dhakki_dates": {
+      "date": "2026-09-26",
+      "min": 251,
+      "max": 460,
+      "median": 405,
+      "markets": [
+        {
+          "market": "DGKHAN",
+          "commodity": "Dates (Irani)",
+          "min": 460,
+          "max": 470
+        },
+        {
+          "market": "Layyah",
+          "commodity": "Dates (Irani)",
+          "min": 430,
+          "max": 435
+        },
+        {
+          "market": "Multan",
+          "commodity": "Dates (Irani)",
+          "min": 350,
+          "max": 362.5
+        },
+        {
+          "market": "Mianwali",
+          "commodity": "Dates (Aseel)",
+          "min": 288,
+          "max": 297
+        },
+        {
+          "market": "Mianwali",
+          "commodity": "Dates (Irani)",
+          "min": 405,
+          "max": 414
+        },
+        {
+          "market": "Abdulhakim",
+          "commodity": "Dates (Irani)",
+          "min": 358,
+          "max": 360
+        },
+        {
+          "market": "AhmadPurEast",
+          "commodity": "Dates (Irani)",
+          "min": 450,
+          "max": 480
+        },
+        {
+          "market": "BahawalNagar",
+          "commodity": "Dates (Irani)",
+          "min": 470,
+          "max": 475
+        },
+        {
+          "market": "Basirpur",
+          "commodity": "Dates (Aseel)",
+          "min": 240,
+          "max": 250
+        },
+        {
+          "market": "Basirpur",
+          "commodity": "Dates (Irani)",
+          "min": 420,
+          "max": 430
+        },
+        {
+          "market": "Burewala",
+          "commodity": "Dates (Aseel)",
+          "min": 320,
+          "max": 340
+        },
+        {
+          "market": "Chichawatni",
+          "commodity": "Dates (Aseel)",
+          "min": 235,
+          "max": 245
+        },
+        {
+          "market": "Chiniot",
+          "commodity": "Dates (Aseel)",
+          "min": 270,
+          "max": 280
+        },
+        {
+          "market": "Chiniot",
+          "commodity": "Dates (Irani)",
+          "min": 420,
+          "max": 430
+        },
+        {
+          "market": "Faisalabad",
+          "commodity": "Dates (Aseel)",
+          "min": 310,
+          "max": 320
+        },
+        {
+          "market": "Faisalabad",
+          "commodity": "Dates (Irani)",
+          "min": 430,
+          "max": 440
+        },
+        {
+          "market": "Fortabas",
+          "commodity": "Dates (Irani)",
+          "min": 450,
+          "max": 470
+        },
+        {
+          "market": "Gojra",
+          "commodity": "Dates (Aseel)",
+          "min": 251,
+          "max": 270
+        },
+        {
+          "market": "Gojra",
+          "commodity": "Dates (Irani)",
+          "min": 395,
+          "max": 405
+        },
+        {
+          "market": "GujarKhan",
+          "commodity": "Dates (Aseel)",
+          "min": 300,
+          "max": 306
+        },
+        {
+          "market": "GujarKhan",
+          "commodity": "Dates (Irani)",
+          "min": 408,
+          "max": 414
+        },
+        {
+          "market": "Gujranwala",
+          "commodity": "Dates (Aseel)",
+          "min": 295,
+          "max": 305
+        },
+        {
+          "market": "Gujranwala",
+          "commodity": "Dates (Irani)",
+          "min": 440,
+          "max": 460
+        },
+        {
+          "market": "Hafizabad",
+          "commodity": "Dates (Aseel)",
+          "min": 350,
+          "max": 360
+        },
+        {
+          "market": "Hafizabad",
+          "commodity": "Dates (Irani)",
+          "min": 450,
+          "max": 460
+        },
+        {
+          "market": "Hazro",
+          "commodity": "Dates (Aseel)",
+          "min": 278,
+          "max": 296
+        },
+        {
+          "market": "Hazro",
+          "commodity": "Dates (Irani)",
+          "min": 400,
+          "max": 419
+        },
+        {
+          "market": "JamPur",
+          "commodity": "Dates (Aseel)",
+          "min": 220,
+          "max": 250
+        },
+        {
+          "market": "JamPur",
+          "commodity": "Dates (Irani)",
+          "min": 450,
+          "max": 500
+        },
+        {
+          "market": "Jaranwala",
+          "commodity": "Dates (Irani)",
+          "min": 410,
+          "max": 450
+        },
+        {
+          "market": "Jhang",
+          "commodity": "Dates (Aseel)",
+          "min": 280,
+          "max": 290
+        },
+        {
+          "market": "Jhang",
+          "commodity": "Dates (Irani)",
+          "min": 430,
+          "max": 440
+        },
+        {
+          "market": "Jhelum",
+          "commodity": "Dates (Aseel)",
+          "min": 288,
+          "max": 297
+        },
+        {
+          "market": "Jhelum",
+          "commodity": "Dates (Irani)",
+          "min": 396,
+          "max": 405
+        },
+        {
+          "market": "KabirWala",
+          "commodity": "Dates (Irani)",
+          "min": 380,
+          "max": 400
+        },
+        {
+          "market": "Kahrorpacca",
+          "commodity": "Dates (Aseel)",
+          "min": 270,
+          "max": 270
+        },
+        {
+          "market": "Kahrorpacca",
+          "commodity": "Dates (Irani)",
+          "min": 410,
+          "max": 410
+        },
+        {
+          "market": "Kamalia",
+          "commodity": "Dates (Aseel)",
+          "min": 350,
+          "max": 360
+        },
+        {
+          "market": "Kamalia",
+          "commodity": "Dates (Irani)",
+          "min": 440,
+          "max": 450
+        },
+        {
+          "market": "Kasur",
+          "commodity": "Dates (Aseel)",
+          "min": 280,
+          "max": 295
+        },
+        {
+          "market": "Kasur",
+          "commodity": "Dates (Irani)",
+          "min": 395,
+          "max": 415
+        },
+        {
+          "market": "kotmoman",
+          "commodity": "Dates (Aseel)",
+          "min": 310,
+          "max": 320
+        },
+        {
+          "market": "kotmoman",
+          "commodity": "Dates (Irani)",
+          "min": 425,
+          "max": 435
+        },
+        {
+          "market": "Lahore",
+          "commodity": "Dates (Aseel)",
+          "min": 280,
+          "max": 295
+        },
+        {
+          "market": "Lahore",
+          "commodity": "Dates (Irani)",
+          "min": 395,
+          "max": 415
+        },
+        {
+          "market": "LiaqatPur",
+          "commodity": "Dates (Aseel)",
+          "min": 414,
+          "max": 432
+        },
+        {
+          "market": "LiaqatPur",
+          "commodity": "Dates (Irani)",
+          "min": 414,
+          "max": 432
+        },
+        {
+          "market": "Lodhran",
+          "commodity": "Dates (Aseel)",
+          "min": 210,
+          "max": 270
+        },
+        {
+          "market": "Lodhran",
+          "commodity": "Dates (Irani)",
+          "min": 410,
+          "max": 410
+        },
+        {
+          "market": "Okara",
+          "commodity": "Dates (Aseel)",
+          "min": 235,
+          "max": 240
+        },
+        {
+          "market": "Okara",
+          "commodity": "Dates (Irani)",
+          "min": 415,
+          "max": 420
+        },
+        {
+          "market": "PakPattan",
+          "commodity": "Dates (Aseel)",
+          "min": 218,
+          "max": 227
+        },
+        {
+          "market": "PakPattan",
+          "commodity": "Dates (Irani)",
+          "min": 381,
+          "max": 410
+        },
+        {
+          "market": "Patoki",
+          "commodity": "Dates (Aseel)",
+          "min": 280,
+          "max": 295
+        },
+        {
+          "market": "Patoki",
+          "commodity": "Dates (Irani)",
+          "min": 395,
+          "max": 415
+        },
+        {
+          "market": "RahimYarKhan",
+          "commodity": "Dates (Aseel)",
+          "min": 400.2,
+          "max": 417.6
+        },
+        {
+          "market": "RahimYarKhan",
+          "commodity": "Dates (Irani)",
+          "min": 418.2,
+          "max": 436.4
+        },
+        {
+          "market": "Rawalpindi",
+          "commodity": "Dates (Aseel)",
+          "min": 273,
+          "max": 291
+        },
+        {
+          "market": "Rawalpindi",
+          "commodity": "Dates (Irani)",
+          "min": 395,
+          "max": 414
+        },
+        {
+          "market": "SadiqAbad",
+          "commodity": "Dates (Irani)",
+          "min": 408,
+          "max": 425
+        },
+        {
+          "market": "Sahiwal",
+          "commodity": "Dates (Aseel)",
+          "min": 235,
+          "max": 242
+        },
+        {
+          "market": "Sahiwal",
+          "commodity": "Dates (Irani)",
+          "min": 415,
+          "max": 422
+        },
+        {
+          "market": "Sambrial",
+          "commodity": "Dates (Irani)",
+          "min": 434,
+          "max": 450
+        },
+        {
+          "market": "Sheikhupura",
+          "commodity": "Dates (Aseel)",
+          "min": 280,
+          "max": 295
+        },
+        {
+          "market": "Sheikhupura",
+          "commodity": "Dates (Irani)",
+          "min": 400,
+          "max": 420
+        },
+        {
+          "market": "Shorkot",
+          "commodity": "Dates (Aseel)",
+          "min": 278,
+          "max": 282
+        },
+        {
+          "market": "Shorkot",
+          "commodity": "Dates (Irani)",
+          "min": 438,
+          "max": 442
+        },
+        {
+          "market": "Sialkot",
+          "commodity": "Dates (Irani)",
+          "min": 450,
+          "max": 455
+        },
+        {
+          "market": "Sraialamgir",
+          "commodity": "Dates (Aseel)",
+          "min": 465,
+          "max": 469
+        },
+        {
+          "market": "Sraialamgir",
+          "commodity": "Dates (Irani)",
+          "min": 460,
+          "max": 464
+        },
+        {
+          "market": "Summandri",
+          "commodity": "Dates (Aseel)",
+          "min": 261,
+          "max": 270
+        },
+        {
+          "market": "TALAGANG",
+          "commodity": "Dates (Aseel)",
+          "min": 310,
+          "max": 312
+        },
+        {
+          "market": "TALAGANG",
+          "commodity": "Dates (Irani)",
+          "min": 423,
+          "max": 425
+        },
+        {
+          "market": "Taunsasharif",
+          "commodity": "Dates (Irani)",
+          "min": 460,
+          "max": 470
+        },
+        {
+          "market": "TTSingh",
+          "commodity": "Dates (Aseel)",
+          "min": 315,
+          "max": 350.3
+        },
+        {
+          "market": "TTSingh",
+          "commodity": "Dates (Irani)",
+          "min": 405,
+          "max": 450
+        },
+        {
+          "market": "Vehari",
+          "commodity": "Dates (Aseel)",
+          "min": 185,
+          "max": 285
+        }
+      ],
+      "commodities": [
+        "Dates (Aseel)",
+        "Dates (Irani)"
+      ],
+      "source": "AMIS Punjab (amis.pk)",
+      "urls": [
+        "http://www.amis.pk/ViewPrices.aspx?searchType=0&commodityId=81",
+        "http://www.amis.pk/ViewPrices.aspx?searchType=0&commodityId=141"
+      ]
+    },
+    "sugarcane": {
+      "min": 12.5,
+      "max": 13.75,
+      "median": 13.1,
+      "date": "2025-12-08",
+      "source": "Indicative mill price Rs 500–550 per 40 kg, 2025-26 season (Profit / Pakistan Today, 8 Dec 2025). Last notified Punjab price: Rs 400 per 40 kg (2023-24).",
+      "urls": [
+        "https://profit.pakistantoday.com.pk/2025/12/08/sugarcane-prices-set-at-rs500-550-per-maund-farmers-interests-safeguarded"
+      ],
+      "markets": [],
+      "commodities": [
+        "Sugarcane (mill gate)"
+      ]
+    }
+  }
+}

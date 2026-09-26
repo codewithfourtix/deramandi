@@ -2,6 +2,7 @@ import { BrowserRouter, Route, Routes } from 'react-router'
 import { Layout } from './components/Layout'
 import { About } from './pages/About'
 import { Check } from './pages/Check'
+import { Prices } from './pages/Prices'
 import { Home } from './pages/Home'
 import { ListDetails } from './pages/ListDetails'
 import { ListPhotos } from './pages/ListPhotos'
@@ -24,6 +25,7 @@ export default function App() {
             <Route path="listings" element={<MyListings />} />
             <Route path="about" element={<About />} />
             <Route path="check" element={<Check />} />
+            <Route path="prices" element={<Prices />} />
             <Route path="*" element={<Home />} />
           </Route>
         </Routes>

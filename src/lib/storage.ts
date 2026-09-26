@@ -1,3 +1,4 @@
+import { useSyncExternalStore } from 'react'
 import type { Farmer, Listing } from '../types'
 
 /*
@@ -223,4 +224,21 @@ export async function restoreBackup(data: unknown): Promise<{ listings: number; 
 export function newId(): string {
   const rand = Math.random().toString(36).slice(2, 7)
   return `${Date.now().toString(36)}${rand}`
+}
+
+// ---- React hooks ---------------------------------------------------------------
+
+/** The listing with this id, re-rendering whenever it changes. */
+export function useListing(id: string): Listing | undefined {
+  return useSyncExternalStore(subscribe, () => getListing(id), () => getListing(id))
+}
+
+/** All listings, re-rendering on any change. */
+export function useListings(): Listing[] {
+  return useSyncExternalStore(subscribe, loadListings, loadListings)
+}
+
+/** All helper-mode farmers, re-rendering on any change. */
+export function useFarmers(): Farmer[] {
+  return useSyncExternalStore(subscribe, loadFarmers, loadFarmers)
 }
