@@ -110,12 +110,26 @@ export async function initStorage() {
     db = await openDb()
     listings = (await readAll<Listing>('listings')).sort(byNewest)
     farmers = (await readAll<Farmer>('farmers')).sort(byNewest)
-    if (legacy.length) {
-      const known = new Set(listings.map((l) => l.id))
-      for (const l of legacy) if (!known.has(l.id)) await write('listings', 'put', l)
-      listings = [...listings, ...legacy.filter((l) => !known.has(l.id))].sort(byNewest)
-      localStorage.removeItem(LEGACY_KEY)
+    // Merge anything saved by an older version (LEGACY_KEY) or while IndexedDB
+    // was unavailable (FALLBACK_KEY), then clear those keys.
+    let fallback: { listings?: Listing[]; farmers?: Farmer[] } = {}
+    try {
+      fallback = JSON.parse(localStorage.getItem(FALLBACK_KEY) || '{}')
+    } catch {
+      fallback = {}
     }
+    const pending = [...legacy, ...(fallback.listings ?? [])]
+    if (pending.length) {
+      const known = new Set(listings.map((l) => l.id))
+      const fresh = pending.filter((l) => l?.id && !known.has(l.id) && (known.add(l.id), true))
+      for (const l of fresh) await write('listings', 'put', l)
+      listings = [...listings, ...fresh].sort(byNewest)
+    }
+    const pendingFarmers = (fallback.farmers ?? []).filter((f) => f?.id && !farmers.some((x) => x.id === f.id))
+    for (const f of pendingFarmers) await write('farmers', 'put', f)
+    farmers = [...farmers, ...pendingFarmers].sort(byNewest)
+    localStorage.removeItem(LEGACY_KEY)
+    localStorage.removeItem(FALLBACK_KEY)
   } catch {
     useFallback = true
     try {

@@ -359,5 +359,32 @@
       "Sweet_Musk_Melon": "musk melon",
       "Sugarcane_mill_gate": "sugarcane at the mill gate"
     }
+  },
+  "sell": {
+    "title": "Sell now, store, or ship?",
+    "lede": "What you would take home for your {{qty}} kg each way, after costs.",
+    "local": "Sell at the local mandi today",
+    "multan": "Truck it to Multan and sell there",
+    "store": "Store it, then sell here",
+    "best": "Most money",
+    "perKg": "Per kg:",
+    "more": "that is more than selling here by",
+    "less": "that is less than selling here by",
+    "cost_commission": "commission",
+    "cost_transport": "truck",
+    "cost_storage": "storage",
+    "millNote": "Sugarcane is sold to the mill. Trucking or storing cane loses sugar, so only the mill price is shown.",
+    "noMultanRate": "No Multan rate today for this crop, so this option can't be worked out.",
+    "assumptions": "Change the assumptions",
+    "assumptionsNote": "Costs come from the sample transporters and stores; prices from today's rates. Change any number to match your case.",
+    "reset": "Reset to defaults",
+    "a_commissionPct": "Commission (%)",
+    "a_truckCost": "Truck to Multan (PKR)",
+    "a_truckKg": "Load per truck (kg)",
+    "a_transitLossPct": "Lost on the road (%)",
+    "a_storeWeeks": "Weeks in storage",
+    "a_storeCostPerKgWeek": "Storage (PKR per kg per week)",
+    "a_storeRisePct": "Price rise after storing (%)",
+    "a_storeLossPctPerWeek": "Lost in storage (% per week)"
   }
 }

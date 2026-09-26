@@ -7,6 +7,7 @@ import { CheckIcon, SnowIcon, WhatsAppIcon } from '../components/Icons'
 import { ShareActions } from '../components/ShareActions'
 import { MarketRate } from '../components/MarketRate'
 import { PriceLadder } from '../components/PriceLadder'
+import { SellOptions } from '../components/SellOptions'
 import { Steps } from '../components/Steps'
 import { cropInfo } from '../data'
 import { GRADE_COLOR } from '../lib/format'
@@ -158,6 +159,8 @@ function ResultView({ listing }: { listing: Listing }) {
         </div>
         <MarketRate crop={listing.crop} />
       </section>
+
+      <SellOptions crop={listing.crop} grade={listing.grade} qtyKg={listing.quantityKg} />
 
       <section className="mt-10 border-t-2 border-soil pt-5" aria-labelledby="buyers-title">
         <h2 id="buyers-title" className="text-lg font-bold">
