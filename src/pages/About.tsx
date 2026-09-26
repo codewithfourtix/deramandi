@@ -56,10 +56,10 @@ export function About() {
       </Section>
 
       <Section id="about-grade" title={t('about.gradeTitle')}>
-        <p>{t('about.grade1', card)}</p>
-        <p className="rounded-md bg-date-wash px-3 py-2 font-bold">{t('about.grade2')}</p>
+        <p>{t(modelCard.includesDhakki ? 'about.grade1Dhakki' : 'about.grade1', card)}</p>
+        <p className="rounded-md bg-date-wash px-3 py-2 font-bold">{t(modelCard.includesDhakki ? 'about.grade2Dhakki' : 'about.grade2', card)}</p>
         <p>{t('about.grade3')}</p>
-        <p className="text-soil-soft">{t('about.grade4')}</p>
+        {!modelCard.includesDhakki && <p className="text-soil-soft">{t('about.grade4')}</p>}
         <p className="text-[0.85rem] text-soil-soft">
           {t('about.credit')}
         </p>

@@ -2,20 +2,39 @@ import { existsSync, readFileSync, statSync } from 'node:fs'
 import { join } from 'node:path'
 import { describe, expect, it } from 'vitest'
 import card from '../data/modelCard.json'
+import { looksUnfamiliar } from '../lib/model'
 
 const PUBLIC = join(__dirname, '..', '..', 'public')
 
 describe('model card (what the app tells farmers and judges)', () => {
   it('reports an accuracy that beats always guessing the most common grade', () => {
-    expect(card.testImages).toBeGreaterThan(200)
+    // the Mendeley headline has ~311 test photos; a Dhakki headline will be smaller
+    expect(card.testImages).toBeGreaterThan(card.includesDhakki ? 10 : 200)
     expect(card.testAccuracy).toBeGreaterThan(card.majorityBaseline)
   })
 
   it('has a confidence interval that contains the accuracy', () => {
     const [lo, hi] = card.testAccuracyWilson95
-    expect(lo).toBeLessThan(card.testAccuracy)
-    expect(hi).toBeGreaterThan(card.testAccuracy)
-    expect(hi - lo).toBeLessThan(0.15)
+    expect(lo).toBeLessThanOrEqual(card.testAccuracy)
+    expect(hi).toBeGreaterThanOrEqual(card.testAccuracy)
+    // a big test set must give a tight interval; a small Dhakki set may not
+    if (card.testImages >= 250) expect(hi - lo).toBeLessThan(0.15)
+  })
+
+  it('only claims Dhakki when Dhakki was trained and tested on', () => {
+    const trained = card.trainVarieties.includes('Dhakki')
+    expect(card.includesDhakki).toBe(trained && card.localVarieties !== null)
+    expect(card.headlineVarieties).toEqual(card.includesDhakki ? ['Dhakki'] : ['Gajar', 'Kupro'])
+    if (!card.includesDhakki) expect(card.dataset).not.toMatch(/Dhakki/)
+  })
+
+  it('derives the colour guard from the training varieties', () => {
+    expect(card.colourGuard.varieties).toEqual(card.trainVarieties)
+    expect(card.colourGuard.photos).toBeGreaterThan(100)
+    expect(card.colourGuard.hueMax).toBeGreaterThan(15)
+    expect(card.colourGuard.hueMax).toBeLessThan(90)
+    expect(card.colourGuard.valMax).toBeGreaterThan(0.5)
+    expect(card.colourGuard.valMax).toBeLessThan(0.95)
   })
 
   it('has a sane calibration temperature', () => {
@@ -25,6 +44,18 @@ describe('model card (what the app tells farmers and judges)', () => {
 
   it('never trains on the variety it reports as unseen', () => {
     expect(card.trainVarieties).not.toContain(card.unseenVariety)
+  })
+})
+
+describe('unfamiliar-photo guard', () => {
+  it('passes typical dried khajoor colours', () => {
+    expect(looksUnfamiliar(12, 0.28)).toBe(false) // dataset median
+    expect(looksUnfamiliar(-60, 0.15)).toBe(false) // dark purple-brown
+  })
+  it('flags yellow or green fruit and very pale photos', () => {
+    expect(looksUnfamiliar(55, 0.5)).toBe(true) // yellow, like fresh doka
+    expect(looksUnfamiliar(100, 0.5)).toBe(true) // green
+    expect(looksUnfamiliar(10, 0.9)).toBe(true) // washed-out
   })
 })
 

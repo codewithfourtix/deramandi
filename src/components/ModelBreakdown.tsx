@@ -52,7 +52,10 @@ export function ModelBreakdown({ probabilities, perPhoto, grade }: { probabiliti
           trained: modelCard.trainImages.toLocaleString('en-US'),
           tested: modelCard.testImages.toLocaleString('en-US'),
           accuracy: Math.round(modelCard.testAccuracy * 100),
-        })}
+          low: Math.round(modelCard.testAccuracyWilson95[0] * 100),
+          high: Math.round(modelCard.testAccuracyWilson95[1] * 100),
+        })}{' '}
+        {modelCard.includesDhakki ? t('model.cardDhakki') : t('model.cardNoDhakki')}
       </p>
     </div>
   )

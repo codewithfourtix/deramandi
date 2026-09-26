@@ -152,13 +152,19 @@ function median(xs: number[]) {
 }
 
 /*
-  Measured on all 3,004 dataset photos (ml/colour_stats.py): dried khajoor has
-  a median hue between about -108 and 26 degrees and brightness 0.11 to 0.51.
-  Well outside that (yellow/green, or very pale) the model is guessing about
-  something it never saw: fresh doka fruit, or a different crop.
+  The guard's thresholds come from the model card: ml/export.py measures the
+  fruit colours of the varieties the model was trained on (ml/colour_stats.py)
+  and adds a margin. For the shipped training set that is hue 38 and brightness
+  0.72, the fallback below. Retraining with Dhakki moves the guard to Dhakki's
+  real colours. Well outside the range (yellow/green, or very pale) the model is
+  guessing about something it never saw: fresh doka fruit, or a different crop.
 */
-function looksUnfamiliar(hue: number, val: number) {
-  return (hue > 38 && hue < 200) || val > 0.72
+const GUARD = (modelCard as { colourGuard?: { hueMax?: number; valMax?: number } }).colourGuard ?? {}
+const HUE_MAX = GUARD.hueMax ?? 38
+const VAL_MAX = GUARD.valMax ?? 0.72
+
+export function looksUnfamiliar(hue: number, val: number) {
+  return hue > HUE_MAX || val > VAL_MAX
 }
 
 export interface ModelGrade {
