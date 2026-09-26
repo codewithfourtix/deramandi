@@ -214,7 +214,12 @@
     "status": {
       "listed": "Listed",
       "reserved": "Request sent"
-    }
+    },
+    "delete": "Delete {{crop}} listing",
+    "confirm": "Delete this listing and its photos from this phone?",
+    "keep": "Keep it",
+    "confirmDelete": "Delete",
+    "deleted": "Listing deleted."
   },
   "footer": {
     "about": "How it works and what is real",

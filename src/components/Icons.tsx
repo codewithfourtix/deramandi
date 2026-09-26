@@ -71,3 +71,11 @@ export function PinIcon({ className = '' }: P) {
     </svg>
   )
 }
+
+export function TrashIcon({ className = '' }: P) {
+  return (
+    <svg viewBox="0 0 24 24" width="20" height="20" className={className} {...base}>
+      <path d="M4 7h16M9 7V4.5h6V7M6.5 7l1 13h9l1-13M10 11v6M14 11v6" />
+    </svg>
+  )
+}

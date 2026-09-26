@@ -52,3 +52,7 @@ export function newId(): string {
   const rand = Math.random().toString(36).slice(2, 7)
   return `${Date.now().toString(36)}${rand}`
 }
+
+export function removeListing(id: string) {
+  saveListings(loadListings().filter((l) => l.id !== id))
+}
