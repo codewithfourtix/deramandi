@@ -1,5 +1,16 @@
 import { useTranslation } from 'react-i18next'
 import { Link } from 'react-router'
+import modelCard from '../data/modelCard.json'
+
+const card = {
+  trained: modelCard.trainImages.toLocaleString('en-US'),
+  tested: modelCard.testImages.toLocaleString('en-US'),
+  accuracy: Math.round(modelCard.testAccuracy * 100),
+  low: Math.round(modelCard.testAccuracyWilson95[0] * 100),
+  high: Math.round(modelCard.testAccuracyWilson95[1] * 100),
+  baseline: Math.round(modelCard.majorityBaseline * 100),
+  unseenA: Math.round(modelCard.unseenVarietiesPredictedShare.A * 100),
+}
 
 function Section({ id, title, children }: { id: string; title: string; children: React.ReactNode }) {
   return (
@@ -45,10 +56,13 @@ export function About() {
       </Section>
 
       <Section id="about-grade" title={t('about.gradeTitle')}>
-        <p>{t('about.grade1')}</p>
+        <p>{t('about.grade1', card)}</p>
         <p className="rounded-md bg-date-wash px-3 py-2 font-bold">{t('about.grade2')}</p>
         <p>{t('about.grade3')}</p>
         <p className="text-soil-soft">{t('about.grade4')}</p>
+        <p className="text-[0.85rem] text-soil-soft">
+          {t('about.credit')}
+        </p>
       </Section>
 
       <Section id="about-lots" title={t('about.lotsTitle')}>

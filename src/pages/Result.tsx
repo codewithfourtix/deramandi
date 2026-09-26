@@ -2,6 +2,7 @@ import { useMemo, useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import { Link, useLocation, useNavigate, useParams } from 'react-router'
 import { GradeStamp } from '../components/GradeStamp'
+import { ModelBreakdown } from '../components/ModelBreakdown'
 import { CheckIcon, SnowIcon } from '../components/Icons'
 import { PriceLadder } from '../components/PriceLadder'
 import { Steps } from '../components/Steps'
@@ -100,8 +101,19 @@ function ResultView({ listing }: { listing: Listing }) {
           {t('result.confidence', { value: Math.round(listing.gradeConfidence * 100) })}
         </p>
 
-        <FactorList factors={listing.gradeFactors} />
-        <p className="mt-3 text-[0.95rem] text-soil-soft">{t('result.gradeNote')}</p>
+        {listing.gradeSource === 'model' && listing.gradeProbabilities ? (
+          <>
+            {listing.gradeUnfamiliar && <p className="mt-4 rounded-md bg-warn-wash px-3 py-2 font-bold text-warn">{t('model.unfamiliar')}</p>}
+            <ModelBreakdown probabilities={listing.gradeProbabilities} perPhoto={listing.gradePerPhoto} grade={listing.grade} />
+            <p className="mt-3 text-[0.95rem] text-soil-soft">{t('model.note')}</p>
+          </>
+        ) : (
+          <>
+            <FactorList factors={listing.gradeFactors} />
+            {listing.crop === 'dhakki_dates' && <p className="mt-3 rounded-md bg-warn-wash px-3 py-2 text-[0.95rem] text-warn">{t('model.fallback')}</p>}
+            <p className="mt-3 text-[0.95rem] text-soil-soft">{t('result.gradeNote')}</p>
+          </>
+        )}
       </section>
 
       {/* The "you are not being cheated" moment. */}

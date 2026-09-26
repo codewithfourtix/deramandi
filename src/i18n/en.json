@@ -241,14 +241,14 @@
     "steps3": "It lists buyers who take that crop, grade and quantity, and nearby storage and transport, with cold storage first for fruit.",
     "steps4": "The grower picks a buyer and sends a request.",
     "gradeTitle": "How the grade is worked out",
-    "grade1": "The grade is worked out on the phone from the photos. It looks at how much of the frame the crop fills, how close its colour is to ripe for that crop and how even it is, and how much of it shows dark spots, mould or unripe patches.",
-    "grade2": "It is a rule-based estimate, not a trained AI model. It has not been measured against graded lots, so treat it as a starting reference. The crop is checked in person at the storage hub before anything is shipped.",
-    "grade3": "If a photo is too dark, washed out, or does not show the crop, the app asks for a retake instead of guessing.",
-    "grade4": "The next step is a small image model trained on photos of graded Dhakki dates, dropped in behind the same grading step.",
+    "grade1": "For khajoor, the grade comes from an image model (MobileNetV2) trained on {{trained}} photos of graded Pakistani khajoor from a public dataset. On {{tested}} photos of the three-grade varieties that it had never seen, it gave the right grade {{accuracy}}% of the time (95% range {{low}} to {{high}}%). Always guessing the most common grade would score {{baseline}}%. On a khajoor variety it never trained on (Fasli Toto, all labelled Grade 1), it said A for {{unseenA}}% of them. It runs on the phone; photos are never uploaded.",
+    "grade2": "Its limits, plainly: the dataset shows Gajar, Kupro and Aseel khajoor, photographed one fruit at a time under a ring light. It has no Dhakki, and no piles photographed in a field, so accuracy on real field photos will be lower until Dhakki photos are added. Middle grade (B) is the hardest for it. The crop is still checked in person before anything is shipped.",
+    "grade3": "For melons, wheat, sugarcane and other crops there is no graded photo set yet, so the grade is a rule-based estimate from colour, size and visible spots, not a trained model. If a photo is too dark, washed out, or does not show the crop, the app asks for a retake instead of guessing.",
+    "grade4": "Next step: collect 100 to 300 graded Dhakki photos from D.I. Khan growers and retrain the same model on them.",
     "lotsTitle": "Small lots, export size",
     "lots1": "Dera Mandi's plan is to combine nearby lots of the same crop and grade until they reach the size an exporter buys. In this prototype, that shows as a note on the result screen when a lot is too small.",
     "realTitle": "What is real in this prototype",
-    "real1": "Real: the full listing flow, the photo checks and grading, price bands, matching by crop, grade, quantity and distance, requests, and history, in Urdu and English.",
+    "real1": "Real: the full listing flow, the trained khajoor grade model, photo checks, price bands, matching by crop, grade, quantity and distance, requests, and history, in Urdu and English.",
     "real2": "Sample: every buyer, store and transporter is an invented sample provider, not a real business. Prices are illustrative, not live mandi rates. A request is saved on the phone but does not reach anyone.",
     "real3": "Your listings and photos are kept only in this phone's browser. Nothing is uploaded.",
     "faqTitle": "Common questions",
@@ -259,6 +259,26 @@
     "faq3q": "Cold storage barely exists in D.I. Khan.",
     "faq3a": "True. Pooling demand from many growers is what makes shared storage worth building, and meanwhile the app routes toward existing cold hubs in Multan and Karachi.",
     "team": "Built for Imaginathon by Banao by The Four Musketeers.",
-    "cta": "List my crop"
+    "cta": "List my crop",
+    "credit": "Training data: Maitlo, A. K. et al., Date Fruit Dataset for Inspection and Grading, Mendeley Data, V3 (2023), doi:10.17632/s5zfvsw5kv.3, licensed CC BY 4.0. Only the original photos were used; duplicates were removed and photos were cropped and resized for training and for the in-app samples."
+  },
+  "model": {
+    "title": "What the grading model saw",
+    "photo": "Photo {{n}}",
+    "card": "Graded by an image model trained on {{trained}} graded Pakistani khajoor photos. On {{tested}} photos it had never seen, it gave the right grade {{accuracy}}% of the time. It has not been trained on Dhakki photos yet.",
+    "note": "The percentages are how sure the model is for these photos. The crop is still checked in person at the store before any sale.",
+    "fallback": "The grading model could not load, so this is a rough rule-based estimate. Connect to the internet once and grade again for the model's grade.",
+    "loading": "Loading the grading model (first time only)",
+    "unfamiliar": "These photos look different from the dried khajoor the model learned from (it may be fresh doka fruit, or another crop). Treat this grade with caution, and check the crop you picked."
+  },
+  "photosDates": {
+    "tip": "Photograph one khajoor at a time, from above, on a plain light cloth, in daylight. Add up to 3 different fruits.",
+    "samplesToggle": "No khajoor to hand? Use a sample photo",
+    "samplesNote": "Real photos from a public graded khajoor dataset (Mendeley, CC BY 4.0). The model never trained on these, so its grade may differ from the label.",
+    "sample": {
+      "g1": "Grade 1 sample",
+      "g2": "Grade 2 sample",
+      "g3": "Grade 3 sample"
+    }
   }
 }
