@@ -10,7 +10,8 @@ a random cloth (colour, weave, noise), at a random phone-like size, JPEG
 compressed, and cut out with the same rule as the app: distance from the
 border colour >= 44, largest object, 18% margin, padded square.
 
-Only the training split is used; test kernels stay untouched.
+Training crops come from training kernels only. SPLIT=test builds a separate
+held-out set in the app's crop style from test kernels, for evaluation only.
 """
 import glob
 import io
@@ -25,11 +26,13 @@ from make_wheat_handfuls import cutout
 
 HERE = os.path.dirname(os.path.abspath(__file__))
 DATA = os.environ.get("DERAMANDI_DATA", os.path.join(HERE, "..", "..", "data"))
-SRC = os.path.join(DATA, "wheat_views", "train")
-DST = os.path.join(DATA, "wheat_appcrops", "train")
+# SPLIT=test makes a held-out app-style test set from test kernels (never used for training)
+SPLIT = os.environ.get("SPLIT", "train")
+SRC = os.path.join(DATA, "wheat_views", SPLIT)
+DST = os.path.join(DATA, "wheat_appcrops", SPLIT)
 THRESHOLD, MARGIN, OUT = 44, 0.18, 184
-rng = random.Random(21)
-nrng = np.random.default_rng(21)
+rng = random.Random(21 if SPLIT == "train" else 99)
+nrng = np.random.default_rng(21 if SPLIT == "train" else 99)
 
 
 def cloth(w, h):

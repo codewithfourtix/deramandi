@@ -104,6 +104,15 @@ function trim(buf: AudioBuffer) {
   return { start: Math.max(0, a - pad) / buf.sampleRate, end: Math.min(data.length, b + pad) / buf.sampleRate }
 }
 
+/** Resolves true once audio is actually running (or false after a short wait). */
+function running(c: AudioContext): Promise<boolean> {
+  if (c.state === 'running') return Promise.resolve(true)
+  return Promise.race([
+    c.resume().then(() => (c.state as AudioContextState) === 'running').catch(() => false),
+    new Promise<boolean>((r) => window.setTimeout(() => r((c.state as AudioContextState) === 'running'), 1200)),
+  ])
+}
+
 export function stopSpeaking() {
   token++
   pending = null
@@ -143,8 +152,13 @@ export function speak(segs: Seg[]) {
       }
     }
     set({ speaking: true })
-    Promise.all(keys.map((k) => clip(CLIPS[k]))).then((parts) => {
+    Promise.all([Promise.all(keys.map((k) => clip(CLIPS[k]))), running(c)]).then(([parts, ok]) => {
       if (my !== token) return
+      if (!ok) {
+        // the browser kept sound blocked: keep the line for the next touch instead of pretending to speak
+        pending = segs
+        return set({ speaking: false })
+      }
       if (parts.some((p) => !p)) return speakWithEngine(segs, lang, my) // offline and never heard: use the phone
       let at = c.currentTime + 0.05
       parts.forEach((p, i) => {
@@ -159,6 +173,8 @@ export function speak(segs: Seg[]) {
         at += next && (next.startsWith('n.') || keys[i].startsWith('n.')) ? 0.04 : 0.22
         if (i === parts.length - 1) src.onended = () => my === token && set({ speaking: false })
       })
+      // backstop in case onended never arrives (some WebViews)
+      window.setTimeout(() => my === token && set({ speaking: false }), (at - c.currentTime + 0.6) * 1000)
     })
     return
   }

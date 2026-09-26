@@ -583,6 +583,15 @@
     "limits_wheat": "It learned from close-up scanner photos of single kernels. A phone photo of a handful is coarser, and accuracy on phone photos has not been measured yet.",
     "limits_sugarcane": "It learned from Louisiana cane varieties photographed on a dark background, and it only knows good or damaged. Local varieties and a sugar test at the mill are not covered.",
     "limits_kulachi_melon": "No graded melon photos exist in public, so it learned from mango, papaya, apple, tomato and Burmese grape. It has never been tested on a melon.",
-    "recallAll": "Per grade, over all {{n}} test photos (Aseel included):"
+    "recallAll": "Per grade, over all {{n}} test photos (Aseel included):",
+    "headlineProxy": "right on {{n}} test photos of other graded fruit (never tested on melon)"
+  },
+  "offlineModels": {
+    "title": "Ready for offline",
+    "body": "Khajoor grading already works without internet. Download the wheat, sugarcane and melon models too ({{mb}} MB) so every crop grades offline.",
+    "button": "Download all models",
+    "busy": "Downloading {{done}} of {{total}}…",
+    "done": "All crop models are on this phone.",
+    "failed": "Download stopped. Check the internet and try again."
   }
 }

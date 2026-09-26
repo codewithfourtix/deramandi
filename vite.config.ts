@@ -35,9 +35,20 @@ export default defineConfig({
       },
       workbox: {
         globPatterns: ['**/*.{js,css,html,svg,png,woff2,jpg,json,bin,mp3}'],
-        globIgnores: ['__parity/**'],
+        // Installed up front: the app, the khajoor model and the Urdu voice clips.
+        // The wheat, sugarcane and melon models (11 MB) are cached the first time they
+        // are used, or all at once from Settings > "Ready for offline".
+        globIgnores: ['__parity*/**', 'models/**'],
         maximumFileSizeToCacheInBytes: 8 * 1024 * 1024,
         navigateFallback: '/index.html',
+        navigateFallbackDenylist: [/^\/api\//, /^\/models\//],
+        runtimeCaching: [
+          {
+            urlPattern: ({ url }) => url.pathname.startsWith('/models/'),
+            handler: 'CacheFirst',
+            options: { cacheName: 'crop-models', expiration: { maxEntries: 40 } },
+          },
+        ],
       },
     }),
   ],

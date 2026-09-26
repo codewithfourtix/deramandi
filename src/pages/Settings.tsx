@@ -4,6 +4,7 @@ import { setVoice } from '../components/Voice'
 import { FarmerForm } from '../components/FarmerPicker'
 import { TrashIcon } from '../components/Icons'
 import { listingsCsv } from '../lib/csv'
+import { cropModelsMB, downloadAllModels } from '../lib/offlineModels'
 import { promptInstall, useInstallState } from '../lib/pwa'
 import { DEMO_NUMBER_DISPLAY, updateSettings, useSettings } from '../lib/settings'
 import { downloadFile } from '../lib/share'
@@ -30,6 +31,7 @@ export function Settings() {
   const fileRef = useRef<HTMLInputElement>(null)
   const [note, setNote] = useState<string | null>(null)
   const [confirmFarmer, setConfirmFarmer] = useState<string | null>(null)
+  const [models, setModels] = useState<{ state: 'idle' | 'busy' | 'done' | 'failed'; done: number; total: number }>({ state: 'idle', done: 0, total: 0 })
   const stamp = new Date().toISOString().slice(0, 10)
 
   async function restore(e: ChangeEvent<HTMLInputElement>) {
@@ -148,6 +150,34 @@ export function Settings() {
         </div>
         <p aria-live="polite" className="mt-2 font-bold text-indus">
           {note}
+        </p>
+      </section>
+
+      <section className="mt-8" aria-labelledby="offline-title">
+        <h2 id="offline-title" className="display text-xl">
+          {t('offlineModels.title')}
+        </h2>
+        <p className="mt-1 text-soil-soft">{t('offlineModels.body', { mb: cropModelsMB() })}</p>
+        <button
+          type="button"
+          className="btn btn-quiet mt-3"
+          disabled={models.state === 'busy'}
+          onClick={async () => {
+            setModels({ state: 'busy', done: 0, total: 0 })
+            try {
+              await downloadAllModels((done, total) => setModels({ state: 'busy', done, total }))
+              setModels((m) => ({ ...m, state: 'done' }))
+            } catch {
+              setModels((m) => ({ ...m, state: 'failed' }))
+            }
+          }}
+        >
+          {t('offlineModels.button')}
+        </button>
+        <p aria-live="polite" className="mt-2 font-bold text-indus">
+          {models.state === 'busy' && t('offlineModels.busy', { done: models.done, total: models.total })}
+          {models.state === 'done' && t('offlineModels.done')}
+          {models.state === 'failed' && <span className="text-warn">{t('offlineModels.failed')}</span>}
         </p>
       </section>
 

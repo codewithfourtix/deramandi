@@ -43,7 +43,7 @@ function Recall({ rows, note }: { rows: Row[]; note?: string }) {
   )
 }
 
-function Block({ crop, name, acc, ci, n, baseline, trained, dataset, citation, licence, rows, extra, recallNote }: {
+function Block({ crop, name, acc, ci, n, baseline, trained, dataset, citation, licence, rows, extra, recallNote, headlineKey = 'accuracy.headline' }: {
   crop: CropId
   name: string
   acc: number
@@ -57,6 +57,7 @@ function Block({ crop, name, acc, ci, n, baseline, trained, dataset, citation, l
   rows: Row[]
   extra?: string
   recallNote?: string
+  headlineKey?: string
 }) {
   const { t } = useTranslation()
   return (
@@ -69,7 +70,7 @@ function Block({ crop, name, acc, ci, n, baseline, trained, dataset, citation, l
         <strong className="num display text-[2rem] text-indus">
           <Num value={`${pct(acc)}%`} />
         </strong>{' '}
-        {t('accuracy.headline', { n: n.toLocaleString('en-US') })}
+        {t(headlineKey, { n: n.toLocaleString('en-US') })}
       </p>
       <p className="text-soil-soft">
         {t('accuracy.range', { low: pct(ci[0]), high: pct(ci[1]) })} {t('accuracy.baseline', { b: pct(baseline) })}
@@ -151,6 +152,7 @@ export function Accuracy() {
             licence={c.licence}
             rows={cropRows(c, t)}
             extra={extra}
+            headlineKey={c.task === 'grade3_proxy' ? 'accuracy.headlineProxy' : undefined}
           />
         )
       })}
