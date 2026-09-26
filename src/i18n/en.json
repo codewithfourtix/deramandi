@@ -284,5 +284,38 @@
       "g2": "Grade 2 sample",
       "g3": "Grade 3 sample"
     }
+  },
+  "share": {
+    "title": "Certificate and WhatsApp Status",
+    "lede": "Show buyers the grade. The certificate is a PDF with the photo, grade, fair price and how the grade was made.",
+    "pdf": "Grade certificate (PDF)",
+    "status": "WhatsApp Status image",
+    "making": "Preparing",
+    "pdfText": "Dera Mandi grade certificate",
+    "statusText": "Graded by Dera Mandi",
+    "pdfShared": "Certificate shared.",
+    "pdfDownloaded": "Certificate saved to your downloads.",
+    "statusShared": "Status image shared. In WhatsApp, choose My status.",
+    "statusDownloaded": "Status image saved. Open WhatsApp, tap Status, and pick it from your gallery.",
+    "failed": "Could not make the file. Try again."
+  },
+  "demo": {
+    "label": "Demo:",
+    "hint": "send the request on WhatsApp to {{number}}",
+    "send": "Send request on WhatsApp",
+    "sentTo": "Sent as a demo request on WhatsApp to {{number}}.",
+    "openAgain": "Open WhatsApp again"
+  },
+  "check": {
+    "title": "Certificate details",
+    "invalid": "This link does not contain certificate details. Scan the QR code on the certificate again.",
+    "reference": "Reference",
+    "date": "Issued",
+    "model": "Graded by the Dera Mandi khajoor model, which gave the right grade {{accuracy}} of the time on {{tested}} photos it had never seen.",
+    "rules": "Graded by a rule-based photo estimate. Its accuracy has not been measured.",
+    "notProof": "This page shows what the certificate says. It is not proof on its own: anyone can make such a link. Check the reference code matches the paper, and inspect the crop in person."
+  },
+  "lot": {
+    "title": "Whole lot"
   }
 }

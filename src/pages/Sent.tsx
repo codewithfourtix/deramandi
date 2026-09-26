@@ -1,10 +1,13 @@
 import { useTranslation } from 'react-i18next'
 import { Link, Navigate, useParams } from 'react-router'
 import { GradeStamp } from '../components/GradeStamp'
-import { CheckIcon } from '../components/Icons'
+import { CheckIcon, WhatsAppIcon } from '../components/Icons'
+import { ShareActions } from '../components/ShareActions'
 import { Num, Price } from '../components/Price'
 import { findBuyer, findLogistics } from '../lib/match'
-import { getListing } from '../lib/storage'
+import { DEMO_NUMBER, DEMO_NUMBER_DISPLAY } from '../lib/settings'
+import { requestMessage, whatsappUrl } from '../lib/share'
+import { getFarmer, getListing } from '../lib/storage'
 
 export function Sent() {
   const { id = '' } = useParams()
@@ -64,7 +67,26 @@ export function Sent() {
         </dl>
       </section>
 
-      <p className="mt-4 text-[0.95rem] text-soil-soft">{t('sent.demoNote')}</p>
+      {listing.sentVia === 'whatsapp-demo' ? (
+        <div className="mt-4 rounded-md bg-field-wash px-3 py-3 text-field">
+          <p className="font-bold">{t('demo.sentTo', { number: DEMO_NUMBER_DISPLAY })}</p>
+          <a
+            className="btn btn-quiet mt-2 w-full sm:w-auto"
+            href={whatsappUrl(DEMO_NUMBER, requestMessage({ listing, buyer, logistics, farmer: getFarmer(listing.farmerId), demo: true }))}
+            target="_blank"
+            rel="noopener noreferrer"
+          >
+            <WhatsAppIcon />
+            {t('demo.openAgain')}
+          </a>
+        </div>
+      ) : (
+        <p className="mt-4 text-[0.95rem] text-soil-soft">{t('sent.demoNote')}</p>
+      )}
+
+      <div className="mt-6">
+        <ShareActions listing={listing} />
+      </div>
 
       <div className="mt-8 grid gap-3 sm:grid-cols-2">
         <Link to="/listings" className="btn btn-primary">

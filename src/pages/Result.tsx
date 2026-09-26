@@ -3,14 +3,17 @@ import { useTranslation } from 'react-i18next'
 import { Link, useLocation, useNavigate, useParams } from 'react-router'
 import { GradeStamp } from '../components/GradeStamp'
 import { ModelBreakdown } from '../components/ModelBreakdown'
-import { CheckIcon, SnowIcon } from '../components/Icons'
+import { CheckIcon, SnowIcon, WhatsAppIcon } from '../components/Icons'
+import { ShareActions } from '../components/ShareActions'
 import { PriceLadder } from '../components/PriceLadder'
 import { Steps } from '../components/Steps'
 import { cropInfo } from '../data'
 import { GRADE_COLOR } from '../lib/format'
 import { Money, Num, Price, PriceStack } from '../components/Price'
-import { matchBuyers, matchLogistics } from '../lib/match'
-import { getListing, updateListing } from '../lib/storage'
+import { findBuyer, findLogistics, matchBuyers, matchLogistics } from '../lib/match'
+import { DEMO_NUMBER, DEMO_NUMBER_DISPLAY, updateSettings, useSettings } from '../lib/settings'
+import { requestMessage, whatsappUrl } from '../lib/share'
+import { getFarmer, getListing, updateListing } from '../lib/storage'
 import type { FactorLevel, GradeFactors, Listing } from '../types'
 
 const NO_LOGISTICS = 'none'
@@ -47,6 +50,7 @@ function ResultView({ listing }: { listing: Listing }) {
   const [buyerId, setBuyerId] = useState<string | undefined>(listing.reservedBuyerId)
   const [logisticsId, setLogisticsId] = useState<string>(listing.reservedLogisticsId ?? '')
   const [sending, setSending] = useState(false)
+  const settings = useSettings()
 
   const cropName = t(`crops.${listing.crop}`)
   const exporterGap = tooSmallFor.find((m) => m.buyer.type === 'exporter') ?? tooSmallFor[0]
@@ -54,12 +58,18 @@ function ResultView({ listing }: { listing: Listing }) {
   function send() {
     if (!buyerId || reserved) return
     setSending(true)
-    updateListing(listing.id, {
+    const updated = updateListing(listing.id, {
       status: 'reserved',
       reservedBuyerId: buyerId,
       reservedLogisticsId: logisticsId && logisticsId !== NO_LOGISTICS ? logisticsId : undefined,
       reservedAt: new Date().toISOString(),
+      sentVia: settings.demoMode ? 'whatsapp-demo' : 'saved',
     })
+    if (settings.demoMode && updated) {
+      // Buyers are sample data, so the demo request goes to the demo WhatsApp number.
+      const message = requestMessage({ listing: updated, buyer: findBuyer(buyerId), logistics: findLogistics(updated.reservedLogisticsId), farmer: getFarmer(updated.farmerId), demo: true })
+      window.open(whatsappUrl(DEMO_NUMBER, message), '_blank', 'noopener')
+    }
     navigate(`/listing/${listing.id}/sent`)
   }
 
@@ -114,6 +124,10 @@ function ResultView({ listing }: { listing: Listing }) {
           </>
         )}
       </section>
+
+      <div className="mt-8">
+        <ShareActions listing={listing} />
+      </div>
 
       {/* The "you are not being cheated" moment. */}
       <section className="mt-10 border-t-2 border-soil pt-5" aria-labelledby="price-title">
@@ -267,9 +281,23 @@ function ResultView({ listing }: { listing: Listing }) {
       {!reserved && matches.length > 0 && (
         <div className="fixed inset-x-0 bottom-0 z-20 border-t-2 border-soil bg-paper px-4 pb-[max(0.75rem,env(safe-area-inset-bottom))] pt-3">
           <div className="mx-auto max-w-2xl">
+            <label className="mb-2 flex min-h-11 cursor-pointer items-center gap-3 text-[0.95rem]">
+              <input
+                id="demo-mode"
+                type="checkbox"
+                role="switch"
+                checked={settings.demoMode}
+                onChange={(e) => updateSettings({ demoMode: e.target.checked })}
+                className="h-5 w-5 shrink-0 accent-[var(--color-date-deep)]"
+              />
+              <span>
+                <strong>{t('demo.label')}</strong> {t('demo.hint', { number: DEMO_NUMBER_DISPLAY })}
+              </span>
+            </label>
             {!buyerId && <p className="mb-2 text-center text-[0.95rem] text-soil-soft">{t('result.sendHint')}</p>}
             <button type="button" className="btn btn-primary w-full" disabled={!buyerId || sending} onClick={send}>
-              {sending ? t('result.sending') : t('result.send')}
+              {settings.demoMode && <WhatsAppIcon />}
+              {sending ? t('result.sending') : settings.demoMode ? t('demo.send') : t('result.send')}
             </button>
           </div>
         </div>

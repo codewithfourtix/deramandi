@@ -45,6 +45,10 @@ export interface Listing {
   gradeProbabilities?: Record<Grade, number>
   gradePerPhoto?: Grade[]
   gradeUnfamiliar?: boolean
+  /** Measured from the photo(s), e.g. { key: 'darkArea', value: '6%' }. Labels come from i18n specs.<key>. */
+  specs?: { key: string; value: string }[]
+  /** Whole-lot grading: how many photos came out A, B and C. */
+  lotCounts?: [number, number, number]
   priceMin: number // PKR per kg
   priceMax: number
   referencePrice: number
@@ -52,6 +56,8 @@ export interface Listing {
   reservedBuyerId?: string
   reservedLogisticsId?: string
   reservedAt?: string
+  /** How the request left the phone. */
+  sentVia?: 'whatsapp-demo' | 'saved'
   createdAt: string
 }
 

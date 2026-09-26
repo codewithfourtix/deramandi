@@ -19,3 +19,8 @@ export const GRADE_COLOR: Record<Grade, string> = {
   B: 'var(--color-date-deep)',
   C: 'var(--color-warn)',
 }
+
+/** Keep numbers and ranges left-to-right inside Urdu text drawn on canvas or sent as plain text. */
+export function ltr(value: string | number) {
+  return `⁦${value}⁩`
+}
