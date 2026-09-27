@@ -595,5 +595,9 @@
     "busy": "Downloading {{done}} of {{total}}…",
     "done": "All crop models are on this phone.",
     "failed": "Download stopped. Check the internet and try again."
+  },
+  "update": {
+    "ready": "A new version of Dera Mandi is ready.",
+    "reload": "Reload"
   }
 }

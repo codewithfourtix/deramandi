@@ -60,3 +60,37 @@ export async function promptInstall() {
   notify()
   return outcome === 'accepted'
 }
+
+/*
+  New versions: the service worker installs a new build in the background and
+  takes over (skipWaiting + clientsClaim). The generated register script never
+  reloads, so the page kept showing the old build until the app was closed and
+  reopened. Now: on takeover, reload at once on a quiet screen; in the middle
+  of listing a crop, show an "update ready" bar instead so nothing is lost.
+*/
+let updateReady = false
+const BUSY = ['/list', '/list/photos']
+
+export function watchForUpdates() {
+  if (typeof navigator === 'undefined' || !('serviceWorker' in navigator)) return
+  const hadController = Boolean(navigator.serviceWorker.controller)
+  let handled = false
+  navigator.serviceWorker.addEventListener('controllerchange', () => {
+    if (!hadController || handled) return // first install: the page is already current
+    handled = true
+    if (BUSY.includes(location.pathname)) {
+      updateReady = true
+      notify()
+    } else {
+      location.reload()
+    }
+  })
+  // Phones keep the app open for days: look for a new build whenever it comes back.
+  const check = () => navigator.serviceWorker.getRegistration().then((r) => r?.update()).catch(() => {})
+  document.addEventListener('visibilitychange', () => document.visibilityState === 'visible' && check())
+  window.setInterval(check, 30 * 60 * 1000)
+}
+
+export function useUpdateReady() {
+  return useSyncExternalStore(subscribe, () => updateReady, () => false)
+}

@@ -2,7 +2,7 @@ import { useEffect } from 'react'
 import { useTranslation } from 'react-i18next'
 import { Link, NavLink, Outlet, useLocation, useMatch } from 'react-router'
 import { refreshLive } from '../lib/prices'
-import { useOnline } from '../lib/pwa'
+import { useOnline, useUpdateReady } from '../lib/pwa'
 import { useSettings } from '../lib/settings'
 import { LanguageToggle } from './LanguageToggle'
 import { VoiceGuide, VoiceToggle } from './Voice'
@@ -27,6 +27,7 @@ export function Layout() {
   // The result screen has a fixed send bar; leave room so it never hides the footer.
   const hasSendBar = Boolean(useMatch('/listing/:id'))
   const online = useOnline()
+  const updateReady = useUpdateReady()
   const { largeText } = useSettings()
 
   // Large text: every size is in rem, so one root size scales the whole app.
@@ -75,6 +76,14 @@ export function Layout() {
           </nav>
         </div>
       </header>
+      {updateReady && (
+        <div role="status" className="flex items-center justify-center gap-3 bg-indus px-4 py-2 text-[0.95rem] text-paper">
+          <span>{t('update.ready')}</span>
+          <button type="button" onClick={() => location.reload()} className="min-h-11 rounded-md border-2 border-paper px-3 font-bold">
+            {t('update.reload')}
+          </button>
+        </div>
+      )}
       {!online && (
         <p role="status" className="m-0 bg-soil px-4 py-2 text-center text-[0.95rem] text-paper">
           {t('offline.banner')}
