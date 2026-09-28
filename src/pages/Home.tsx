@@ -105,9 +105,6 @@ export function Home() {
 
       <section className="mt-10 border-t border-line pt-6">
         <p className="text-[1rem] leading-relaxed text-soil-soft">{t('home.why')}</p>
-        <Link to="/about" className="mt-2 inline-flex min-h-11 items-center font-bold text-indus underline underline-offset-4">
-          {t('footer.about')}
-        </Link>
       </section>
     </div>
   )

@@ -96,9 +96,6 @@ export function Layout() {
       <footer className="border-t border-line">
         <div className={`mx-auto max-w-2xl px-4 pt-5 text-[0.9rem] text-soil-soft ${hasSendBar ? 'pb-36' : 'pb-8'}`}>
           <div className="flex flex-wrap gap-x-5">
-            <Link to="/about" className="inline-flex min-h-11 items-center font-bold text-indus underline underline-offset-4">
-              {t('footer.about')}
-            </Link>
             <Link to="/prices" className="inline-flex min-h-11 items-center font-bold text-indus underline underline-offset-4">
               {t('rates.title')}
             </Link>
