@@ -99,9 +99,6 @@ export function Layout() {
             <Link to="/prices" className="inline-flex min-h-11 items-center font-bold text-indus underline underline-offset-4">
               {t('rates.title')}
             </Link>
-            <Link to="/accuracy" className="inline-flex min-h-11 items-center font-bold text-indus underline underline-offset-4">
-              {t('footerLinks.accuracy')}
-            </Link>
             <Link to="/settings" className="inline-flex min-h-11 items-center font-bold text-indus underline underline-offset-4">
               {t('footerLinks.settings')}
             </Link>
